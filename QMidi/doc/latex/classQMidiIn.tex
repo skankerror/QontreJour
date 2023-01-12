@@ -1,0 +1,62 @@
+\hypertarget{classQMidiIn}{}\doxysection{QMidi\+In Class Reference}
+\label{classQMidiIn}\index{QMidiIn@{QMidiIn}}
+Inheritance diagram for QMidi\+In\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classQMidiIn}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Slots}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classQMidiIn_a3a26a9adabb737e1b64bee75fa18865d}\label{classQMidiIn_a3a26a9adabb737e1b64bee75fa18865d}} 
+void {\bfseries connect\+Midi\+In} (int t\+\_\+port\+Number)
+\item 
+\mbox{\Hypertarget{classQMidiIn_a8b0a851bf27ec6ac778fb243be7b01f1}\label{classQMidiIn_a8b0a851bf27ec6ac778fb243be7b01f1}} 
+void {\bfseries connect\+Midi\+In} (QString \&t\+\_\+port\+Name)
+\item 
+\mbox{\Hypertarget{classQMidiIn_aeaf22103c1340be5642121d0d52db261}\label{classQMidiIn_aeaf22103c1340be5642121d0d52db261}} 
+void {\bfseries connect\+Virtual\+Midi\+In} ()
+\item 
+\mbox{\Hypertarget{classQMidiIn_ac473f4fb7bfe016201c11a5d0e809341}\label{classQMidiIn_ac473f4fb7bfe016201c11a5d0e809341}} 
+void {\bfseries disconnect\+Midi\+In} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classQMidiIn_a4930318591da64175476d22afea0a139}\label{classQMidiIn_a4930318591da64175476d22afea0a139}} 
+void {\bfseries sig\+Recieve\+Message} (\mbox{\hyperlink{classQMidiMessage}{QMidi\+Message}} $\ast$)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classQMidiIn_a9cf53e0e44a7748818e9e616ec2dc8bb}\label{classQMidiIn_a9cf53e0e44a7748818e9e616ec2dc8bb}} 
+{\bfseries QMidi\+In} (QObject $\ast$parent=nullptr, \mbox{\hyperlink{qmidi_8h_aff30caf48e0efcb42494fa073cb42b46}{QMidi\+Api}} t\+\_\+api=\mbox{\hyperlink{qmidi_8h_aff30caf48e0efcb42494fa073cb42b46acc954a08ca8b8a001f1f48e5b2c34603}{Q\+\_\+\+UNSPECIFIED}}, const QString \&t\+\_\+client\+Name=MIDI\+\_\+\+IN\+\_\+\+CLIENT\+\_\+\+DEFAULT\+\_\+\+NAME, unsigned int t\+\_\+queue\+Size\+Limit=QUEUE\+\_\+\+SIZE\+\_\+\+LIMIT)
+\item 
+\mbox{\Hypertarget{classQMidiIn_a3bcb2abc7239c23f3c655b80011c73a4}\label{classQMidiIn_a3bcb2abc7239c23f3c655b80011c73a4}} 
+int {\bfseries port\+Count} ()
+\item 
+\mbox{\Hypertarget{classQMidiIn_a8ab07c3861e7b96d015d257e444afd6e}\label{classQMidiIn_a8ab07c3861e7b96d015d257e444afd6e}} 
+QString\+List {\bfseries port\+Names} ()
+\item 
+\mbox{\Hypertarget{classQMidiIn_a3939a72c02423fcac69f068291383549}\label{classQMidiIn_a3939a72c02423fcac69f068291383549}} 
+bool {\bfseries is\+Midi\+Port\+Open} () const
+\item 
+\mbox{\Hypertarget{classQMidiIn_aff6658fec0a5479a36950eb4ea72566e}\label{classQMidiIn_aff6658fec0a5479a36950eb4ea72566e}} 
+bool {\bfseries is\+Ignore\+Sysex} () const
+\item 
+\mbox{\Hypertarget{classQMidiIn_ae0e9d29dd63a3be0e1035255a0fdb8be}\label{classQMidiIn_ae0e9d29dd63a3be0e1035255a0fdb8be}} 
+bool {\bfseries is\+Ignore\+Time} () const
+\item 
+\mbox{\Hypertarget{classQMidiIn_a36b897cbeeee345c483953718c8d5b6b}\label{classQMidiIn_a36b897cbeeee345c483953718c8d5b6b}} 
+bool {\bfseries is\+Ignore\+Sense} () const
+\item 
+\mbox{\Hypertarget{classQMidiIn_a9d6f1724a1fdb6726bf8e2a3d4f79979}\label{classQMidiIn_a9d6f1724a1fdb6726bf8e2a3d4f79979}} 
+void {\bfseries set\+Ignored\+Types} (bool t\+\_\+ignore\+Sysex, bool t\+\_\+ignore\+Time, bool t\+\_\+ignore\+Sense)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+qmidiin.\+h\item 
+qmidiin.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,119 @@
+\hypertarget{qmidiout_8h_source}{}\doxysection{qmidiout.\+h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ * (c) 2021 Michaël Creusy -\/-\/ creusy(.)michael(@)gmail(.)com}}
+\DoxyCodeLine{3 \textcolor{comment}{ *}}
+\DoxyCodeLine{4 \textcolor{comment}{ * This program is free software: you can redistribute it and/or modify}}
+\DoxyCodeLine{5 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}}
+\DoxyCodeLine{6 \textcolor{comment}{ * the Free Software Foundation, either version 3 of the License, or}}
+\DoxyCodeLine{7 \textcolor{comment}{ * (at your option) any later version.}}
+\DoxyCodeLine{8 \textcolor{comment}{ *}}
+\DoxyCodeLine{9 \textcolor{comment}{ * This program is distributed in the hope that it will be useful,}}
+\DoxyCodeLine{10 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}}
+\DoxyCodeLine{11 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}}
+\DoxyCodeLine{12 \textcolor{comment}{ * GNU General Public License for more details.}}
+\DoxyCodeLine{13 \textcolor{comment}{ *}}
+\DoxyCodeLine{14 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}}
+\DoxyCodeLine{15 \textcolor{comment}{ * along with this program.  If not, see <http://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{16 \textcolor{comment}{ */}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#ifndef QMIDIOUT\_H}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#define QMIDIOUT\_H}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#include <QObject>}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#include <QStringList>}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#include "{}RtMidi/RtMidi.h"{}}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{qmidi_8h}{qmidi.h}}"{}}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#include "{}qmidimessage.h"{}}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 \textcolor{keyword}{class }\mbox{\hyperlink{classQMidiOut}{QMidiOut}} :}
+\DoxyCodeLine{28     \textcolor{keyword}{public} QObject\textcolor{comment}{/*,}}
+\DoxyCodeLine{29 \textcolor{comment}{    private RtMidiOut*/}}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32   Q\_OBJECT}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{public}:}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36   \mbox{\hyperlink{classQMidiOut}{QMidiOut}}(QObject *parent = \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{37            \mbox{\hyperlink{qmidi_8h_aff30caf48e0efcb42494fa073cb42b46}{QMidiApi}} t\_api = \mbox{\hyperlink{qmidi_8h_aff30caf48e0efcb42494fa073cb42b46acc954a08ca8b8a001f1f48e5b2c34603}{Q\_UNSPECIFIED}},}
+\DoxyCodeLine{38            \textcolor{keyword}{const} QString \&t\_clientName = MIDI\_OUT\_CLIENT\_DEFAULT\_NAME);}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40   \mbox{\hyperlink{classQMidiOut}{\string~QMidiOut}}();}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42   \textcolor{keywordtype}{int} portCount();}
+\DoxyCodeLine{43   QStringList portNames();}
+\DoxyCodeLine{44   \textcolor{keywordtype}{bool} isMidiPortOpen()\{ \textcolor{keywordflow}{return} m\_isPortOpen; \};}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46   \textcolor{comment}{// send Channel Voice messages}}
+\DoxyCodeLine{47   \textcolor{keywordtype}{void} sendNoteOn(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{48                   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_pitch,}
+\DoxyCodeLine{49                   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_velocity = DEFAULT\_VELOCITY);}
+\DoxyCodeLine{50   \textcolor{keywordtype}{void} sendNoteOff(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{51                    \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_pitch,}
+\DoxyCodeLine{52                    \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_velocity = 0);}
+\DoxyCodeLine{53   \textcolor{keywordtype}{void} sendProgChange(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{54                       \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_progID);}
+\DoxyCodeLine{55   \textcolor{keywordtype}{void} sendPitchBend(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{56                      QPair<unsigned int, unsigned int> t\_pitchBend);}
+\DoxyCodeLine{57   \textcolor{keywordtype}{void} sendAftertouch(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{58                       \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_pressure);}
+\DoxyCodeLine{59   \textcolor{keywordtype}{void} sendPolyAftertouch(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{60                           \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_pitch,}
+\DoxyCodeLine{61                           \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_pressure);}
+\DoxyCodeLine{62   \textcolor{keywordtype}{void} sendControlChange(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{63                          \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_control,}
+\DoxyCodeLine{64                          \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_value);}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66   \textcolor{comment}{// send Channel Mode messages}}
+\DoxyCodeLine{67   \textcolor{keywordtype}{void} sendChannelModeReset(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{68   \textcolor{keywordtype}{void} sendLocalControlOn(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{69   \textcolor{keywordtype}{void} sendLocalControlOff(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{70   \textcolor{keywordtype}{void} sendAllNotesOff(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{71   \textcolor{keywordtype}{void} sendOmniOff(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{72   \textcolor{keywordtype}{void} sendOmniOn(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{73   \textcolor{keywordtype}{void} sendMonoOn(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel,}
+\DoxyCodeLine{74                   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channelNumber);}
+\DoxyCodeLine{75   \textcolor{keywordtype}{void} sendPolyOn(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_channel);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77   \textcolor{comment}{// send System real time messages}}
+\DoxyCodeLine{78   \textcolor{keywordtype}{void} sendMidiClock();}
+\DoxyCodeLine{79   \textcolor{keywordtype}{void} sendStart();}
+\DoxyCodeLine{80   \textcolor{keywordtype}{void} sendStop();}
+\DoxyCodeLine{81   \textcolor{keywordtype}{void} sendContinue();}
+\DoxyCodeLine{82   \textcolor{keywordtype}{void} sendActiveSensing();}
+\DoxyCodeLine{83   \textcolor{keywordtype}{void} sendSystemReset();}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85   \textcolor{comment}{// send system common messages}}
+\DoxyCodeLine{86   \textcolor{keywordtype}{void} sendSongPosPointer(QPair<unsigned int, unsigned int> t\_songPos);}
+\DoxyCodeLine{87   \textcolor{keywordtype}{void} sendSongSelect(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} t\_seqID);}
+\DoxyCodeLine{88   \textcolor{keywordtype}{void} sendTuneRequest();}
+\DoxyCodeLine{89 }
+\DoxyCodeLine{90   \textcolor{comment}{// send system exclusive messages}}
+\DoxyCodeLine{91   \textcolor{keywordtype}{void} sendSysEx(std::vector<unsigned char> *t\_sysExData);}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93 \textcolor{keyword}{public} slots:}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95   \textcolor{comment}{// connection slots}}
+\DoxyCodeLine{96   \textcolor{keywordtype}{void} connectMidiOut(\textcolor{keywordtype}{int} t\_portNumber);}
+\DoxyCodeLine{97   \textcolor{keywordtype}{void} connectMidiOut(QString \&t\_portName);}
+\DoxyCodeLine{98   \textcolor{keywordtype}{void} connectVirtualMidiOut();}
+\DoxyCodeLine{99   \textcolor{keywordtype}{void} disconnectMidiOut();}
+\DoxyCodeLine{100   \textcolor{comment}{// send messages}}
+\DoxyCodeLine{101   \textcolor{keywordtype}{void} sendQMidiMessage(\mbox{\hyperlink{classQMidiMessage}{QMidiMessage}} *t\_message);}
+\DoxyCodeLine{102   \textcolor{keywordtype}{void} sendRawMessage(std::vector<unsigned char> t\_rawMessage);}
+\DoxyCodeLine{103 }
+\DoxyCodeLine{104 \textcolor{keyword}{private}:}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106   RtMidiOut *m\_rtMidiOut;}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108   \textcolor{keyword}{const} \textcolor{keywordtype}{int} m\_currentID;}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110   \textcolor{keywordtype}{bool} m\_isPortOpen;}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112 \};}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// QMIDIOUT\_H}}
+
+\end{DoxyCode}

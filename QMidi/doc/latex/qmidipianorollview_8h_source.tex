@@ -1,0 +1,75 @@
+\hypertarget{qmidipianorollview_8h_source}{}\doxysection{qmidipianorollview.\+h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ * (c) 2021 Michaël Creusy -\/-\/ creusy(.)michael(@)gmail(.)com}}
+\DoxyCodeLine{3 \textcolor{comment}{ *}}
+\DoxyCodeLine{4 \textcolor{comment}{ * This program is free software: you can redistribute it and/or modify}}
+\DoxyCodeLine{5 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}}
+\DoxyCodeLine{6 \textcolor{comment}{ * the Free Software Foundation, either version 3 of the License, or}}
+\DoxyCodeLine{7 \textcolor{comment}{ * (at your option) any later version.}}
+\DoxyCodeLine{8 \textcolor{comment}{ *}}
+\DoxyCodeLine{9 \textcolor{comment}{ * This program is distributed in the hope that it will be useful,}}
+\DoxyCodeLine{10 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}}
+\DoxyCodeLine{11 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}}
+\DoxyCodeLine{12 \textcolor{comment}{ * GNU General Public License for more details.}}
+\DoxyCodeLine{13 \textcolor{comment}{ *}}
+\DoxyCodeLine{14 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}}
+\DoxyCodeLine{15 \textcolor{comment}{ * along with this program.  If not, see <http://www.gnu.org/licenses/>.}}
+\DoxyCodeLine{16 \textcolor{comment}{ */}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#ifndef QMIDIPIANOROLLVIEW\_H}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#define QMIDIPIANOROLLVIEW\_H}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#include <QGraphicsView>}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#include <QGraphicsScene>}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#include <QGraphicsRectItem>}}
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#include <QMouseEvent>}}
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#include "{}qmidimessage.h"{}}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 }
+\DoxyCodeLine{28 \textcolor{keyword}{class }\mbox{\hyperlink{classQMidiPianoRollView}{QMidiPianoRollView}} :}
+\DoxyCodeLine{29     \textcolor{keyword}{public} QGraphicsView}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32   Q\_OBJECT}
+\DoxyCodeLine{33 }
+\DoxyCodeLine{34 \textcolor{keyword}{public}:}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36   \textcolor{keyword}{explicit} \mbox{\hyperlink{classQMidiPianoRollView}{QMidiPianoRollView}}(QWidget *parent = \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{keyword}{protected}:}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40   \textcolor{keywordtype}{void} mousePressEvent(QMouseEvent *t\_event) \textcolor{keyword}{override};}
+\DoxyCodeLine{41   \textcolor{keywordtype}{void} mouseDoubleClickEvent(QMouseEvent *t\_event) \textcolor{keyword}{override};}
+\DoxyCodeLine{42   \textcolor{keywordtype}{void} mouseMoveEvent(QMouseEvent *t\_event) \textcolor{keyword}{override};}
+\DoxyCodeLine{43   \textcolor{keywordtype}{void} mouseReleaseEvent(QMouseEvent *t\_event) \textcolor{keyword}{override};}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45 \textcolor{keyword}{private}:}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47   \textcolor{keywordtype}{bool} isBlackKey(\textcolor{keywordtype}{int} t\_pitch);}
+\DoxyCodeLine{48   \textcolor{keywordtype}{bool} isBlackKey(QGraphicsRectItem *t\_item);}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 signals:}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52   \textcolor{keywordtype}{void} sigKeyPressed(\mbox{\hyperlink{classQMidiMessage}{QMidiMessage}} *);}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{public} slots:}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56   \textcolor{keywordtype}{void} onMidiReceive(\mbox{\hyperlink{classQMidiMessage}{QMidiMessage}} *t\_message);}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58 \textcolor{keyword}{private}:}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60   QGraphicsScene *m\_scene;}
+\DoxyCodeLine{61   \textcolor{keywordtype}{int} m\_keyWidth;}
+\DoxyCodeLine{62   \textcolor{keywordtype}{int} m\_keyHeight;}
+\DoxyCodeLine{63   QVector<QGraphicsRectItem *> m\_keys;}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65   \textcolor{keywordtype}{bool} m\_isKeyClicked = \textcolor{keyword}{false};}
+\DoxyCodeLine{66   QGraphicsRectItem *m\_keyClicked = \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68 \};}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// QMIDIPIANOROLLVIEW\_H}}
+
+\end{DoxyCode}

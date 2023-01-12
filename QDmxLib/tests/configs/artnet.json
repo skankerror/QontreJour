@@ -1,0 +1,6 @@
+{
+    "enabled": true,
+    "long_name": "QDmxLib - ArtNet Driver",
+    "short_name": "QDmxLib",
+    "style": "controller"
+}

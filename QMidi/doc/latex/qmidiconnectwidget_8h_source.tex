@@ -1,0 +1,64 @@
+\hypertarget{qmidiconnectwidget_8h_source}{}\doxysection{qmidiconnectwidget.\+h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef QMIDICONNECTWIDGET\_H}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define QMIDICONNECTWIDGET\_H}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <QPushButton>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <QWidget>}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#include "{}qmidiin.h"{}}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}qmidiout.h"{}}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{comment}{// créer 3 classes pour les 3 types de boutons}}
+\DoxyCodeLine{10 \textcolor{comment}{// héritées de qpushbutton}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{keyword}{class }\mbox{\hyperlink{classQMidiConnectInWidget}{QMidiConnectInWidget}} :}
+\DoxyCodeLine{13     \textcolor{keyword}{public} QWidget}
+\DoxyCodeLine{14 \{}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16   Q\_OBJECT}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 public :}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20   \textcolor{keyword}{explicit} \mbox{\hyperlink{classQMidiConnectInWidget}{QMidiConnectInWidget}}(\mbox{\hyperlink{classQMidiIn}{QMidiIn}} *t\_midiIn,}
+\DoxyCodeLine{21                                 QWidget *parent = \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24   \mbox{\hyperlink{classQMidiIn}{QMidiIn}} *midiIn()\textcolor{keyword}{ const}\{ \textcolor{keywordflow}{return} m\_midiIn; \}}
+\DoxyCodeLine{25   \textcolor{keywordtype}{void} setMidiIn(\mbox{\hyperlink{classQMidiIn}{QMidiIn}} *t\_midiIn)\{ m\_midiIn = t\_midiIn; \}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27 signals :}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29 private :}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31   \mbox{\hyperlink{classQMidiIn}{QMidiIn}} *m\_midiIn;}
+\DoxyCodeLine{32   QPushButton *m\_connectMidiButton;}
+\DoxyCodeLine{33 \};}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 }
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37 \textcolor{keyword}{class }\mbox{\hyperlink{classQMidiConnectOutWidget}{QMidiConnectOutWidget}} :}
+\DoxyCodeLine{38     \textcolor{keyword}{public} QWidget}
+\DoxyCodeLine{39 \{}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41   Q\_OBJECT}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 public :}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45   \textcolor{keyword}{explicit} \mbox{\hyperlink{classQMidiConnectOutWidget}{QMidiConnectOutWidget}}(\mbox{\hyperlink{classQMidiOut}{QMidiOut}} *t\_midiOut,}
+\DoxyCodeLine{46                                  QWidget *parent = \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48   \mbox{\hyperlink{classQMidiOut}{QMidiOut}} *midiOut()\textcolor{keyword}{ const}\{ \textcolor{keywordflow}{return} m\_midiOut; \}}
+\DoxyCodeLine{49   \textcolor{keywordtype}{void} setMidiOut(\mbox{\hyperlink{classQMidiOut}{QMidiOut}} *t\_midiOut)\{ m\_midiOut = t\_midiOut; \}}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51 signals :}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53 private :}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55   \mbox{\hyperlink{classQMidiOut}{QMidiOut}} *m\_midiOut;}
+\DoxyCodeLine{56   QPushButton *m\_connectMidiButton;}
+\DoxyCodeLine{57 \};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{preprocessor}{\#endif }\textcolor{comment}{// QMIDICONNECTWIDGET\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,31 @@
+set error fn callback with QMidiError new class ?
+
+fn ds rtmidi :
+
+getVersion
+getCompiledApi
+getApiName
+getApiDisplayName
+getCompiledApiByName
+openPort
+openVirtualPort
+getPortCount
+getPortName
+closePort
+setClientName
+setPortName
+isPortOpen
+setErrorCallback
+
+rtmidiin :
+
+getCurrentApi
+ignoreTypes( bool midiSysex = true, bool midiTime = true, bool midiSense = true )
+getMessage ?
+protected : openMidiApi
+
+rtmidiout :
+
+getCurrentApi
+sendMessage
+protected : openMidiApi
