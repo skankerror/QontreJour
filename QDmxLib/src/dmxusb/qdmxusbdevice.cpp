@@ -70,6 +70,7 @@ void QDmxUsbDevicePrivate::init()
             _outputCount = 1;
             _inputCount = 1;
             _name = devName;
+//            _name = _officialName;
             _iface = new QEnttecPro(q);
         }
     }

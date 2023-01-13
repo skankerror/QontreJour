@@ -1,6 +1,15 @@
 #ifndef QONTREJOUR_H
 #define QONTREJOUR_H
 
+enum dmxDrivers
+{
+  dummy,
+  artnet,
+  e131,
+  dmxusb,
+  uart,
+  Count_dmxDrivers = uart +1
+};
 // types.h
 
 #ifndef	HIDDEN
@@ -83,13 +92,13 @@ typedef unsigned char	WORD8;		/* unsigned  8-bit quantity */
 
 //rs232.h
 
-#define	MAX_COMPORTS        4
-#define	MAXLINESIZE         128
+//#define	MAX_COMPORTS        4
+//#define	MAXLINESIZE         128
 
-#define ErrTimeout          9997
-#define TIMEOUT_INF ~((timeout_t) 0)
+//#define ErrTimeout          9997
+//#define TIMEOUT_INF ~((timeout_t) 0)
 
-#define INVALID_HANDLE_VALUE -1
+//#define INVALID_HANDLE_VALUE -1
 
 //#define DEBUG_RS232
 
@@ -97,11 +106,11 @@ typedef unsigned char	WORD8;		/* unsigned  8-bit quantity */
 
 //enttecdmxusb.h
 
-#define NB_CANAUX_MAX 512
-#define NB_INTERFACES 2
+//#define NB_CANAUX_MAX 512
+//#define NB_INTERFACES 2
 
 
-#define DEBUG_DMX_USB
+//#define DEBUG_DMX_USB
 
 //
 

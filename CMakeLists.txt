@@ -44,6 +44,8 @@ set(PROJECT_SOURCES
         dimmer.cpp
         universe.h
         universe.cpp
+        dmxmanagerwidget.h
+        dmxmanagerwidget.cpp
         ${TS_FILES}
 )
 
