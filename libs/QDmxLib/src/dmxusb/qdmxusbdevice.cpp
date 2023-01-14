@@ -79,8 +79,8 @@ void QDmxUsbDevicePrivate::init()
     {
         _type = QDmxUsbDevice::ProRXTX;
         _outputCount = 1;
-        _inputCount = 1;
-//        _inputCount = 0;
+//        _inputCount = 1;
+        _inputCount = 0;
         _name = _officialName;
         _iface = new QEnttecPro(q);
     }

@@ -24,10 +24,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #    endif()
 #endif()
 
-add_subdirectory(QMidi)
-add_subdirectory(QOSC)
-add_subdirectory(QEnttecPro)
-add_subdirectory(QDmxLib)
+add_subdirectory(libs/QMidi)
+add_subdirectory(libs/QOSC)
+add_subdirectory(libs/QEnttecPro)
+add_subdirectory(libs/QDmxLib)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network SerialPort REQUIRED)
@@ -36,24 +36,24 @@ find_package(ossia REQUIRED)
 set(TS_FILES QontreJour_fr_GF.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.h
-        mainwindow.cpp
-        qontrejour.h
-        dimmer.h
-        dimmer.cpp
-        universe.h
-        universe.cpp
-        dmxmanagerwidget.h
-        dmxmanagerwidget.cpp
-        sequencerwidget.h
-        sequencerwidget.cpp
-        dmxoutputwidget.h
-        dmxoutputwidget.cpp
-        grandmasterwidget.h
-        grandmasterwidget.cpp
-        playbackwidget.h
-        playbackwidget.cpp
+        src/main.cpp
+        src/qontrejour.h
+        src/gui/mainwindow.h
+        src/gui/mainwindow.cpp
+        src/core/dimmer.h
+        src/core/dimmer.cpp
+        src/core/universe.h
+        src/core/universe.cpp
+        src/gui/dmxmanagerwidget.h
+        src/gui/dmxmanagerwidget.cpp
+        src/gui/sequencerwidget.h
+        src/gui/sequencerwidget.cpp
+        src/gui/dmxoutputwidget.h
+        src/gui/dmxoutputwidget.cpp
+        src/gui/grandmasterwidget.h
+        src/gui/grandmasterwidget.cpp
+        src/gui/playbackwidget.h
+        src/gui/playbackwidget.cpp
         ${TS_FILES}
 )
 
