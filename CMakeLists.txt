@@ -46,6 +46,14 @@ set(PROJECT_SOURCES
         universe.cpp
         dmxmanagerwidget.h
         dmxmanagerwidget.cpp
+        sequencerwidget.h
+        sequencerwidget.cpp
+        dmxoutputwidget.h
+        dmxoutputwidget.cpp
+        grandmasterwidget.h
+        grandmasterwidget.cpp
+        playbackwidget.h
+        playbackwidget.cpp
         ${TS_FILES}
 )
 

@@ -9,6 +9,8 @@
 #include <qdmxlib/private/qnanodmx.h>
 #include <qdmxlib/private/qvinceusbdmx.h>
 
+#include <qdmxlib/private/qdmxftdidevice.h>
+
 namespace dmxusb_details
 {
 
@@ -35,7 +37,7 @@ void QDmxUsbDevicePrivate::init()
         _outputCount = 2;
         _inputCount = 1;
     }
-    else if (_officialName.contains("DMX USB PRO") || _officialName.contains("ULTRADMX"))
+    else if (/*_officialName.contains("DMX USB PRO") || */_officialName.contains("ULTRADMX"))
     {
         /** Check if the device responds to label 77 and 78, so it might be a DMXking adapter */
         int ESTAID = 0;
@@ -64,21 +66,22 @@ void QDmxUsbDevicePrivate::init()
                 _iface = new QEnttecPro(q);
             }
         }
-        else
-        {
-            _type = QDmxUsbDevice::ProRXTX;
-            _outputCount = 1;
-            _inputCount = 1;
-            _name = devName;
-//            _name = _officialName;
-            _iface = new QEnttecPro(q);
-        }
+
     }
     else if (_officialName.contains("DMXIS"))
     {
         _type = QDmxUsbDevice::ProRXTX;
         _outputCount = 1;
         _inputCount = 0;
+        _iface = new QEnttecPro(q);
+    }
+    else if (_officialName.contains("DMX USB PRO"))
+    {
+        _type = QDmxUsbDevice::ProRXTX;
+        _outputCount = 1;
+        _inputCount = 1;
+//        _inputCount = 0;
+        _name = _officialName;
         _iface = new QEnttecPro(q);
     }
     else if (_officialName.contains("USB-DMX512 CONVERTER"))

@@ -163,6 +163,7 @@ bool QEnttecPro::isOpen()
 
 void QEnttecPro::newDataCallback()
 {
+  if (_newData.try_lock())
     _newData.unlock();
 }
 

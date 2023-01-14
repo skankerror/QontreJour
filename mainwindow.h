@@ -24,6 +24,8 @@
 #include <QAction>
 #include <ossia-cpp/ossia-cpp98.hpp>
 #include "dmxmanagerwidget.h"
+#include "grandmasterwidget.h"
+#include "playbackwidget.h"
 
 
 class MainWindow : public QMainWindow
@@ -75,8 +77,11 @@ private:
   QAction *m_aboutAct;
   QAction *m_aboutQtAct;
 
+  GrandMasterWidget *m_grandMasterWidget;
   QTabWidget *m_tabWidget;
   DMXManagerWidget *m_dmxManagerWidget;
+  PlaybackWidget *m_playbackWidget;
+  QDmxManager *m_dmxManager;
 
 };
 #endif // MAINWINDOW_H

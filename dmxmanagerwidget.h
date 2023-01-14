@@ -26,6 +26,7 @@ signals:
 private slots:
 
   void PopulateDevices(const QString &t_driverString = "dummy");
+  void Connect();
 
 private:
 
@@ -35,6 +36,9 @@ private:
 
   QDmxManager *m_dmxManager;
   QDmxDriver *m_dmxDriver;
+  QDmxDevice *m_dmxDevice;
+
+  bool m_isConnected;
 
 };
 

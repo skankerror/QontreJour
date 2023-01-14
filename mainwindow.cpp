@@ -17,6 +17,7 @@
 
 #include "mainwindow.h"
 #include <QDebug>
+#include <QDockWidget>
 //#include "QEnttecPro/qenttecpro.h"
 #include "qdmxlib/QDmxManager"
 #include "qdmxlib/QDmxUsbDriver"
@@ -25,7 +26,10 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
     m_tabWidget(new QTabWidget(this)),
-    m_dmxManagerWidget(new DMXManagerWidget(this))
+    m_dmxManagerWidget(new DMXManagerWidget(this)),
+    m_dmxManager(QDmxManager::instance()),
+    m_grandMasterWidget(new GrandMasterWidget(this)),
+    m_playbackWidget(new PlaybackWidget(this))
 {
   CreateActions();
   CreateMenubar();
@@ -47,33 +51,33 @@ void MainWindow::TestingZone()
     // Please note that this the manager is implemented as a Singleton,
     // There's one and only one global instance of the manager that you can
     // retrieve using the following method anywhere in your program.
-    auto manager = QDmxManager::instance();
-    manager->init();
+//    auto manager = QDmxManager::instance();
+//    manager->init();
 
     // The manager also has methods to get what driver are available and
     // what devices within those drivers
-    qDebug() << "List all drivers:";
-    for(auto d : manager->availableDrivers())
-      qDebug() << "- " << d->name();
+//    qDebug() << "List all drivers:";
+//    for(auto d : manager->availableDrivers())
+//      qDebug() << "- " << d->name();
 
     // Let's say you want to use the art-net driver
     // you need to enable it first
-    auto driver = manager->driver("dmxusb");
-    Q_ASSERT(driver);
+//    auto driver = manager->driver("dmxusb");
+//    Q_ASSERT(driver);
 
-    driver->setEnabled(true);
+//    driver->setEnabled(true);
 
     // now the driver is enabled you can list all available devices
-    qDebug() << "List all devices for the dmxusb driver:";
-    for(auto d : driver->availableDevices())
-      qDebug() << "- " << d->name();
+//    qDebug() << "List all devices for the dmxusb driver:";
+//    for(auto d : driver->availableDevices())
+//      qDebug() << "- " << d->name();
 
     // The art-net drivers (as all network based driver) creates one device per network interface
     // the name the device is the name of said interface.
     // Assuming you are on a unix machine, you can query the manager like so:
-    auto dev = manager->device("dmxusb", "OpenDMX");
+//    auto dev = manager->device("dmxusb", "OpenDMX");
 
-    Q_ASSERT(dev); // The methods return nullptr if it can't find the device
+//    Q_ASSERT(dev); // The methods return nullptr if it can't find the device
 
     // alternatively, you could have query the driver directly like this
   //  dev = driver->device("eth0");
@@ -84,10 +88,10 @@ void MainWindow::TestingZone()
 
     // note: this methods returns true on successful patch
 
-    manager->patch(QDmxManager::Output, /* Type of port to patch*/
-                   dev,                 /* device to patch */
-                   0,                   /* Port id on the device */
-                   0);                  /* Universe id */
+//    manager->patch(QDmxManager::Output, /* Type of port to patch*/
+//                   dev,                 /* device to patch */
+//                   0,                   /* Port id on the device */
+//                   0);                  /* Universe id */
 
     // let's also patch the first input port
   //  manager->patch(QDmxManager::Input, dev, 0, 0);
@@ -107,15 +111,15 @@ void MainWindow::TestingZone()
   //  QByteArray inputData = manager->readInputData(0 /* universe */);
 
     // let's do a dirty ramp up from 0 to 255
-    for(int i = 0; i < 255; i++)
-    {
-      manager->writeData(0,  /* Universe */
-                         0,  /* Channel */
-                         i); /* Value */
+//    for(int i = 0; i < 255; i++)
+//    {
+//      manager->writeData(0,  /* Universe */
+//                         0,  /* Channel */
+//                         i); /* Value */
 
       // Please note: The channels indexing starts from 0 and ends at 511
       // So what usually people call DMX channel 1, is index 0 in this library
-    }
+//    }
 
     // The writeData methods also have overloads that takes QByteArray argument
     // to modify multiple consicutive value in one call like so:
@@ -131,11 +135,11 @@ void MainWindow::TestingZone()
 
     // If you ever want to know what is currently being send you can also read
     // the output buffer:
-    QByteArray outputData = manager->readOutputData(0 /* universe */);
-    qDebug() << outputData;
+//    QByteArray outputData = manager->readOutputData(0 /* universe */);
+//    qDebug() << outputData;
     // Once you're done, before your application shutdown, don't forget to call
     // the teardown method
-    manager->teardown();
+//    manager->teardown();
 
     //  auto test  = QDmxManager::instance();
     //  test->init();
@@ -173,7 +177,15 @@ void MainWindow::CreateToolBars()
 
 void MainWindow::CreateDockWidgets()
 {
+  auto leftDock = new QDockWidget(this);
+  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea/* | Qt::RightDockWidgetArea*/);
+  leftDock->setWidget(m_grandMasterWidget);
+  addDockWidget(Qt::LeftDockWidgetArea, leftDock);
 
+  auto rightDock = new QDockWidget(this);
+  rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
+  rightDock->setWidget(m_playbackWidget);
+  addDockWidget(Qt::RightDockWidgetArea, rightDock);
 }
 
 void MainWindow::CreateCentralWidget()
