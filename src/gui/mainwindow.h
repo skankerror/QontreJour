@@ -26,7 +26,9 @@
 #include "dmxmanagerwidget.h"
 #include "grandmasterwidget.h"
 #include "playbackwidget.h"
-
+#include "sequencerwidget.h"
+#include "dmxoutputwidget.h"
+#include "submasterwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -52,35 +54,23 @@ private:
 private:
 
   QMenu *m_fileMenu;
-//  QMenu *editMenu;
-//  QMenu *formatMenu;
   QMenu *m_helpMenu;
-//  QActionGroup *alignmentGroup;
   QAction *m_newAct;
   QAction *m_openAct;
   QAction *m_saveAct;
-//  QAction *printAct;
   QAction *m_exitAct;
-//  QAction *undoAct;
-//  QAction *redoAct;
-//  QAction *cutAct;
-//  QAction *copyAct;
-//  QAction *pasteAct;
-//  QAction *boldAct;
-//  QAction *italicAct;
-//  QAction *leftAlignAct;
-//  QAction *rightAlignAct;
-//  QAction *justifyAct;
-//  QAction *centerAct;
-//  QAction *setLineSpacingAct;
-//  QAction *setParagraphSpacingAct;
   QAction *m_aboutAct;
   QAction *m_aboutQtAct;
 
-  GrandMasterWidget *m_grandMasterWidget;
   QTabWidget *m_tabWidget;
+  SubMasterWidget *m_submasterWidget;
   DMXManagerWidget *m_dmxManagerWidget;
+
+  GrandMasterWidget *m_grandMasterWidget;
   PlaybackWidget *m_playbackWidget;
+  SequencerWidget *m_sequencerWidget;
+  DmxOutputWidget *m_dmxOutputWidget;
+
   QDmxManager *m_dmxManager;
 
 };

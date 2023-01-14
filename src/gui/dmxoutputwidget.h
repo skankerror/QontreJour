@@ -19,14 +19,21 @@
 #define DMXOUTPUTWIDGET_H
 
 #include <QWidget>
+#include <QTableWidget>
 
 class DmxOutputWidget : public QWidget
 {
   Q_OBJECT
+
 public:
+
   explicit DmxOutputWidget(QWidget *parent = nullptr);
 
 signals:
+
+private:
+
+  QTableWidget *m_tableWidget;
 
 };
 

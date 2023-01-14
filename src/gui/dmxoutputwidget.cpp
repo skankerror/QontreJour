@@ -16,9 +16,15 @@
  */
 
 #include "dmxoutputwidget.h"
+#include <QLayout>
 
 DmxOutputWidget::DmxOutputWidget(QWidget *parent)
-  : QWidget{parent}
+  : QWidget(parent),
+    m_tableWidget(new QTableWidget(this))
 {
+  auto layout = new QVBoxLayout();
 
+  layout->addWidget(m_tableWidget);
+
+  setLayout(layout);
 }

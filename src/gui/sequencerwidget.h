@@ -19,6 +19,7 @@
 #define SEQUENCERWIDGET_H
 
 #include <QWidget>
+#include <QTreeWidget>
 
 class SequencerWidget : public QWidget
 {
@@ -30,6 +31,10 @@ public:
   explicit SequencerWidget(QWidget *parent = nullptr);
 
 signals:
+
+private:
+
+  QTreeWidget *m_treeWidget;
 
 };
 

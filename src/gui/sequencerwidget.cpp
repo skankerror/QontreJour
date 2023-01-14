@@ -16,9 +16,16 @@
  */
 
 #include "sequencerwidget.h"
+#include <QLayout>
 
 SequencerWidget::SequencerWidget(QWidget *parent)
-  : QWidget(parent)
+  : QWidget(parent),
+    m_treeWidget(new QTreeWidget(this))
 {
+  auto layout = new QVBoxLayout();
 
+  m_treeWidget->setColumnCount(8);
+
+  layout->addWidget(m_treeWidget);
+  setLayout(layout);
 }

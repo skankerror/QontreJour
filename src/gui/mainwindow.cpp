@@ -29,7 +29,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_dmxManagerWidget(new DMXManagerWidget(this)),
     m_dmxManager(QDmxManager::instance()),
     m_grandMasterWidget(new GrandMasterWidget(this)),
-    m_playbackWidget(new PlaybackWidget(this))
+    m_playbackWidget(new PlaybackWidget(this)),
+    m_sequencerWidget(new SequencerWidget(this)),
+    m_dmxOutputWidget(new DmxOutputWidget(this)),
+    m_submasterWidget(new SubMasterWidget(this))
 {
   CreateActions();
   CreateMenubar();
@@ -154,8 +157,6 @@ void MainWindow::TestingZone()
 
 }
 
-
-
 MainWindow::~MainWindow()
 {
 }
@@ -180,17 +181,39 @@ void MainWindow::CreateDockWidgets()
   auto leftDock = new QDockWidget(this);
   leftDock->setAllowedAreas(Qt::LeftDockWidgetArea/* | Qt::RightDockWidgetArea*/);
   leftDock->setWidget(m_grandMasterWidget);
+  leftDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::LeftDockWidgetArea, leftDock);
 
   auto rightDock = new QDockWidget(this);
   rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
   rightDock->setWidget(m_playbackWidget);
+  rightDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::RightDockWidgetArea, rightDock);
+
+  auto topDock = new QDockWidget(this);
+  topDock->setAllowedAreas(Qt::TopDockWidgetArea);
+  topDock->setWidget(m_sequencerWidget);
+  topDock->setFeatures(QDockWidget::DockWidgetFloatable);
+  addDockWidget(Qt::TopDockWidgetArea, topDock);
+
+  auto bottomDock = new QDockWidget(this);
+  bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+  bottomDock->setWidget(m_dmxOutputWidget);
+  bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
+  addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
+
+  setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+  setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+  setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+  setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
 }
 
 void MainWindow::CreateCentralWidget()
 {
+  m_tabWidget->addTab(m_submasterWidget, "Submasters");
   m_tabWidget->addTab(m_dmxManagerWidget, "DMX Manager");
+
   setCentralWidget(m_tabWidget);
 }
 
