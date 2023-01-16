@@ -107,7 +107,7 @@ QByteArray QDmxFTDIBackend::readLabel(quint8 label, int& code)
     }
 
     QByteArray array(40, 0x00);
-    usleep(300000); // give some time to the device to respond
+    usleep(3000000); // give some time to the device to respond
 
     ftdi_read_data(_context, (uchar*)array.data(), array.size());
 

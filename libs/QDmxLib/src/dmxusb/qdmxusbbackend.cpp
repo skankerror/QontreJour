@@ -83,7 +83,7 @@ bool QDmxUsbBackend::clear(QDmxUsbDevice::Backend backend,
     for(auto it = devices.cbegin(); it != devices.cend();)
     {
         auto dev = *it;
-        if(dev->backend() == backend)
+        if(dev->backend() != backend)
         {
             ++it;
             continue;
