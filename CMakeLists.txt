@@ -40,8 +40,6 @@ set(PROJECT_SOURCES
         src/qontrejour.h
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
-        src/core/dimmer.h
-        src/core/dimmer.cpp
         src/core/universe.h
         src/core/universe.cpp
         src/gui/dmxmanagerwidget.h

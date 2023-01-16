@@ -1,5 +1,6 @@
 #include <qdmxlib/private/qopendmx.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 #include <QElapsedTimer>
 
@@ -33,7 +34,7 @@ bool QOpenDmx::close()
 
     gracefullyStop();
 
-    return _device->close();
+    return _backend->close();
 }
 
 bool QOpenDmx::isOpen()
@@ -58,17 +59,17 @@ void QOpenDmx::run()
         // Measure how much time passes during these calls
         time.restart();
 
-        if (_device->setBreak(true))
+        if (_backend->setBreak(true))
         {
             if(goodGranularity)
                 QThread::usleep(breakLength);
 
-            if(_device->setBreak(false))
+            if(_backend->setBreak(false))
             {
                 if(goodGranularity)
                     QThread::usleep(mabLength);
 
-                _device->write(_device->readOutputData(0));
+                _backend->write(_device->readOutputData(0));
             }
         }
 

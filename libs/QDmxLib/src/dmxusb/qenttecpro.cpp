@@ -1,6 +1,7 @@
 #include <qdmxlib/private/qenttecpro.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
 #include <qdmxlib/private/qdmxusbglobal.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 #include <QElapsedTimer>
 
@@ -28,31 +29,33 @@ void QEnttecProInput::run()
 
 bool QEnttecProInput::readData(QDmxUsbDevice* device, QByteArray& data)
 {
+    auto backend = device->privateBackend();
+
     bool ok = false;
     quint8 byte = 0;
 
     // Skip bytes until we find the start of the next message
-    byte = device->readByte(&ok);
+    byte = backend->readByte(&ok);
     if(!ok || byte != dmxusb_details::enttec_pro_start_of_msg)
         return false;
 
     // skip non dmx packets
-    byte = device->readByte(&ok);
+    byte = backend->readByte(&ok);
     if(!ok || byte != dmxusb_details::enttec_pro_recv_dmx_pkt)
         return false;
 
-    quint8 lsb = device->readByte(&ok);
+    quint8 lsb = backend->readByte(&ok);
     if(!ok)
         return false;
 
-    quint8 msb = device->readByte(&ok);
+    quint8 msb = backend->readByte(&ok);
     if(!ok)
         return false;
 
     quint16 dataLength = (msb << 8) + lsb;
 
     // Check status bytes
-    byte = device->readByte(&ok);
+    byte = backend->readByte(&ok);
     if(!ok)
         return false;
 
@@ -62,7 +65,7 @@ bool QEnttecProInput::readData(QDmxUsbDevice* device, QByteArray& data)
         qWarning() << "[enttecpro] Device receive overrun occurred";
 
     // Check DMX startcode
-    byte = device->readByte(&ok);
+    byte = backend->readByte(&ok);
     if(!ok)
         return false;
 
@@ -71,10 +74,10 @@ bool QEnttecProInput::readData(QDmxUsbDevice* device, QByteArray& data)
     dataLength -= 2;
 
     data.clear();
-    data = device->read(dataLength);
+    data = backend->read(dataLength);
 
     // read end byte
-    device->readByte(&ok);
+    backend->readByte(&ok);
 
     return ok;
 }
@@ -113,7 +116,7 @@ bool QEnttecPro::open()
         request.append(dmxusb_details::enttec_pro_end_of_msg); // Stop byte
 
         /* Write "Set API Key Request" message */
-        if(!_device->write(request))
+        if(!_backend->write(request))
         {
             qWarning() << "[enttecpro]" << _device->name() << "Failed to configure ports";
             return false;
@@ -129,7 +132,7 @@ bool QEnttecPro::open()
         request.append(dmxusb_details::enttec_pro_end_of_msg); // Stop byte
 
         /* Write "Set Port Assignment Request" message */
-        if(!_device->write(request))
+        if(!_backend->write(request))
         {
             qWarning() << "[enttecpro]" << _device->name() << "Failed to configure ports";
             return false;
@@ -153,7 +156,7 @@ bool QEnttecPro::close()
     if(_inputThread->isRunning())
         _inputThread->gracefullyStop();
 
-    return _device->close();
+    return _backend->close();
 }
 
 bool QEnttecPro::isOpen()
@@ -163,7 +166,6 @@ bool QEnttecPro::isOpen()
 
 void QEnttecPro::newDataCallback()
 {
-  if (_newData.try_lock())
     _newData.unlock();
 }
 
@@ -181,10 +183,10 @@ void QEnttecPro::run()
             continue;
         }
 
-        _device->write(payload(0)); // dmx for port 0
+        _backend->write(payload(0)); // dmx for port 0
 
         if(_device->outputCount() == 2)
-            _device->write(payload(1)); // dmx for port 1
+            _backend->write(payload(1)); // dmx for port 1
 
         frameSleep(time.elapsed());
     }

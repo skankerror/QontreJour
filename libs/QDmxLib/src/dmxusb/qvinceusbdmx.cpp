@@ -1,6 +1,7 @@
 #include <qdmxlib/private/qvinceusbdmx.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
 #include <qdmxlib/private/qdmxusbglobal.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 QVinceUsbDmx::QVinceUsbDmx(QDmxUsbDevice* device) :
     QDmxUsbInterface(device)
@@ -13,13 +14,13 @@ bool QVinceUsbDmx::open()
     if(isOpen())
         return true;
 
-    if(!_device->open())
+    if(!_backend->open())
         return false;
 
-    if(!_device->clearRts())
+    if(!_backend->clearRts())
         return false;
 
-    if(!_device->write(QByteArray(2, 0x00)))
+    if(!_backend->write(QByteArray(2, 0x00)))
         return false;
 
     return sendCommand(dmxusb_details::vince_cmd_start_dmx);
@@ -31,14 +32,14 @@ bool QVinceUsbDmx::close()
         return true;
 
     if(sendCommand(dmxusb_details::vince_cmd_stop_dmx))
-        return _device->close();
+        return _backend->close();
 
     return false;
 }
 
 bool QVinceUsbDmx::isOpen()
 {
-    return _device->isOpen();
+    return _backend->isOpen();
 }
 
 void QVinceUsbDmx::newDataCallback()
@@ -79,7 +80,7 @@ bool QVinceUsbDmx::sendCommand(quint8 command, const QByteArray& data)
 
     msg.append(dmxusb_details::vince_end_of_msg);
 
-    return _device->write(msg);
+    return _backend->write(msg);
 }
 
 bool QVinceUsbDmx::checkRely()
@@ -91,7 +92,7 @@ bool QVinceUsbDmx::checkRely()
 
     for(int i = 0; i < 6; i++)
     {
-        byte = _device->readByte(&ok);
+        byte = _backend->readByte(&ok);
         if(!ok)
             return false;
 
@@ -121,7 +122,7 @@ bool QVinceUsbDmx::checkRely()
     {
         for (int i = 0; i < length; i++)
         {
-            byte = _device->readByte(&ok);
+            byte = _backend->readByte(&ok);
             if(!ok)
             {
                 qWarning() << "[vinceusbdmx] No available byte to read (" << (length - i) << "missing bytes)";
@@ -132,7 +133,7 @@ bool QVinceUsbDmx::checkRely()
         }
     }
 
-    byte = _device->readByte(&ok);
+    byte = _backend->readByte(&ok);
     if(!ok)
         return false;
 

@@ -6,11 +6,11 @@
 #include <QTimer>
 
 #ifdef QDMXLIB_HAS_FTDI
-#include <qdmxlib/private/qdmxftdidevice.h>
+#include <qdmxlib/private/qdmxftdibackend_p.h>
 #endif
 
 #ifdef QDMXLIB_HAS_QTSERIAL
-#include <qdmxlib/private/qdmxserialdevice.h>
+#include <qdmxlib/private/qdmxserialbackend_p.h>
 #endif
 
 class QDmxUsbDriverPrivate : public QDmxDriverPrivate
@@ -48,11 +48,11 @@ void QDmxUsbDriver::pollDevices(bool preventEmit)
     bool shouldEmit = false;
 
 #ifdef QDMXLIB_HAS_FTDI
-    shouldEmit |= QDmxFtdiDevice::pollDevices(d->_devices, this);
+    shouldEmit |= QDmxFTDIBackend::pollDevices(d->_devices, this);
 #endif
 
 #ifdef QDMXLIB_HAS_QTSERIAL
-    shouldEmit |= QDmxSerialDevice::pollDevices(d->_devices, this);
+    shouldEmit |= QDmxSerialBackend::pollDevices(d->_devices, this);
 #endif
 
     if(shouldEmit && !preventEmit)

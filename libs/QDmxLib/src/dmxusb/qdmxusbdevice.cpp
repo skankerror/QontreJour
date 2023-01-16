@@ -9,24 +9,6 @@
 #include <qdmxlib/private/qnanodmx.h>
 #include <qdmxlib/private/qvinceusbdmx.h>
 
-#include <qdmxlib/private/qdmxftdidevice.h>
-
-namespace dmxusb_details
-{
-
-bool checkIds(quint16 vid, quint16 pid)
-{
-    if(vid != ftdi_vid && vid != atmel_vid && vid != microchip_vid)
-        return false;
-
-    if(pid != ftdi_pid && pid != dmx4all_pid && pid != nanodmx_pid && pid != eurolite_pid && pid != electrotas_pid)
-        return false;
-
-    return true;
-}
-
-}
-
 void QDmxUsbDevicePrivate::init()
 {
     Q_Q(QDmxUsbDevice);
@@ -37,14 +19,14 @@ void QDmxUsbDevicePrivate::init()
         _outputCount = 2;
         _inputCount = 1;
     }
-    else if (/*_officialName.contains("DMX USB PRO") || */_officialName.contains("ULTRADMX"))
+    else if (_officialName.contains("DMX USB PRO") || _officialName.contains("ULTRADMX"))
     {
         /** Check if the device responds to label 77 and 78, so it might be a DMXking adapter */
         int ESTAID = 0;
         int DEVID = 0;
-        QString manName = q->readLabel(dmxusb_details::dmxking_usb_device_manufacturer, ESTAID);
+        QString manName = _backend->readLabel(dmxusb_details::dmxking_usb_device_manufacturer, ESTAID);
         qDebug() << "--------> Device Manufacturer: " << manName;
-        QString devName = q->readLabel(dmxusb_details::dmxking_usb_device_name, DEVID);
+        QString devName = _backend->readLabel(dmxusb_details::dmxking_usb_device_name, DEVID);
         qDebug() << "--------> Device Name: " << devName;
         qDebug() << "--------> ESTA Code: " << QString::number(ESTAID, 16) << ", Device ID: " << QString::number(DEVID, 16);
         if (ESTAID == dmxusb_details::dmxking_esta_id)
@@ -66,22 +48,20 @@ void QDmxUsbDevicePrivate::init()
                 _iface = new QEnttecPro(q);
             }
         }
-
+        else
+        {
+            _type = QDmxUsbDevice::ProRXTX;
+            _outputCount = 1;
+            _inputCount = 1;
+            _name = devName;
+            _iface = new QEnttecPro(q);
+        }
     }
     else if (_officialName.contains("DMXIS"))
     {
         _type = QDmxUsbDevice::ProRXTX;
         _outputCount = 1;
         _inputCount = 0;
-        _iface = new QEnttecPro(q);
-    }
-    else if (_officialName.contains("DMX USB PRO"))
-    {
-        _type = QDmxUsbDevice::ProRXTX;
-        _outputCount = 1;
-//        _inputCount = 1;
-        _inputCount = 0;
-        _name = _officialName;
         _iface = new QEnttecPro(q);
     }
     else if (_officialName.contains("USB-DMX512 CONVERTER"))
@@ -132,8 +112,9 @@ QDmxUsbDevice::QDmxUsbDevice(const QString& name,
                              const QString& vendor,
                              quint16 vid,
                              quint16 pid,
+                             QDmxUsbDevice::Backend backend,
                              QDmxUsbDriver* parent) :
-    QDmxDevice(*new QDmxUsbDevicePrivate(name, serial, vendor, vid, pid, parent), parent)
+    QDmxDevice(*new QDmxUsbDevicePrivate(name, serial, vendor, vid, pid, backend, parent), parent)
 {
     d_func()->init();
 }
@@ -141,7 +122,16 @@ QDmxUsbDevice::QDmxUsbDevice(const QString& name,
 QDmxUsbDevice::~QDmxUsbDevice()
 {
     Q_D(QDmxUsbDevice);
+
+    if(d->_iface->isOpen())
+        d->_iface->close();
+
     delete d->_iface;
+}
+
+QDmxUsbDevice::Backend QDmxUsbDevice::backend() const
+{
+    return d_func()->_backend->backend();
 }
 
 QString QDmxUsbDevice::name() const
@@ -177,6 +167,11 @@ quint16 QDmxUsbDevice::vendorId() const
 quint16 QDmxUsbDevice::productId() const
 {
     return d_func()->_productId;
+}
+
+QDmxUsbBackend* QDmxUsbDevice::privateBackend() const
+{
+    return d_func()->_backend;
 }
 
 void QDmxUsbDevice::setData(quint8 port, quint16 channel, quint8 data)

@@ -16,9 +16,10 @@ set(HEADERS
     ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbdriver.h
     ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbdevice.h
     ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbdevice_p.h
+    ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbbackend_p.h
+    ${BUILD_INCLUDE}/qdmxlib/private/qdmxftdibackend_p.h
+    ${BUILD_INCLUDE}/qdmxlib/private/qdmxserialbackend_p.h
     ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbglobal.h
-    ${BUILD_INCLUDE}/qdmxlib/private/qdmxftdidevice.h
-    ${BUILD_INCLUDE}/qdmxlib/private/qdmxserialdevice.h
     ${BUILD_INCLUDE}/qdmxlib/private/qdmxusbinterface.h
     ${BUILD_INCLUDE}/qdmxlib/private/qopendmx.h
     ${BUILD_INCLUDE}/qdmxlib/private/qenttecpro.h
@@ -52,8 +53,9 @@ set(SOURCES
 
     dmxusb/qdmxusbdriver.cpp
     dmxusb/qdmxusbdevice.cpp
-    dmxusb/qdmxftdidevice.cpp
-    dmxusb/qdmxserialdevice.cpp
+    dmxusb/qdmxusbbackend.cpp
+    dmxusb/qdmxftdibackend.cpp
+    dmxusb/qdmxserialbackend.cpp
     dmxusb/qdmxusbinterface.cpp
     dmxusb/qopendmx.cpp
     dmxusb/qenttecpro.cpp
@@ -81,6 +83,7 @@ target_compile_definitions(QDmxLib PRIVATE QDMXLIB_LIBRARY)
 target_compile_definitions(QDmxLib PRIVATE SOFT_VERSION=${PROJECT_VERSION})
 target_compile_definitions(QDmxLib PRIVATE GIT_VERSION=${GIT_VERSION})
 target_link_libraries(QDmxLib PUBLIC Qt::Core Qt::Network)
+target_include_directories(QDmxLib PRIVATE ${${Qt}Core_PRIVATE_INCLUDE_DIRS})
 
 if(${LibFTDI1_FOUND})
     message(STATUS "Build with FTDI support")

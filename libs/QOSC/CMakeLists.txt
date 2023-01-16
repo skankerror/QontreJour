@@ -13,7 +13,7 @@ add_subdirectory(oscpack)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
-add_library(QOSC STATIC
+set(PROJECT_SOURCES
   qoscargument.h
   qoscsender.h
   qoscsender.cpp
@@ -45,16 +45,23 @@ add_library(QOSC STATIC
   oscpack/osc/OscPrintReceivedElements.cpp
   oscpack/osc/OscReceivedElements.cpp
   oscpack/osc/OscTypes.cpp
-
-#if(UNIX)
-    oscpack/ip/posix/NetworkingUtils.cpp
-    oscpack/ip/posix/UdpSocket.cpp
-#else()
-#    oscpack/ip/win32/NetworkingUtils.cpp
-#    oscpack/ip/win32/UdpSocket.cpp
-#endif()
+  ${PROJECT_SOURCES}
 )
 
-target_link_libraries(QOSC PRIVATE Qt6::Core)
+if(UNIX)
+  set(PROJECT_SOURCES
+    oscpack/ip/posix/NetworkingUtils.cpp
+    oscpack/ip/posix/UdpSocket.cpp
+    ${PROJECT_SOURCES}
+  )
+else()
+  set(PROJECT_SOURCES
+    oscpack/ip/win32/NetworkingUtils.cpp
+    oscpack/ip/win32/UdpSocket.cpp
+    ${PROJECT_SOURCES}
+  )
+endif()
 
-target_compile_definitions(QOSC PRIVATE QENTTECPRO_LIBRARY)
+add_library(QOSC STATIC ${PROJECT_SOURCES})
+
+target_link_libraries(QOSC PRIVATE Qt6::Core)

@@ -2,9 +2,9 @@
 #define QDMXUSBDEVICE_H
 
 #include "qdmxdevice.h"
-#include "qdmxmanager.h"
 #include <QDebug>
 
+class QDmxUsbBackend;
 class QDmxUsbDriver;
 class QDmxUsbDevicePrivate;
 class Q_DECL_EXPORT QDmxUsbDevice : public QDmxDevice
@@ -13,6 +13,7 @@ class Q_DECL_EXPORT QDmxUsbDevice : public QDmxDevice
 
     Q_DECLARE_PRIVATE(QDmxUsbDevice);
 
+    friend class QDmxSerialBackend;
     friend class QDmxUsbInterface;
     friend class QOpenDmx;
     friend class QEnttecPro;
@@ -48,10 +49,11 @@ public:
                   const QString& vendor,
                   quint16 vid,
                   quint16 pid,
+                  Backend backend,
                   QDmxUsbDriver* parent = nullptr);
     ~QDmxUsbDevice() override;
 
-    virtual Backend backend() const = 0;
+    Backend backend() const;
 
     QString name() const override;
     QString officialName() const;
@@ -60,6 +62,9 @@ public:
     QString vendor() const;
     quint16 vendorId() const;
     quint16 productId() const;
+
+protected:
+    QDmxUsbBackend* privateBackend() const;
 
 protected slots:
     void setData(quint8 port, quint16 channel, quint8 data) override;
@@ -73,24 +78,6 @@ protected:
     bool stopHook() override;
 
     void updateInput(quint8 port, const QByteArray& data);
-
-    virtual QByteArray readLabel(quint8 label, int& code) = 0;
-
-    virtual bool open() = 0;
-    virtual bool openPID(int pid) = 0;
-    virtual bool close() = 0;
-    virtual bool isOpen() = 0;
-    virtual bool reset() = 0;
-    virtual bool setLineProperty() = 0;
-    virtual bool setBaudRate() = 0;
-    virtual bool setFlowControl() = 0;
-    virtual bool setLowLatency(bool lowLatency) = 0;
-    virtual bool clearRts() = 0;
-    virtual bool purgeBuffers() = 0;
-    virtual bool setBreak(bool on) = 0;
-    virtual bool write(const QByteArray& data) = 0;
-    virtual QByteArray read(int size = -1) = 0;
-    virtual uchar readByte(bool* ok = nullptr) = 0;
 };
 
 

@@ -4,6 +4,7 @@
 #include <QThread>
 
 class QDmxUsbDevice;
+class QDmxUsbBackend;
 class QDmxUsbInterface
 {
 public:
@@ -21,6 +22,7 @@ protected:
 
 protected:
     QDmxUsbDevice* _device = nullptr;
+    QDmxUsbBackend* _backend = nullptr;
 };
 
 class QDmxUsbThread : public QThread

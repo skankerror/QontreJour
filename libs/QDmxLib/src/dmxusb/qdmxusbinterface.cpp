@@ -1,23 +1,25 @@
 #include <qdmxlib/private/qdmxusbinterface.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 QDmxUsbInterface::QDmxUsbInterface(QDmxUsbDevice* device) :
-    _device(device)
+    _device(device),
+    _backend(device->privateBackend())
 {
 
 }
 
 bool QDmxUsbInterface::init()
 {
-    if(!_device->open())
+    if(!_backend->open())
     {
-        _device->close();
+        _backend->close();
         return false;
     }
 
-    if(!_device->clearRts())
+    if(!_backend->clearRts())
     {
-        _device->close();
+        _backend->close();
         return false;
     }
 

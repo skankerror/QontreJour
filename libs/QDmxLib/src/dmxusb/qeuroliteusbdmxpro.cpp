@@ -1,6 +1,7 @@
 #include <qdmxlib/private/qeuroliteusbdmxpro.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
 #include <qdmxlib/private/qdmxusbglobal.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 #include <QElapsedTimer>
 
@@ -30,7 +31,7 @@ bool QEuroliteUsbDmxPro::close()
 
     gracefullyStop();
 
-    return _device->close();
+    return _backend->close();
 }
 
 bool QEuroliteUsbDmxPro::isOpen()
@@ -69,7 +70,7 @@ void QEuroliteUsbDmxPro::run()
         data.append(dmx);
         data.append(dmxusb_details::eurolite_usb_dmx_pro_end_of_msg); // Stop byte
 
-        _device->write(data);
+        _backend->write(data);
 
         frameSleep(time.elapsed());
     }

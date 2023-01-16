@@ -1,6 +1,7 @@
 #include <qdmxlib/private/qnanodmx.h>
 #include <qdmxlib/private/qdmxusbdevice.h>
 #include <qdmxlib/private/qdmxusbglobal.h>
+#include <qdmxlib/private/qdmxusbbackend_p.h>
 
 #include <QElapsedTimer>
 
@@ -33,7 +34,7 @@ bool QNanoDmx::close()
 
     gracefullyStop();
 
-    return _device->close();
+    return _backend->close();
 }
 
 bool QNanoDmx::isOpen()
@@ -81,17 +82,17 @@ void QNanoDmx::run()
             data.append(channel);
             data.append(dmx[i]);
 
-            if(!_device->write(data))
+            if(!_backend->write(data))
             {
                 qWarning() << "[nanodmx] Didn't accept the data";
-                _device->purgeBuffers();
+                _backend->purgeBuffers();
                 continue;
             }
 
             compare[i] = dmx[i];
 
             if(!checkReply())
-                _device->purgeBuffers();
+                _backend->purgeBuffers();
 
             frameSleep(time.elapsed());
         }
@@ -100,7 +101,7 @@ void QNanoDmx::run()
 
 bool QNanoDmx::initialSequence()
 {
-    if(!_device->write("C?"))
+    if(!_backend->write("C?"))
     {
         qWarning() << "[nanodmx] Initialisation failed";
         return false;
@@ -112,7 +113,7 @@ bool QNanoDmx::initialSequence()
         return false;
     }
 
-    if(!_device->write("N511"))
+    if(!_backend->write("N511"))
     {
         qWarning() << "[nanodmx] Initialisation failed";
         return false;
@@ -132,7 +133,7 @@ bool QNanoDmx::checkReply()
     bool ok = false;
     quint8 byte;
 
-    byte = _device->readByte(&ok);
+    byte = _backend->readByte(&ok);
 
     return ok && byte == 0x47;
 }

@@ -51,7 +51,7 @@ if(NOT ${LibFTDI1_FOUND} AND ${PkgConfig_FOUND})
     pkg_search_module(LibFTDI1 libftdi1)
 endif()
 
-option(QDMXLIB_BUILD_TESTS "Build the unit tests"  ON)
+option(QDMXLIB_BUILD_TESTS "Build the unit tests"  OFF)
 option(QDMXLIB_INSTALL     "Generate install targets" ${NUMPYCPP_MASTER_PROJECT})
 
 if(${QDMXLIB_BUILD_TESTS})
