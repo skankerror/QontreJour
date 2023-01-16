@@ -38,10 +38,20 @@ set(TS_FILES QontreJour_fr_GF.ts)
 set(PROJECT_SOURCES
         src/main.cpp
         src/qontrejour.h
+        src/core/dmxuniverse.h
+        src/core/dmxuniverse.cpp
+        src/core/dmxoutput.h
+        src/core/dmxoutput.cpp
+        src/core/dmxchannel.h
+        src/core/dmxchannel.cpp
+        src/core/dmxchannelgroup.h
+        src/core/dmxchannelgroup.cpp
+        src/core/dmxscene.h
+        src/core/dmxscene.cpp
+        src/core/dmxsequence.h
+        src/core/dmxsequence.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
-        src/core/universe.h
-        src/core/universe.cpp
         src/gui/dmxmanagerwidget.h
         src/gui/dmxmanagerwidget.cpp
         src/gui/sequencerwidget.h

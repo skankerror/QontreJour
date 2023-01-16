@@ -66,7 +66,6 @@ public slots:
   void connectMidiIn(int t_portNumber);
   void connectMidiIn(QString &t_portName);
   void connectVirtualMidiIn();
-  // TODO: add connect with string
   void disconnectMidiIn();
 
 private:
