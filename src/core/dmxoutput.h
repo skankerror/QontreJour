@@ -47,7 +47,8 @@ public:
 
 signals:
 
-  void levelChanged();
+  void levelChanged(int, // output id
+                    int); // level
   void maxLevelChanged(int);
 
 private:

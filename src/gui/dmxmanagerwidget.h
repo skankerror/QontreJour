@@ -22,6 +22,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QLabel>
 #include "qdmxlib/QDmxManager"
 #include "../core/dmxuniverse.h"
 
@@ -33,6 +34,7 @@ class DmxManagerWidget : public QWidget
 public:
 
   explicit DmxManagerWidget(QWidget *parent = nullptr);
+  ~DmxManagerWidget();
 
 private:
 
@@ -41,14 +43,21 @@ private:
 
 signals:
 
+  void universeClaimsUpdate(int, //universe ID
+                            int, //output ID
+                            int); // level
+
 private slots:
 
   void PopulateDevices(const QString &t_driverString = "dummy");
   void Connect();
-  void disconnect();
+  void disConnect();
+  void onOutputLevelChanged(int t_output,
+                            int t_level);
 
 private:
 
+  QLabel *m_universeIDLabel;
   QComboBox *m_dmxDriversComboBox;
   QComboBox *m_dmxDevicesComboBox;
   QPushButton *m_dmxConnect;

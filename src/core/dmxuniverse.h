@@ -54,11 +54,13 @@ public:
 
 signals:
 
-  void dmxOutputUpdateRequired();
+  void dmxOutputUpdateRequired(int, // output id
+                               int); // level
 
 private slots:
 
-  void onOutputLevelChanged();
+  void onOutputLevelChanged(int t_outputID,
+                            int t_level);
 
 private:
 

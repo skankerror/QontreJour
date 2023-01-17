@@ -34,9 +34,9 @@ DmxUniverse::DmxUniverse(int t_outputCount/* = 512 */,
     m_L_dmxOutput.append(dmxOutput);
 
     connect(dmxOutput,
-            SIGNAL(levelChanged()),
+            SIGNAL(levelChanged(int,int)),
             this,
-            SLOT(onOutputLevelChanged()));
+            SLOT(onOutputLevelChanged(int,int)));
   }
 }
 
@@ -44,6 +44,7 @@ DmxUniverse::~DmxUniverse()
 {
 //  m_dmxDevice->stop();
   // TODO : check that !
+  STATIC_UNIVERSE_COUNT--;
 }
 
 bool DmxUniverse::setOutputLevel(int t_outputID,
@@ -59,7 +60,8 @@ bool DmxUniverse::setOutputLevel(int t_outputID,
   return false;
 }
 
-void DmxUniverse::onOutputLevelChanged()
+void DmxUniverse::onOutputLevelChanged(int t_outputID, int t_level)
 {
-  emit dmxOutputUpdateRequired();
+  emit dmxOutputUpdateRequired(t_outputID,
+                               t_level);
 }

@@ -59,6 +59,9 @@ private slots:
 
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
+  void onDmxManagerClaimsUpdate(int t_universeID,
+                                int t_outputID,
+                                int t_level);
 
 private:
 

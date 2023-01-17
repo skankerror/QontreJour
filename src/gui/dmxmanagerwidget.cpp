@@ -22,6 +22,7 @@
 
 DmxManagerWidget::DmxManagerWidget(QWidget *parent)
   : QWidget(parent),
+    m_universeIDLabel(new QLabel(this)),
     m_dmxDriversComboBox(new QComboBox(this)),
     m_dmxDevicesComboBox(new QComboBox(this)),
     m_dmxConnect(new QPushButton(this)),
@@ -32,6 +33,15 @@ DmxManagerWidget::DmxManagerWidget(QWidget *parent)
 {
   CreateWidget();
   CreateConnections();
+}
+
+DmxManagerWidget::~DmxManagerWidget()
+{
+  if (m_isConnected)
+  {
+    disConnect();
+  }
+  m_dmxUniverse->deleteLater();
 }
 
 void DmxManagerWidget::CreateWidget()
@@ -47,8 +57,10 @@ void DmxManagerWidget::CreateWidget()
 
   PopulateDevices();
 
+  m_universeIDLabel->setText(QString(tr("Universe %1").arg(m_universeID + 1)));
   m_dmxConnect->setText("Connect");
 
+  layout->addWidget(m_universeIDLabel);
   layout->addWidget(m_dmxDriversComboBox);
   layout->addWidget(m_dmxDevicesComboBox);
   layout->addWidget(m_dmxConnect);
@@ -58,11 +70,11 @@ void DmxManagerWidget::CreateWidget()
 
 void DmxManagerWidget::CreateConnections()
 {
-  connect(m_dmxDriversComboBox,
+  QObject::connect(m_dmxDriversComboBox,
           SIGNAL(currentTextChanged(QString)),
           this,
           SLOT(PopulateDevices(QString)));
-  connect(m_dmxConnect,
+  QObject::connect(m_dmxConnect,
           SIGNAL(clicked(bool)),
           this,
           SLOT(Connect()));
@@ -98,20 +110,66 @@ void DmxManagerWidget::Connect()
   else
   {
     if(m_dmxManager->patch(QDmxManager::Output,
-                        m_dmxDevice,
-                        0, // TODO : handle several output ports
-                        m_universeID,
-                        QDmxManager::HTP)) // TODO : voir ça...
+                           m_dmxDevice,
+                           0, // TODO : handle several output ports
+                           m_universeID,
+                           QDmxManager::HTP)) // TODO : voir ça...
     {
       m_isConnected = true;
       m_dmxUniverse->setConnected(true);
       m_dmxUniverse->setDmxDevice(m_dmxDevice);
+      m_dmxConnect->setText("Disconnect");
+
+      QObject::disconnect(m_dmxConnect,
+                          SIGNAL(clicked(bool)),
+                          this,
+                          SLOT(Connect()));
+
+      QObject::connect(m_dmxConnect,
+                       SIGNAL(clicked(bool)),
+                       this,
+                       SLOT(disConnect()));
+      QObject::connect(m_dmxUniverse,
+                       SIGNAL(dmxOutputUpdateRequired(int,int)),
+                       this,
+                       SLOT(onOutputLevelChanged(int,int)));
+
     }
   }
 }
 
-void DmxManagerWidget::disconnect()
+void DmxManagerWidget::disConnect()
 {
+  if (m_dmxDevice->isStarted())
+  {
+    if (m_dmxManager->unpatch(QDmxManager::Output,
+                              m_dmxDevice))
+    {
+      m_isConnected = true;
+      m_dmxUniverse->setConnected(false);
+      m_dmxUniverse->setDmxDevice(nullptr);
+      m_dmxConnect->setText("Connect");
 
+      QObject::disconnect(m_dmxConnect,
+                          SIGNAL(clicked(bool)),
+                          this,
+                          SLOT(disConnect()));
+
+      QObject::connect(m_dmxConnect,
+                       SIGNAL(clicked(bool)),
+                       this,
+                       SLOT(Connect()));
+
+
+    }
+
+  }
 }
 
+void DmxManagerWidget::onOutputLevelChanged(int t_output,
+                                            int t_level)
+{
+  emit universeClaimsUpdate(m_universeID,
+                            t_output,
+                            t_level);
+}

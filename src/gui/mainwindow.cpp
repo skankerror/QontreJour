@@ -26,7 +26,6 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
     m_tabWidget(new QTabWidget(this)),
-//    m_dmxManagerWidget(new DmxManagerWidget(this)),
     m_dmxManager(QDmxManager::instance()),
     m_grandMasterWidget(new GrandMasterWidget(this)),
     m_playbackWidget(new PlaybackWidget(this)),
@@ -50,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 //  TestingZone();
 }
+
+MainWindow::~MainWindow()
+{}
 
 void MainWindow::TestingZone()
 {
@@ -169,15 +171,30 @@ void MainWindow::addDmxManagerWidget()
   auto dmxManagerWidget = new DmxManagerWidget(m_dmxManagerContainerWidget);
   m_L_dmxManagerWidget.append(dmxManagerWidget);
   m_dmxManagerContainerLayout->addWidget(dmxManagerWidget);
+
+  // connection to qdmx
+  connect(dmxManagerWidget,
+          SIGNAL(universeClaimsUpdate(int,int,int)),
+          this,
+          SLOT(onDmxManagerClaimsUpdate(int,int,int)));
 }
 
 void MainWindow::removeDmxManagerWidget()
 {
-
+  if (m_L_dmxManagerWidget.size() > 1) // we always keep one universe
+  {
+    --STATIC_UNIVERSE_COUNT;
+    auto dmxManagerWidget = m_L_dmxManagerWidget.last();
+    m_L_dmxManagerWidget.removeLast();
+    dmxManagerWidget->deleteLater();
+  }
 }
 
-MainWindow::~MainWindow()
+void MainWindow::onDmxManagerClaimsUpdate(int t_universeID, int t_outputID, int t_level)
 {
+  m_dmxManager->writeData(t_universeID,
+                          t_outputID,
+                          t_level);
 }
 
 void MainWindow::CreateActions()
@@ -267,6 +284,8 @@ void MainWindow::createConnections()
           SIGNAL(clicked()),
           this,
           SLOT(removeDmxManagerWidget()));
+
+
 
 }
 

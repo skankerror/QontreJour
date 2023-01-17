@@ -21,7 +21,8 @@
 #include <QWidget>
 #include <QTableWidget>
 
-class DmxOutputWidget : public QWidget
+class DmxOutputWidget
+    : public QWidget
 {
   Q_OBJECT
 

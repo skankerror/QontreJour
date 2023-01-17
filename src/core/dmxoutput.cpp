@@ -32,7 +32,8 @@ void DmxOutput::setLevel(int t_level)
   if (m_level == t_level || t_level > m_maxLevel)
     return;
   m_level = t_level;
-  emit levelChanged();
+  emit levelChanged(m_outputID,
+                    m_level);
 }
 
 void DmxOutput::setMaxLevel(int t_maxLevel)
