@@ -22,6 +22,8 @@
 #include <QMenu>
 #include <QActionGroup>
 #include <QAction>
+#include <QList>
+#include <QPushButton>
 #include <ossia-cpp/ossia-cpp98.hpp>
 #include "dmxmanagerwidget.h"
 #include "grandmasterwidget.h"
@@ -45,11 +47,18 @@ private:
   void CreateMenubar();
   void CreateToolBars();
   void CreateDockWidgets();
+  void createDmxManagerContainerWidget();
   void CreateCentralWidget();
   void CreateStatusBar();
 
+  void createConnections();
+
   void TestingZone();
 
+private slots:
+
+  void addDmxManagerWidget();
+  void removeDmxManagerWidget();
 
 private:
 
@@ -64,7 +73,11 @@ private:
 
   QTabWidget *m_tabWidget;
   SubMasterWidget *m_submasterWidget;
-  DMXManagerWidget *m_dmxManagerWidget;
+  QWidget *m_dmxManagerContainerWidget;
+  QPushButton *m_addDmxManagerWidgetButton;
+  QPushButton *m_removeDmxManagerWidgetButton;
+  QVBoxLayout *m_dmxManagerContainerLayout;
+  QList<DmxManagerWidget *> m_L_dmxManagerWidget;
 
   GrandMasterWidget *m_grandMasterWidget;
   PlaybackWidget *m_playbackWidget;

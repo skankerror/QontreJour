@@ -38,11 +38,10 @@ public:
   QList<DmxOutput *> getL_dmxOutput() const { return m_L_dmxOutput; }
   DmxOutput* getL_dmxOutputAt(int t_index);
 
-
   //setters
   void setLevel(const int t_level);
 
-
+  //public methods
   void addDmxOutput(DmxOutput *t_dmxOutput);
   void addDmxOutputs(const QList<DmxOutput *> t_L_dmxOutput);
   bool removeDmxOutput(const DmxOutput *t_dmxOutput);

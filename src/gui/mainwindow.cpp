@@ -26,20 +26,27 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
     m_tabWidget(new QTabWidget(this)),
-    m_dmxManagerWidget(new DMXManagerWidget(this)),
+//    m_dmxManagerWidget(new DmxManagerWidget(this)),
     m_dmxManager(QDmxManager::instance()),
     m_grandMasterWidget(new GrandMasterWidget(this)),
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
     m_dmxOutputWidget(new DmxOutputWidget(this)),
-    m_submasterWidget(new SubMasterWidget(this))
+    m_submasterWidget(new SubMasterWidget(this)),
+    m_dmxManagerContainerWidget(new QWidget(this)),
+    m_dmxManagerContainerLayout(new QVBoxLayout()),
+    m_addDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
+    m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget))
 {
   CreateActions();
   CreateMenubar();
   CreateToolBars();
   CreateDockWidgets();
+  createDmxManagerContainerWidget();
   CreateCentralWidget();
   CreateStatusBar();
+
+  createConnections();
 
 //  TestingZone();
 }
@@ -157,6 +164,18 @@ void MainWindow::TestingZone()
 
 }
 
+void MainWindow::addDmxManagerWidget()
+{
+  auto dmxManagerWidget = new DmxManagerWidget(m_dmxManagerContainerWidget);
+  m_L_dmxManagerWidget.append(dmxManagerWidget);
+  m_dmxManagerContainerLayout->addWidget(dmxManagerWidget);
+}
+
+void MainWindow::removeDmxManagerWidget()
+{
+
+}
+
 MainWindow::~MainWindow()
 {
 }
@@ -179,7 +198,7 @@ void MainWindow::CreateToolBars()
 void MainWindow::CreateDockWidgets()
 {
   auto leftDock = new QDockWidget(this);
-  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea/* | Qt::RightDockWidgetArea*/);
+  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
   leftDock->setWidget(m_grandMasterWidget);
   leftDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::LeftDockWidgetArea, leftDock);
@@ -209,16 +228,45 @@ void MainWindow::CreateDockWidgets()
 
 }
 
+void MainWindow::createDmxManagerContainerWidget()
+{
+  m_addDmxManagerWidgetButton->setText("Add universe");
+  m_removeDmxManagerWidgetButton->setText("Remove universe");
+  auto buttonsLayout = new QHBoxLayout();
+  buttonsLayout->addWidget(m_addDmxManagerWidgetButton);
+  buttonsLayout->addWidget(m_removeDmxManagerWidgetButton);
+  m_dmxManagerContainerLayout->addLayout(buttonsLayout);
+
+  // create first dmx manager widget for first universe
+  addDmxManagerWidget();
+
+  m_dmxManagerContainerWidget->setLayout(m_dmxManagerContainerLayout);
+}
+
 void MainWindow::CreateCentralWidget()
 {
   m_tabWidget->addTab(m_submasterWidget, "Submasters");
-  m_tabWidget->addTab(m_dmxManagerWidget, "DMX Manager");
+  m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
 
   setCentralWidget(m_tabWidget);
 }
 
 void MainWindow::CreateStatusBar()
 {
+
+}
+
+void MainWindow::createConnections()
+{
+  connect(m_addDmxManagerWidgetButton,
+          SIGNAL(clicked()),
+          this,
+          SLOT(addDmxManagerWidget()));
+
+  connect(m_removeDmxManagerWidgetButton,
+          SIGNAL(clicked()),
+          this,
+          SLOT(removeDmxManagerWidget()));
 
 }
 

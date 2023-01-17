@@ -17,18 +17,22 @@
 
 #include "dmxoutput.h"
 
-DmxOutput::DmxOutput(QObject *parent)
+DmxOutput::DmxOutput(int t_universeID,
+                     int t_outputID,
+                     QObject *parent)
   : QObject(parent),
     m_level(0),
-    m_maxLevel(255)
+    m_maxLevel(255),
+    m_universeID(t_universeID),
+    m_outputID(t_outputID)
 {}
 
 void DmxOutput::setLevel(int t_level)
 {
-  if (m_level == t_level)
+  if (m_level == t_level || t_level > m_maxLevel)
     return;
   m_level = t_level;
-  emit levelChanged(m_level);
+  emit levelChanged();
 }
 
 void DmxOutput::setMaxLevel(int t_maxLevel)

@@ -37,6 +37,8 @@ DmxOutput *DmxChannel::getL_dmxOutputAt(int t_index)
 
 void DmxChannel::setLevel(const int t_level)
 {
+  if (m_level == t_level)
+    return;
   m_level = t_level;
   emit levelChanged(m_level);
 }

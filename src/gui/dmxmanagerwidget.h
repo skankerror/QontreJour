@@ -23,15 +23,16 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include "qdmxlib/QDmxManager"
+#include "../core/dmxuniverse.h"
 
-class DMXManagerWidget : public QWidget
+class DmxManagerWidget : public QWidget
 {
 
   Q_OBJECT
 
 public:
 
-  explicit DMXManagerWidget(QWidget *parent = nullptr);
+  explicit DmxManagerWidget(QWidget *parent = nullptr);
 
 private:
 
@@ -44,6 +45,7 @@ private slots:
 
   void PopulateDevices(const QString &t_driverString = "dummy");
   void Connect();
+  void disconnect();
 
 private:
 
@@ -54,6 +56,9 @@ private:
   QDmxManager *m_dmxManager;
   QDmxDriver *m_dmxDriver;
   QDmxDevice *m_dmxDevice;
+
+  DmxUniverse *m_dmxUniverse;
+  int m_universeID;
 
   bool m_isConnected;
 

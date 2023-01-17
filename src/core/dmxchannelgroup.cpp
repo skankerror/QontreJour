@@ -20,3 +20,11 @@
 DmxChannelGroup::DmxChannelGroup(QObject *parent)
   : QObject{parent}
 {}
+
+void DmxChannelGroup::setLevel(int t_level)
+{
+  if (m_level == t_level)
+    return;
+  m_level = t_level;
+  emit levelChanged();
+}

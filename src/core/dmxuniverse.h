@@ -19,14 +19,55 @@
 #define DMXUNIVERSE_H
 
 #include <QObject>
+#include <QList>
+#include "dmxoutput.h"
+#include "../qontrejour.h"
+#include "qdmxlib/QDmxManager"
 
-class DmxUniverse : public QObject
+class DmxUniverse
+    : public QObject
 {
+
   Q_OBJECT
+
 public:
-  explicit DmxUniverse(QObject *parent = nullptr);
+
+  // cstr
+  explicit DmxUniverse(int t_outputCount = UNIVERSE_OUTPUT_COUNT_DEFAULT,
+                       QObject *parent = nullptr);
+
+  //destr
+  ~DmxUniverse();
+
+  // getters
+  int getID() const { return m_ID; }
+  int getOutputCount() const { return m_outputCount; }
+  QDmxDevice* getDmxDevice() const { return m_dmxDevice; }
+  bool isConnected() const { return m_isConnected; }
+
+  // setters
+  void setID(int t_ID) { m_ID = t_ID; }
+  bool setOutputLevel(int t_outputID,
+                      int t_level);
+  void setDmxDevice(QDmxDevice *t_dmxDevice) { m_dmxDevice = t_dmxDevice; }
+  void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 
 signals:
+
+  void dmxOutputUpdateRequired();
+
+private slots:
+
+  void onOutputLevelChanged();
+
+private:
+
+  QList<DmxOutput *> m_L_dmxOutput;
+  int m_ID;
+  int m_outputCount;
+
+  QDmxDevice *m_dmxDevice;
+  bool m_isConnected;
 
 };
 

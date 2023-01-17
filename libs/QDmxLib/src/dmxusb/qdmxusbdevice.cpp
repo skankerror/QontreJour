@@ -24,11 +24,12 @@ void QDmxUsbDevicePrivate::init()
         /** Check if the device responds to label 77 and 78, so it might be a DMXking adapter */
         int ESTAID = 0;
         int DEVID = 0;
-        QString manName = _backend->readLabel(dmxusb_details::dmxking_usb_device_manufacturer, ESTAID);
-        qDebug() << "--------> Device Manufacturer: " << manName;
-        QString devName = _backend->readLabel(dmxusb_details::dmxking_usb_device_name, DEVID);
-        qDebug() << "--------> Device Name: " << devName;
-        qDebug() << "--------> ESTA Code: " << QString::number(ESTAID, 16) << ", Device ID: " << QString::number(DEVID, 16);
+//        QString manName = _backend->readLabel(dmxusb_details::dmxking_usb_device_manufacturer, ESTAID);
+//        qDebug() << "--------> Device Manufacturer: " << manName;
+//        QString devName = _backend->readLabel(dmxusb_details::dmxking_usb_device_name, DEVID);
+        QString devName = "ProRXTX";
+//        qDebug() << "--------> Device Name: " << devName;
+//        qDebug() << "--------> ESTA Code: " << QString::number(ESTAID, 16) << ", Device ID: " << QString::number(DEVID, 16);
         if (ESTAID == dmxusb_details::dmxking_esta_id)
         {
             if (DEVID == dmxusb_details::ultradmx_pro_dev_id)
@@ -52,7 +53,8 @@ void QDmxUsbDevicePrivate::init()
         {
             _type = QDmxUsbDevice::ProRXTX;
             _outputCount = 1;
-            _inputCount = 1;
+//            _inputCount = 1;
+            _inputCount = 0;
             _name = devName;
             _iface = new QEnttecPro(q);
         }

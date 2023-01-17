@@ -17,19 +17,24 @@
 
 #include <QDebug>
 #include "dmxmanagerwidget.h"
+#include "../qontrejour.h"
 
-DMXManagerWidget::DMXManagerWidget(QWidget *parent)
+
+DmxManagerWidget::DmxManagerWidget(QWidget *parent)
   : QWidget(parent),
     m_dmxDriversComboBox(new QComboBox(this)),
     m_dmxDevicesComboBox(new QComboBox(this)),
     m_dmxConnect(new QPushButton(this)),
-    m_isConnected(false)
+    m_isConnected(false),
+    m_dmxUniverse(new DmxUniverse(UNIVERSE_OUTPUT_COUNT_DEFAULT,
+                                  this)),
+    m_universeID(m_dmxUniverse->getID())
 {
   CreateWidget();
   CreateConnections();
 }
 
-void DMXManagerWidget::CreateWidget()
+void DmxManagerWidget::CreateWidget()
 {
   auto layout = new QHBoxLayout();
 
@@ -51,7 +56,7 @@ void DMXManagerWidget::CreateWidget()
 
 }
 
-void DMXManagerWidget::CreateConnections()
+void DmxManagerWidget::CreateConnections()
 {
   connect(m_dmxDriversComboBox,
           SIGNAL(currentTextChanged(QString)),
@@ -63,7 +68,7 @@ void DMXManagerWidget::CreateConnections()
           SLOT(Connect()));
 }
 
-void DMXManagerWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
+void DmxManagerWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
 {
   m_dmxDriver = m_dmxManager->driver(t_driverString);
   Q_ASSERT(m_dmxDriver);
@@ -80,21 +85,33 @@ void DMXManagerWidget::PopulateDevices(const QString &t_driverString /* = "dummy
     m_dmxDevicesComboBox->addItem("No device");
 }
 
-void DMXManagerWidget::Connect()
+void DmxManagerWidget::Connect()
 {
   m_dmxDevice = m_dmxManager->device(m_dmxDriversComboBox->currentText(),
                                      m_dmxDevicesComboBox->currentText());
 
+  // TODO: this if is really ugly, bad work !
   if (m_dmxDevicesComboBox->currentText() == "No device")
   {
     qDebug() << "no device to connect !";
   }
   else
   {
-    m_dmxManager->patch(QDmxManager::Output,
+    if(m_dmxManager->patch(QDmxManager::Output,
                         m_dmxDevice,
-                        0,
-                        0);
+                        0, // TODO : handle several output ports
+                        m_universeID,
+                        QDmxManager::HTP)) // TODO : voir ça...
+    {
+      m_isConnected = true;
+      m_dmxUniverse->setConnected(true);
+      m_dmxUniverse->setDmxDevice(m_dmxDevice);
+    }
   }
+}
+
+void DmxManagerWidget::disconnect()
+{
+
 }
 

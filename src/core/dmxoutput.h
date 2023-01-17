@@ -29,25 +29,33 @@ class DmxOutput
 
 public:
 
-  explicit DmxOutput(QObject *parent = nullptr);
+  explicit DmxOutput(int t_universeID,
+                     int t_outputID,
+                     QObject *parent = nullptr);
 
   // getters
   int getLevel() const { return m_level; }
   int getMaxLevel() const { return m_maxLevel; }
+  int getUniverseID() const { return m_universeID; }
+  int getOutputID() const { return m_outputID; }
 
   // setters
   void setLevel(int t_level);
   void setMaxLevel(int t_maxLevel);
+  void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
+  void setOutputID(int t_outputID) { m_outputID = t_outputID; }
 
 signals:
 
-  void levelChanged(int);
+  void levelChanged();
   void maxLevelChanged(int);
 
 private:
 
   int m_level;
   int m_maxLevel;
+  int m_universeID;
+  int m_outputID;
   // TODO : add curves output
 
   Q_PROPERTY(int getLevel

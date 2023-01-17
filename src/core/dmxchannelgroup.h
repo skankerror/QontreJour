@@ -32,13 +32,27 @@ public:
 
   explicit DmxChannelGroup(QObject *parent = nullptr);
 
+  // getters
+  QList<QPair<DmxChannel *, int> > getV_p_dmxChannel() const { return v_p_dmxChannel; }
+  int getLevel() const { return m_level; }
+
+  // setters
+  void setLevel(int t_level);
+
 signals:
+
+  void v_p_dmxChannelChanged();
+  void levelChanged();
 
 private:
 
   QList<QPair<DmxChannel*, int>> v_p_dmxChannel;
   int m_level;
 
+  Q_PROPERTY(int getLevel
+             READ getLevel
+             WRITE setLevel
+             NOTIFY levelChanged)
 };
 
 #endif // DMXCHANNELGROUP_H

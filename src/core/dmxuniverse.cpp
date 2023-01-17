@@ -16,9 +16,50 @@
  */
 
 #include "dmxuniverse.h"
+#include <QDebug>
 
-DmxUniverse::DmxUniverse(QObject *parent)
-  : QObject{parent}
+DmxUniverse::DmxUniverse(int t_outputCount/* = 512 */,
+                         QObject *parent)
+  : QObject(parent),
+    m_ID(STATIC_UNIVERSE_COUNT++), // first universe will have id 0
+    m_outputCount(t_outputCount),
+    m_isConnected(false),
+    m_dmxDevice(nullptr)
 {
+  for (int i = 0; i < m_outputCount; i++)
+  {
+    auto dmxOutput = new DmxOutput(m_ID,
+                                   i, // first output channel will be id 0
+                                   this);
+    m_L_dmxOutput.append(dmxOutput);
 
+    connect(dmxOutput,
+            SIGNAL(levelChanged()),
+            this,
+            SLOT(onOutputLevelChanged()));
+  }
+}
+
+DmxUniverse::~DmxUniverse()
+{
+//  m_dmxDevice->stop();
+  // TODO : check that !
+}
+
+bool DmxUniverse::setOutputLevel(int t_outputID,
+                                 int t_level)
+{
+  if (t_outputID < m_outputCount)
+  {
+    auto dmxOutput = m_L_dmxOutput.at(t_outputID);
+    dmxOutput->setLevel(t_level);
+    return true;
+  }
+  qWarning() << "try to set an output out of range in this universe";
+  return false;
+}
+
+void DmxUniverse::onOutputLevelChanged()
+{
+  emit dmxOutputUpdateRequired();
 }
