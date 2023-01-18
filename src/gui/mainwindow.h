@@ -31,8 +31,13 @@
 #include "sequencerwidget.h"
 #include "dmxoutputwidget.h"
 #include "submasterwidget.h"
+#include "dmxchanneloutputwidget.h"
+#include "../core/dmxchanneloutputtablemodel.h"
+//#include "dmxchanneloutputtabledelegate.h"
 
-class MainWindow : public QMainWindow
+
+class MainWindow
+    : public QMainWindow
 {
   Q_OBJECT
 
@@ -55,13 +60,14 @@ private:
 
   void TestingZone();
 
+signals:
+
+  void universeCountChanged(int);
+
 private slots:
 
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
-  void onDmxManagerClaimsUpdate(int t_universeID,
-                                int t_outputID,
-                                int t_level);
 
 private:
 
@@ -81,13 +87,17 @@ private:
   QPushButton *m_removeDmxManagerWidgetButton;
   QVBoxLayout *m_dmxManagerContainerLayout;
   QList<DmxManagerWidget *> m_L_dmxManagerWidget;
+  QList<DmxChannelOutputTableModel *> m_L_dmxChannelOutputTableModel;
 
   GrandMasterWidget *m_grandMasterWidget;
   PlaybackWidget *m_playbackWidget;
   SequencerWidget *m_sequencerWidget;
   DmxOutputWidget *m_dmxOutputWidget;
+  DmxChannelOutputWidget *m_dmxChannelOutputWidget;
 
   QDmxManager *m_dmxManager;
+
+  int m_universeCount; // a copy of static one cos I have troubles
 
 };
 #endif // MAINWINDOW_H

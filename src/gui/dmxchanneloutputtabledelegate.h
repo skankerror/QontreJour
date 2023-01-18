@@ -15,29 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QONTREJOUR_H
-#define QONTREJOUR_H
+#ifndef DMXCHANNELOUTPUTTABLEDELEGATE_H
+#define DMXCHANNELOUTPUTTABLEDELEGATE_H
 
-enum dmxDrivers
+#include <QStyledItemDelegate>
+
+class DmxChannelOutputTableDelegate
+    : public QStyledItemDelegate
 {
-  dummy,
-  artnet,
-  e131,
-  dmxusb,
-  uart,
-  Count_dmxDrivers = uart +1
+
+  Q_OBJECT
+
+public:
+
+  explicit DmxChannelOutputTableDelegate(QObject *parent = nullptr);
+
+  // override
+  void paint(QPainter *painter,
+             const QStyleOptionViewItem &option,
+             const QModelIndex &index) const override;
 };
 
-#define SUBMASTER_SLIDERS_COUNT 24
-
-#define UNIVERSE_OUTPUT_COUNT_DEFAULT 512
-
-#define DMX_CHANNEL_OUTPUT_TABLE_MODEL_ROWS_COUNT_DEFAULT 32
-#define DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT 32
-
-
-static int STATIC_UNIVERSE_COUNT = 0; // TODO this is ugly
-static float STATIC_GRAND_MASTER_VALUE = 1.0f; // this will multiply each output
-
-
-#endif // QONTREJOUR_H
+#endif // DMXCHANNELOUTPUTTABLEDELEGATE_H

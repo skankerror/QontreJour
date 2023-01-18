@@ -18,8 +18,13 @@
 #include "dmxchannel.h"
 #include <QDebug>
 
-DmxChannel::DmxChannel(QObject *parent)
-  : QObject{parent}
+DmxChannel::DmxChannel(int t_universeID,
+                       int t_channelID,
+                       QObject *parent)
+  : QObject(parent),
+    m_level(0),
+    m_universeID(t_universeID),
+    m_channelID(t_channelID)
 {}
 
 DmxChannel::~DmxChannel()
@@ -40,7 +45,8 @@ void DmxChannel::setLevel(const int t_level)
   if (m_level == t_level)
     return;
   m_level = t_level;
-  emit levelChanged(m_level);
+  emit levelChanged(m_channelID,
+                    m_level);
 }
 
 void DmxChannel::addDmxOutput(DmxOutput *t_dmxOutput)
@@ -104,5 +110,6 @@ void DmxChannel::clear()
 {
   m_L_dmxOutput.clear();
   // emit signal ?
+  // TODO : delete the outputs ?
   m_L_dmxOutput.squeeze();
 }

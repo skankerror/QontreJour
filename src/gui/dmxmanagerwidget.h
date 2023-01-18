@@ -36,6 +36,12 @@ public:
   explicit DmxManagerWidget(QWidget *parent = nullptr);
   ~DmxManagerWidget();
 
+  // getters
+  DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
+
+  // setters
+//  void setDmxUniverse(DmxUniverse *t_dmxUniverse) { m_dmxUniverse = t_dmxUniverse; }
+
 private:
 
   void CreateWidget();
@@ -43,9 +49,9 @@ private:
 
 signals:
 
-  void universeClaimsUpdate(int, //universe ID
-                            int, //output ID
-                            int); // level
+//  void universeClaimsUpdate(int, //universe ID
+//                            int, //output ID
+//                            int); // level
 
 private slots:
 

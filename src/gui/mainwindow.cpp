@@ -31,19 +31,21 @@ MainWindow::MainWindow(QWidget *parent)
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
     m_dmxOutputWidget(new DmxOutputWidget(this)),
+    m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
     m_submasterWidget(new SubMasterWidget(this)),
     m_dmxManagerContainerWidget(new QWidget(this)),
     m_dmxManagerContainerLayout(new QVBoxLayout()),
     m_addDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
-    m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget))
+    m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
+    m_universeCount(0)
 {
-  CreateActions();
-  CreateMenubar();
-  CreateToolBars();
-  CreateDockWidgets();
+//  CreateActions();
+//  CreateMenubar();
+//  CreateToolBars();
   createDmxManagerContainerWidget();
+  CreateDockWidgets();
   CreateCentralWidget();
-  CreateStatusBar();
+//  CreateStatusBar();
 
   createConnections();
 
@@ -169,14 +171,29 @@ void MainWindow::TestingZone()
 void MainWindow::addDmxManagerWidget()
 {
   auto dmxManagerWidget = new DmxManagerWidget(m_dmxManagerContainerWidget);
+
   m_L_dmxManagerWidget.append(dmxManagerWidget);
   m_dmxManagerContainerLayout->addWidget(dmxManagerWidget);
 
+  // we get his universe to get *DmxChannel to set
+  // model for channel view
+  auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
+  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+  auto channelModel = new DmxChannelOutputTableModel(L_dmxChannel,
+                                                     dmxManagerWidget); // TODO: parent, good idea ?
+
+  m_L_dmxChannelOutputTableModel.append(channelModel);
+
+  // TESTING :
+  m_dmxChannelOutputWidget->setModel(channelModel);
+
+  emit universeCountChanged(++m_universeCount);
+
   // connection to qdmx
-  connect(dmxManagerWidget,
-          SIGNAL(universeClaimsUpdate(int,int,int)),
-          this,
-          SLOT(onDmxManagerClaimsUpdate(int,int,int)));
+//  connect(dmxManagerWidget,
+//          SIGNAL(universeClaimsUpdate(int,int,int)),
+//          this,
+//          SLOT(onDmxManagerClaimsUpdate(int,int,int)));
 }
 
 void MainWindow::removeDmxManagerWidget()
@@ -187,14 +204,12 @@ void MainWindow::removeDmxManagerWidget()
     auto dmxManagerWidget = m_L_dmxManagerWidget.last();
     m_L_dmxManagerWidget.removeLast();
     dmxManagerWidget->deleteLater();
-  }
-}
+    auto channelModel = m_L_dmxChannelOutputTableModel.last();
+    m_L_dmxChannelOutputTableModel.removeLast();
+    channelModel->deleteLater();
 
-void MainWindow::onDmxManagerClaimsUpdate(int t_universeID, int t_outputID, int t_level)
-{
-  m_dmxManager->writeData(t_universeID,
-                          t_outputID,
-                          t_level);
+    emit universeCountChanged(--m_universeCount);
+  }
 }
 
 void MainWindow::CreateActions()
@@ -234,7 +249,8 @@ void MainWindow::CreateDockWidgets()
 
   auto bottomDock = new QDockWidget(this);
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-  bottomDock->setWidget(m_dmxOutputWidget);
+//  m_dmxChannelOutputWidget->setModel();
+  bottomDock->setWidget(m_dmxChannelOutputWidget);
   bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
@@ -284,7 +300,10 @@ void MainWindow::createConnections()
           SIGNAL(clicked()),
           this,
           SLOT(removeDmxManagerWidget()));
-
+  connect(this,
+          SIGNAL(universeCountChanged(int)),
+          m_dmxChannelOutputWidget,
+          SLOT(onUniverseCountChanged(int)));
 
 
 }

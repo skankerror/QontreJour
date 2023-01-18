@@ -169,7 +169,10 @@ void DmxManagerWidget::disConnect()
 void DmxManagerWidget::onOutputLevelChanged(int t_output,
                                             int t_level)
 {
-  emit universeClaimsUpdate(m_universeID,
-                            t_output,
-                            t_level);
+  m_dmxManager->writeData(m_universeID,
+                          t_output,
+                          t_level);
+//  emit universeClaimsUpdate(m_universeID,
+//                            t_output,
+//                            t_level);
 }

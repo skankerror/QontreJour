@@ -15,29 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QONTREJOUR_H
-#define QONTREJOUR_H
+#include "dmxchanneloutputtableview.h"
+#include <QHeaderView>
+#include "../qontrejour.h"
 
-enum dmxDrivers
+DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
+  : QTableView(parent)
 {
-  dummy,
-  artnet,
-  e131,
-  dmxusb,
-  uart,
-  Count_dmxDrivers = uart +1
-};
+  setSortingEnabled(false);
+  horizontalHeader()->setMinimumSectionSize(49);
+//  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  verticalHeader()->setMinimumSectionSize(49);
+  horizontalHeader()->hide();
+  verticalHeader()->hide();
+//  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
+//  {
+//    setColumnWidth(i, 10);
+//  }
+  resizeColumnsToContents();
 
-#define SUBMASTER_SLIDERS_COUNT 24
-
-#define UNIVERSE_OUTPUT_COUNT_DEFAULT 512
-
-#define DMX_CHANNEL_OUTPUT_TABLE_MODEL_ROWS_COUNT_DEFAULT 32
-#define DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT 32
-
-
-static int STATIC_UNIVERSE_COUNT = 0; // TODO this is ugly
-static float STATIC_GRAND_MASTER_VALUE = 1.0f; // this will multiply each output
-
-
-#endif // QONTREJOUR_H
+}

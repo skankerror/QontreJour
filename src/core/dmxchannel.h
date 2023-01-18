@@ -19,6 +19,7 @@
 #define DMXCHANNEL_H
 
 #include <QObject>
+#include <QAbstractTableModel>
 #include <QList>
 #include "dmxoutput.h"
 
@@ -30,16 +31,23 @@ class DmxChannel
 
 public:
 
-  explicit DmxChannel(QObject *parent = nullptr);
+  explicit DmxChannel(int t_universeID,
+                      int t_channelID,
+                      QObject *parent = nullptr);
   ~DmxChannel();
 
   // getters
   int getLevel() const{ return m_level; }
   QList<DmxOutput *> getL_dmxOutput() const { return m_L_dmxOutput; }
   DmxOutput* getL_dmxOutputAt(int t_index);
+  int getUniverseID() const { return m_universeID; }
+  int getChannelID() const { return m_channelID; }
 
   //setters
   void setLevel(const int t_level);
+  void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
+  void setChannelID(int t_channelID) { m_channelID = t_channelID; }
+
 
   //public methods
   void addDmxOutput(DmxOutput *t_dmxOutput);
@@ -54,12 +62,20 @@ public:
 signals:
 
   void L_dmxOutputChanged();
-  void levelChanged(int);
+  void levelChanged(int, // channel id
+                    int); // level
 
 private:
 
   QList<DmxOutput *> m_L_dmxOutput;
   int m_level;
+  int m_universeID;
+  int m_channelID;
+
+  Q_PROPERTY(int getLevel
+             READ getLevel
+             WRITE setLevel
+             NOTIFY levelChanged)
 
 };
 
