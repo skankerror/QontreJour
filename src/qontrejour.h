@@ -18,15 +18,6 @@
 #ifndef QONTREJOUR_H
 #define QONTREJOUR_H
 
-enum dmxDrivers
-{
-  dummy,
-  artnet,
-  e131,
-  dmxusb,
-  uart,
-  Count_dmxDrivers = uart +1
-};
 
 #define SUBMASTER_SLIDERS_COUNT 24
 
@@ -36,8 +27,6 @@ enum dmxDrivers
 #define DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT 32
 
 
-//static int STATIC_UNIVERSE_COUNT = 0; // TODO this is ugly
-//static float STATIC_GRAND_MASTER_VALUE = 1.0f; // this will multiply each output
 
 
 #endif // QONTREJOUR_H

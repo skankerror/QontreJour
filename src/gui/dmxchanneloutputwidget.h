@@ -78,13 +78,11 @@ class DmxChannelOutputTableModel
 
   Q_OBJECT
 
-  friend class DmxChannelOutputTableDelegate;
+//  friend class DmxChannelOutputTableDelegate;
 
 public:
 
   explicit DmxChannelOutputTableModel(QObject *parent = nullptr);
-//  DmxChannelOutputTableModel(const QList<DmxChannel *> &t_L_dmxChannel,
-//                             QObject *parent = nullptr);
 
   QList<DmxChannel *> getL_dmxChannel() const { return m_L_dmxChannel; }
   void setL_dmxChannel(const QList<DmxChannel *> &t_L_dmxChannel){ m_L_dmxChannel = t_L_dmxChannel; }

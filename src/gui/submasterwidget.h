@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QSlider>
 #include "../qontrejour.h"
+#include "../core/dmxchannelgroup.h"
 
 class SubMasterWidget : public QWidget
 {
@@ -18,7 +19,7 @@ signals:
 
 private:
 
-  QList<QSlider*> l_m_sliders;
+  QList<QSlider*> m_L_sliders;
 
 };
 

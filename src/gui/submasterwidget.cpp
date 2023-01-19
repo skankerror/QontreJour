@@ -9,9 +9,15 @@ SubMasterWidget::SubMasterWidget(QWidget *parent)
   for (int i = 0; i < SUBMASTER_SLIDERS_COUNT; i++)
   {
     auto slider = new QSlider(this);
-    l_m_sliders.append(slider);
+    slider->setMaximum(255);
+    slider->setMinimum(0);
+//    auto DmxChannelGroup
+    m_L_sliders.append(slider);
     slidersLayout->addWidget(slider);
   }
 
   setLayout(slidersLayout);
 }
+
+// TODO : c'est le bordel y faut sans doute sous-classer slider...
+// et faire méthodes pour y assigner des channels existants.

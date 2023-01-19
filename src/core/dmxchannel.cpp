@@ -110,6 +110,5 @@ void DmxChannel::clear()
 {
   m_L_dmxOutput.clear();
   // emit signal ?
-  // TODO : delete the outputs ?
   m_L_dmxOutput.squeeze();
 }

@@ -29,7 +29,6 @@
 #include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
-#include "dmxoutputwidget.h"
 #include "submasterwidget.h"
 #include "dmxchanneloutputwidget.h"
 
@@ -87,7 +86,7 @@ private:
   GrandMasterWidget *m_grandMasterWidget;
   PlaybackWidget *m_playbackWidget;
   SequencerWidget *m_sequencerWidget;
-  DmxOutputWidget *m_dmxOutputWidget;
+//  DmxOutputWidget *m_dmxOutputWidget;
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
   DmxChannelOutputTableModel *m_dmxChannelOutputTableModel;
   DmxChannelOutputTableDelegate *m_dmxChannelOutputTableDelegate;

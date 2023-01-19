@@ -1,12 +1,12 @@
 QontreJour
 ====== 
-QontreJour is a light controlling software
+QontreJour is a light controlling software.
+Alpha version.
+About nearly nothing is working yet.
 
 
 Build status
 ---------------
-
-Github Actions: ![Build on macOS](https://github.com/skankerror/QontreJour/.github/workflows/Build%20on%20macOS/badge.svg) ![Build on Ubuntu](https://github.com/skankerror/QontreJour/.github/workflows/Build%20on%20Ubuntu/badge.svg) ![Build on Windows](https://github.com/skankerror/QontreJour/.github/workflows/Build%20on%20Windows/badge.svg)
 
 
 Ackowledgements

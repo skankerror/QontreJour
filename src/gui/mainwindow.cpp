@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_grandMasterWidget(new GrandMasterWidget(this)),
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
-    m_dmxOutputWidget(new DmxOutputWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
     m_dmxChannelOutputTableModel(new DmxChannelOutputTableModel(this)),
     m_dmxChannelOutputTableDelegate(new DmxChannelOutputTableDelegate(this)),
@@ -57,7 +56,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addDmxManagerWidget()
 {
-  auto dmxManagerWidget = new DmxManagerWidget(m_universeCount++,
+  auto dmxManagerWidget = new DmxManagerWidget(m_universeCount,
                                                m_dmxManagerContainerWidget);
 
   m_L_dmxManagerWidget.append(dmxManagerWidget);
@@ -67,13 +66,13 @@ void MainWindow::addDmxManagerWidget()
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
   auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
-//  auto universeID = dmxUniverse->getID(); // TODO : why ? we have id !
-  auto universeID = m_universeCount - 1;
 
   m_dmxChannelOutputTableModel->setL_dmxChannel(L_dmxChannel);
-  m_dmxChannelOutputTableModel->setUniverseID(universeID);
+  m_dmxChannelOutputTableModel->setUniverseID(m_universeCount);// count has not been ++ yet
   m_dmxChannelOutputTableDelegate->setL_dmxChannel(L_dmxChannel);
-  m_dmxChannelOutputTableDelegate->setUniverseID(universeID);
+  m_dmxChannelOutputTableDelegate->setUniverseID(m_universeCount);
+
+  m_universeCount++;
 
   emit universeCountChanged(m_universeCount);
 
@@ -83,7 +82,6 @@ void MainWindow::removeDmxManagerWidget()
 {
   if (m_L_dmxManagerWidget.size() > 1) // we always keep one universe
   {
-//    --STATIC_UNIVERSE_COUNT;
     auto dmxManagerWidget = m_L_dmxManagerWidget.last();
     m_L_dmxManagerWidget.removeLast();
     dmxManagerWidget->deleteLater();

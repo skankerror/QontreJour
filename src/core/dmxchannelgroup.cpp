@@ -16,9 +16,10 @@
  */
 
 #include "dmxchannelgroup.h"
+#include <QDebug>
 
 DmxChannelGroup::DmxChannelGroup(QObject *parent)
-  : QObject{parent}
+  : QObject(parent)
 {}
 
 void DmxChannelGroup::setLevel(int t_level)
@@ -26,5 +27,53 @@ void DmxChannelGroup::setLevel(int t_level)
   if (m_level == t_level)
     return;
   m_level = t_level;
+
   emit levelChanged();
+}
+
+bool DmxChannelGroup::addDmxChannel(QPair<DmxChannel *, int> t_P_dmxChannel)
+{
+  if (!t_P_dmxChannel.first() || t_P_dmxChannel.second() < 1)
+    return false;
+  if (m_L_P_dmxChannel.contains(t_P_dmxChannel))
+    return setDmxChannelLevel(t_P_dmxChannel);
+
+  m_L_P_dmxChannel.append(t_P_dmxChannel);
+}
+
+bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
+{
+  for (const auto &item : std::as_const(m_L_P_dmxChannel))
+  {
+    auto dmxChannel = item.first();
+    if (dmxChannel = t_dmxChannel)
+    {
+      m_L_P_dmxChannel.removeOne(item);
+      return true;
+    }
+  }
+  qWarning () << "Can't remove channel, it's not in the group";
+  return false;
+}
+
+bool DmxChannelGroup::setDmxChannelLevel(QPair<DmxChannel *, int> t_P_dmxChannel)
+{
+  if (!t_P_dmxChannel) return false;
+  for (const auto &item : std::as_const(m_L_P_dmxChannel))
+  {
+    auto dmxChannel = item.first();
+    if (dmxChannel = t_dmxChannel)
+    {
+      dmxChannel->setLevel(t_P_dmxChannel);
+      return true;
+    }
+  }
+    qWarning () << "Can't find channel to edit, it's not in the group";
+    return false;
+}
+
+void DmxChannelGroup::clear()
+{
+  m_L_P_dmxChannel.clear();
+  m_L_P_dmxChannel.squeeze();
 }

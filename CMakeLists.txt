@@ -26,7 +26,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(libs/QMidi)
 add_subdirectory(libs/QOSC)
-add_subdirectory(libs/QEnttecPro)
+#add_subdirectory(libs/QEnttecPro)
 add_subdirectory(libs/QDmxLib)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
@@ -58,8 +58,6 @@ set(PROJECT_SOURCES
         src/gui/sequencerwidget.cpp
         src/gui/dmxchanneloutputwidget.h
         src/gui/dmxchanneloutputwidget.cpp
-        src/gui/dmxoutputwidget.h
-        src/gui/dmxoutputwidget.cpp
         src/gui/grandmasterwidget.h
         src/gui/grandmasterwidget.cpp
         src/gui/playbackwidget.h
@@ -94,7 +92,7 @@ target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::SerialPort)
 target_link_libraries(QontreJour PRIVATE ossia)
-target_link_libraries(QontreJour PUBLIC QMidi QOSC QEnttecPro QDmxLib)
+target_link_libraries(QontreJour PUBLIC QMidi QOSC #[[QEnttecPro]] QDmxLib)
 
 set_target_properties(QontreJour PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
