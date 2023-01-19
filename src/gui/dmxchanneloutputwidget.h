@@ -20,21 +20,25 @@
 
 #include <QWidget>
 #include <QSpinBox>
-#include "dmxchanneloutputtableview.h"
-#include "../core/dmxchanneloutputtablemodel.h"
-#include "dmxchanneloutputtabledelegate.h"
+#include <QTableView>
+#include <QAbstractTableModel>
+#include <QStyledItemDelegate>
+#include "../core/dmxchannel.h"
 
+class DmxChannelOutputTableView;
+class DmxChannelOutputTableModel;
+class DmxChannelOutputTableDelegate;
 
 class DmxChannelOutputWidget
     : public QWidget
 {
+
   Q_OBJECT
 
 public:
 
   explicit DmxChannelOutputWidget(QWidget *parent = nullptr);
 
-//  DmxChannelOutputTableView *getTableView() const { return m_tableView; }
 
 signals:
 
@@ -42,13 +46,93 @@ public slots:
 
   void onUniverseCountChanged(int t_universeCount);
   void setModel(DmxChannelOutputTableModel *t_model);
+  void setDelegate(DmxChannelOutputTableDelegate *t_delegate);
 
 private:
 
   DmxChannelOutputTableView *m_tableView;
-  DmxChannelOutputTableDelegate *m_delegate;
   QSpinBox *m_universeSpinBox;
+  int m_universeCount;
 
 };
+
+/********************************************************************/
+
+class DmxChannelOutputTableView
+    : public QTableView
+{
+
+  Q_OBJECT
+
+public:
+
+  DmxChannelOutputTableView(QWidget *parent);
+
+};
+
+/********************************************************************/
+
+class DmxChannelOutputTableModel
+    : public QAbstractTableModel
+{
+
+  Q_OBJECT
+
+  friend class DmxChannelOutputTableDelegate;
+
+public:
+
+  explicit DmxChannelOutputTableModel(QObject *parent = nullptr);
+//  DmxChannelOutputTableModel(const QList<DmxChannel *> &t_L_dmxChannel,
+//                             QObject *parent = nullptr);
+
+  QList<DmxChannel *> getL_dmxChannel() const { return m_L_dmxChannel; }
+  void setL_dmxChannel(const QList<DmxChannel *> &t_L_dmxChannel){ m_L_dmxChannel = t_L_dmxChannel; }
+  int getUniverseID() const { return m_universeID; }
+  void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
+
+  // overrides
+  int rowCount(const QModelIndex &parent) const override;
+  int columnCount(const QModelIndex &parent) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
+  bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role) override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+private:
+
+  QList<DmxChannel *> m_L_dmxChannel;
+  int m_universeID;
+
+};
+
+/*********************************************************************/
+
+class DmxChannelOutputTableDelegate
+    : public QStyledItemDelegate
+{
+
+  Q_OBJECT
+
+public:
+
+  explicit DmxChannelOutputTableDelegate(QObject *parent = nullptr);
+  void setL_dmxChannel(const QList<DmxChannel *> &t_L_dmxChannel){ m_L_dmxChannel = t_L_dmxChannel; }
+  int getUniverseID() const { return m_universeID; }
+  void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
+
+  // override
+  void paint(QPainter *painter,
+             const QStyleOptionViewItem &option,
+             const QModelIndex &index) const override;
+
+private:
+
+  QList<DmxChannel *> m_L_dmxChannel;
+  int m_universeID;
+
+};
+
 
 #endif // DMXCHANNELOUTPUTWIDGET_H

@@ -50,8 +50,6 @@ set(PROJECT_SOURCES
         src/core/dmxscene.cpp
         src/core/dmxsequence.h
         src/core/dmxsequence.cpp
-        src/core/dmxchanneloutputtablemodel.h
-        src/core/dmxchanneloutputtablemodel.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
         src/gui/dmxmanagerwidget.h
@@ -60,10 +58,6 @@ set(PROJECT_SOURCES
         src/gui/sequencerwidget.cpp
         src/gui/dmxchanneloutputwidget.h
         src/gui/dmxchanneloutputwidget.cpp
-        src/gui/dmxchanneloutputtableview.h
-        src/gui/dmxchanneloutputtableview.cpp
-        src/gui/dmxchanneloutputtabledelegate.h
-        src/gui/dmxchanneloutputtabledelegate.cpp
         src/gui/dmxoutputwidget.h
         src/gui/dmxoutputwidget.cpp
         src/gui/grandmasterwidget.h

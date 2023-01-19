@@ -18,10 +18,11 @@
 #include "dmxuniverse.h"
 #include <QDebug>
 
-DmxUniverse::DmxUniverse(int t_outputCount/* = 512 */,
+DmxUniverse::DmxUniverse(int t_universeID,
+                         int t_outputCount/* = 512 */,
                          QObject *parent)
   : QObject(parent),
-    m_ID(STATIC_UNIVERSE_COUNT++), // first universe will have id 0
+    m_ID(t_universeID), // first universe will have id 0
     m_outputCount(t_outputCount),
     m_isConnected(false),
     m_dmxDevice(nullptr)
@@ -53,7 +54,25 @@ DmxUniverse::~DmxUniverse()
 {
 //  m_dmxDevice->stop();
   // TODO : check that !
-  STATIC_UNIVERSE_COUNT--;
+  // détruire output et channel !
+  for (const auto &item : std::as_const(m_L_dmxOutput))
+  {
+    item->deleteLater();
+  }
+
+  for (const auto &item : std::as_const(m_L_dmxChannel))
+  {
+    item->deleteLater();
+  }
+
+  m_L_dmxOutput.clear();
+  m_L_dmxOutput.squeeze();
+  m_L_dmxChannel.clear();
+  m_L_dmxChannel.squeeze();
+//  if (DmxUniverse::isConnected)
+//    m_dmxDevice->deleteLater();
+
+//  STATIC_UNIVERSE_COUNT--;
 }
 
 bool DmxUniverse::setOutputLevel(int t_outputID,

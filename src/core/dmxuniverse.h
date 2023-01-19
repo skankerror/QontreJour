@@ -34,7 +34,8 @@ class DmxUniverse
 public:
 
   // cstr
-  explicit DmxUniverse(int t_outputCount = UNIVERSE_OUTPUT_COUNT_DEFAULT,
+  explicit DmxUniverse(int t_universeID,
+                       int t_outputCount = UNIVERSE_OUTPUT_COUNT_DEFAULT,
                        QObject *parent = nullptr);
 
   //destr

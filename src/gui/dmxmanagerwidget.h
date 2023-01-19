@@ -33,7 +33,8 @@ class DmxManagerWidget : public QWidget
 
 public:
 
-  explicit DmxManagerWidget(QWidget *parent = nullptr);
+  explicit DmxManagerWidget(int t_universeID,
+                            QWidget *parent = nullptr);
   ~DmxManagerWidget();
 
   // getters

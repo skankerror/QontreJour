@@ -32,8 +32,6 @@
 #include "dmxoutputwidget.h"
 #include "submasterwidget.h"
 #include "dmxchanneloutputwidget.h"
-#include "../core/dmxchanneloutputtablemodel.h"
-//#include "dmxchanneloutputtabledelegate.h"
 
 
 class MainWindow
@@ -57,8 +55,6 @@ private:
   void CreateStatusBar();
 
   void createConnections();
-
-  void TestingZone();
 
 signals:
 
@@ -87,13 +83,14 @@ private:
   QPushButton *m_removeDmxManagerWidgetButton;
   QVBoxLayout *m_dmxManagerContainerLayout;
   QList<DmxManagerWidget *> m_L_dmxManagerWidget;
-  QList<DmxChannelOutputTableModel *> m_L_dmxChannelOutputTableModel;
 
   GrandMasterWidget *m_grandMasterWidget;
   PlaybackWidget *m_playbackWidget;
   SequencerWidget *m_sequencerWidget;
   DmxOutputWidget *m_dmxOutputWidget;
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
+  DmxChannelOutputTableModel *m_dmxChannelOutputTableModel;
+  DmxChannelOutputTableDelegate *m_dmxChannelOutputTableDelegate;
 
   QDmxManager *m_dmxManager;
 
