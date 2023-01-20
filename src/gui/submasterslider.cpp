@@ -15,25 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "submasterwidget.h"
-#include <QLayout>
+#include "submasterslider.h"
 
-SubMasterWidget::SubMasterWidget(QWidget *parent)
-  : QWidget(parent)
-{
-  auto slidersLayout = new QHBoxLayout();
+SubMasterSlider::SubMasterSlider(QWidget *parent)
+  : QSlider(parent)
+{}
 
-  for (int i = 0; i < SUBMASTER_SLIDERS_COUNT; i++)
-  {
-    auto slider = new SubMasterSlider(this);
-    slider->setMaximum(255);
-    slider->setMinimum(0);
-    m_L_sliders.append(slider);
-    slidersLayout->addWidget(slider);
-  }
-
-  setLayout(slidersLayout);
-}
-
-// TODO : c'est le bordel y faut sans doute sous-classer slider...
-// et faire méthodes pour y assigner des channels existants.
+SubMasterSlider::SubMasterSlider(DmxChannelGroup *t_dmxChannelGroup,
+                                 QWidget *parent)
+  : QSlider(parent),
+    m_dmxChannelGroup(t_dmxChannelGroup)
+{}

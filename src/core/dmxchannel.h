@@ -19,7 +19,6 @@
 #define DMXCHANNEL_H
 
 #include <QObject>
-#include <QAbstractTableModel>
 #include <QList>
 #include "dmxoutput.h"
 

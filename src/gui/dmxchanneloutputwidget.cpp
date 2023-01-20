@@ -184,9 +184,7 @@ Qt::ItemFlags DmxChannelOutputTableModel::flags(const QModelIndex &index) const
 
 DmxChannelOutputTableDelegate::DmxChannelOutputTableDelegate(QObject *parent)
   : QStyledItemDelegate(parent)
-{
-
-}
+{}
 
 
 void DmxChannelOutputTableDelegate::paint(QPainter *painter,
@@ -207,11 +205,30 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
                                       + index.column() + 1),
                       textOption);
   }
-  painter->restore();
   if (index.row()%2) // ligne impaire, channel level
   {
-    QStyledItemDelegate::paint(painter, option, index);
-  }
+    painter->setBackgroundMode(Qt::OpaqueMode);
+    QTextOption textOption;
+    textOption.setAlignment(Qt::AlignCenter);
+    painter->fillRect(option.rect,
+                      QBrush(QColor("#BA6D2B")));
+    int channelID = (((index.row() -1)/2) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+        + index.column();
+    if (channelID < 0 || channelID >= m_L_dmxChannel.size())
+      return;
+    auto dmxChannel = m_L_dmxChannel.at(channelID);
+    painter->drawText(option.rect,
+                      QString::number(dmxChannel->getLevel()),
+                      textOption);
 
+
+//    painter->drawText(option.rect,
+//                      QString::number(((index.row() / 2 ) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+//                                      + index.column() + 1),
+//                      textOption);
+
+  }
+  painter->restore();
+//  QStyledItemDelegate::paint(painter, option, index);
 
 }

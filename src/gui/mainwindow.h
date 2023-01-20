@@ -32,6 +32,8 @@
 #include "submasterwidget.h"
 #include "dmxchanneloutputwidget.h"
 
+#include "../core/dmxchannelgroup.h"
+
 
 class MainWindow
     : public QMainWindow

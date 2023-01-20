@@ -38,7 +38,7 @@ public:
   ~DmxManagerWidget();
 
   // getters
-  DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
+  DmxUniverse *getDmxUniverse() /*const */{ return m_dmxUniverse; }
 
   // setters
 //  void setDmxUniverse(DmxUniverse *t_dmxUniverse) { m_dmxUniverse = t_dmxUniverse; }

@@ -65,7 +65,7 @@ void MainWindow::addDmxManagerWidget()
   // we get his universe to get *DmxChannel to set
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
-  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();  
 
   m_dmxChannelOutputTableModel->setL_dmxChannel(L_dmxChannel);
   m_dmxChannelOutputTableModel->setUniverseID(m_universeCount);// count has not been ++ yet
@@ -157,6 +157,16 @@ void MainWindow::createDmxManagerContainerWidget()
 
 void MainWindow::CreateCentralWidget()
 {
+  // TODO : create channel group (1-1) and add them to widget for testing purpose
+  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)->getDmxUniverse()->getL_dmxChannel();
+  for (const auto &item : std::as_const(L_dmxChannel))
+  {
+    auto dmxChannelGroup = new DmxChannelGroup(m_submasterWidget);
+    dmxChannelGroup->addDmxChannel(QPair(item, 255));
+    // TODO : les assigner aux sliders...
+  }
+
+
   m_tabWidget->addTab(m_submasterWidget, "Submasters");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
 

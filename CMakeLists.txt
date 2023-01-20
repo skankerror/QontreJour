@@ -64,6 +64,8 @@ set(PROJECT_SOURCES
         src/gui/playbackwidget.cpp
         src/gui/submasterwidget.h
         src/gui/submasterwidget.cpp
+        src/gui/submasterslider.h
+        src/gui/submasterslider.cpp
         ${TS_FILES}
 )
 

@@ -33,20 +33,22 @@ void DmxChannelGroup::setLevel(int t_level)
 
 bool DmxChannelGroup::addDmxChannel(QPair<DmxChannel *, int> t_P_dmxChannel)
 {
-  if (!t_P_dmxChannel.first() || t_P_dmxChannel.second() < 1)
+//  auto dmxChannel = t_P_dmxChannel.first
+  if (!(t_P_dmxChannel.first) || t_P_dmxChannel.second < 1)
     return false;
   if (m_L_P_dmxChannel.contains(t_P_dmxChannel))
     return setDmxChannelLevel(t_P_dmxChannel);
 
   m_L_P_dmxChannel.append(t_P_dmxChannel);
+  return true;
 }
 
 bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
 {
   for (const auto &item : std::as_const(m_L_P_dmxChannel))
   {
-    auto dmxChannel = item.first();
-    if (dmxChannel = t_dmxChannel)
+    auto dmxChannel = item.first;
+    if (dmxChannel == t_dmxChannel)
     {
       m_L_P_dmxChannel.removeOne(item);
       return true;
@@ -58,13 +60,13 @@ bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
 
 bool DmxChannelGroup::setDmxChannelLevel(QPair<DmxChannel *, int> t_P_dmxChannel)
 {
-  if (!t_P_dmxChannel) return false;
+  if (!t_P_dmxChannel.first) return false;
   for (const auto &item : std::as_const(m_L_P_dmxChannel))
   {
-    auto dmxChannel = item.first();
-    if (dmxChannel = t_dmxChannel)
+    auto dmxChannel = item.first;
+    if (t_P_dmxChannel.first == dmxChannel)
     {
-      dmxChannel->setLevel(t_P_dmxChannel);
+      dmxChannel->setLevel(t_P_dmxChannel.second);
       return true;
     }
   }

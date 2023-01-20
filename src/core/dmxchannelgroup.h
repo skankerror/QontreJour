@@ -33,7 +33,7 @@ public:
   explicit DmxChannelGroup(QObject *parent = nullptr);
 
   // getters
-  QList<QPair<DmxChannel *, int> > getL_P_dmxChannel() const { return v_p_dmxChannel; }
+  QList<QPair<DmxChannel *, int> > getL_P_dmxChannel() const { return m_L_P_dmxChannel; }
   int getLevel() const { return m_level; }
 
   // setters
@@ -52,6 +52,7 @@ signals:
 
 private:
 
+  // TODO : transformer QPair en struct ?
   QList<QPair<DmxChannel*, int>> m_L_P_dmxChannel; // un channel et son level
   int m_level;
 
