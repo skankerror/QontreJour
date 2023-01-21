@@ -28,7 +28,7 @@ void DmxChannelGroup::setLevel(int t_level)
     return;
   m_level = t_level;
 
-  emit levelChanged();
+  emit levelChanged(m_level); // ?
 }
 
 bool DmxChannelGroup::addDmxChannel(QPair<DmxChannel *, int> t_P_dmxChannel)
@@ -78,4 +78,24 @@ void DmxChannelGroup::clear()
 {
   m_L_P_dmxChannel.clear();
   m_L_P_dmxChannel.squeeze();
+}
+
+void DmxChannelGroup::updateLevel(int t_level)
+{
+  if ((m_level == t_level)
+      || (t_level < 0)
+      || (t_level > 255))
+    return;
+
+  m_level = t_level;
+
+  for (const auto &item : std::as_const(m_L_P_dmxChannel))
+  {
+    auto dmxChannel = item.first;
+    auto level = item.second;
+    double coef = double(t_level)/255.0f;
+    dmxChannel->setLevel((int)coef * level);
+  }
+
+//  emit levelChanged(m_level);
 }

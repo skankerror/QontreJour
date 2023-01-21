@@ -45,10 +45,16 @@ public:
 
   void clear();
 
+
 signals:
 
   void v_p_dmxChannelChanged();
-  void levelChanged();
+  void levelChanged(int); // TODO : pas besoin il faut bouleguer dans update level,
+  // jouer avec les levels pour envoyer la bonne valeur au channel
+
+public slots:
+
+  void updateLevel(int t_level);
 
 private:
 

@@ -17,23 +17,58 @@
 
 #include "submasterwidget.h"
 #include <QLayout>
+#include <QDebug>
 
 SubMasterWidget::SubMasterWidget(QWidget *parent)
-  : QWidget(parent)
+  : QWidget(parent),
+    m_stackedLayout(new QStackedLayout()),
+    m_changePageComboBox(new QComboBox(this))
 {
-  auto slidersLayout = new QHBoxLayout();
-
-  for (int i = 0; i < SUBMASTER_SLIDERS_COUNT; i++)
-  {
-    auto slider = new SubMasterSlider(this);
-    slider->setMaximum(255);
-    slider->setMinimum(0);
-    m_L_sliders.append(slider);
-    slidersLayout->addWidget(slider);
-  }
-
-  setLayout(slidersLayout);
+  auto totalLayout = new QVBoxLayout();
+  totalLayout->addWidget(m_changePageComboBox);
+  totalLayout->addLayout(m_stackedLayout);
+  setLayout(totalLayout);
 }
 
-// TODO : c'est le bordel y faut sans doute sous-classer slider...
-// et faire méthodes pour y assigner des channels existants.
+void SubMasterWidget::setL_sliders(const QList<SubMasterSlider *> &t_L_sliders)
+{
+  m_L_sliders = t_L_sliders;
+}
+
+void SubMasterWidget::clear()
+{
+
+}
+
+void SubMasterWidget::populateWidget()
+{
+  // on crée le 1er widget pour contenir 32 sliders
+  int page_count = m_L_sliders.size() / SLIDERS_PER_PAGE;
+//  qDebug() << "page count : " << page_count;
+  if (m_L_sliders.size() > page_count * SLIDERS_PER_PAGE)
+    page_count++;
+
+  for (int i = 0; i < page_count; i++) // for each page
+  {
+    auto widget = new QWidget(this);
+    auto pageLayout = new QHBoxLayout();
+
+    for (int j = 0; j < SLIDERS_PER_PAGE; j++) // for each slider
+    {
+      auto slider = m_L_sliders.at(j + (i * SLIDERS_PER_PAGE));
+      pageLayout->addWidget(slider);
+    }
+    widget->setLayout(pageLayout);
+    m_stackedLayout->addWidget(widget);
+//    m_stackedLayout->addChildLayout(pageLayout);
+    m_changePageComboBox->addItem(tr("page %1").arg(i + 1));
+  }
+  connect(m_changePageComboBox, &QComboBox::activated,
+          m_stackedLayout, &QStackedLayout::setCurrentIndex);
+}
+
+
+//QSize SubMasterWidget::sizeHint() const
+//{
+//  return QSize(800, 300);
+//}

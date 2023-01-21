@@ -95,6 +95,8 @@ private:
 
   QDmxManager *m_dmxManager;
 
+  QList<DmxChannelGroup *> m_L_dmxChannelGroup;
+
   int m_universeCount; // a copy of static one cos I have troubles
 
 };

@@ -25,4 +25,12 @@ SubMasterSlider::SubMasterSlider(DmxChannelGroup *t_dmxChannelGroup,
                                  QWidget *parent)
   : QSlider(parent),
     m_dmxChannelGroup(t_dmxChannelGroup)
-{}
+{
+  setMinimum(0);
+  setMaximum(255);
+
+  connect(this,
+          SIGNAL(valueChanged(int)),
+          m_dmxChannelGroup,
+          SLOT(updateLevel(int)));
+}

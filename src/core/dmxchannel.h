@@ -61,8 +61,7 @@ public:
 signals:
 
   void L_dmxOutputChanged();
-  void levelChanged(int, // channel id
-                    int); // level
+  void levelChanged(int); // level
 
 private:
 

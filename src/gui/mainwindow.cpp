@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 //  CreateStatusBar();
 
   createConnections();
+
 }
 
 MainWindow::~MainWindow()
@@ -157,20 +158,30 @@ void MainWindow::createDmxManagerContainerWidget()
 
 void MainWindow::CreateCentralWidget()
 {
-  // TODO : create channel group (1-1) and add them to widget for testing purpose
+  // create channel group (1-1) and add them to widget for testing purpose
   auto L_dmxChannel = m_L_dmxManagerWidget.at(0)->getDmxUniverse()->getL_dmxChannel();
+  auto L_subMasterSlider = QList<SubMasterSlider *>();
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     auto dmxChannelGroup = new DmxChannelGroup(m_submasterWidget);
     dmxChannelGroup->addDmxChannel(QPair(item, 255));
-    // TODO : les assigner aux sliders...
+    // créer sliders
+    auto subMasterSlider = new SubMasterSlider(dmxChannelGroup
+                                               );
+    L_subMasterSlider.append(subMasterSlider);
   }
-
+  // les donner aux widgets
+  m_submasterWidget->setL_sliders(L_subMasterSlider);
+  m_submasterWidget->populateWidget();
 
   m_tabWidget->addTab(m_submasterWidget, "Submasters");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
+//  m_tabWidget->setMaximumSize(1024, 600);
 
   setCentralWidget(m_tabWidget);
+
+//  resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+//  setGeometry(0, 0, 1280, 720);
 }
 
 void MainWindow::CreateStatusBar()

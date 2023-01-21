@@ -19,8 +19,13 @@
 #define SUBMASTERWIDGET_H
 
 #include <QWidget>
+#include <QStackedLayout>
+#include <QComboBox>
+//#include <QLayout>
 #include "../qontrejour.h"
 #include "submasterslider.h"
+
+// sliders are created in mainwindow and pass to widget
 
 class SubMasterWidget
     : public QWidget
@@ -32,9 +37,27 @@ public:
 
   explicit SubMasterWidget(QWidget *parent = nullptr);
 
+  // getters
+  QList<SubMasterSlider *> getL_sliders() const { return m_L_sliders; }
+
+  // setters
+  void setL_sliders(const QList<SubMasterSlider *> &t_L_sliders);
+
+  void clear();
+
+  //  QSize sizeHint() const override;
+
 signals:
 
+public slots:
+
+  void populateWidget();
+
 private:
+
+  QStackedLayout *m_stackedLayout;
+  QComboBox *m_changePageComboBox;
+//  QList<QWidget *> m_L_widget;
 
   QList<SubMasterSlider *> m_L_sliders;
 

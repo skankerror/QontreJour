@@ -43,10 +43,17 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_L_dmxChannel.append(dmxChannel);
     m_L_dmxOutput.append(dmxOutput);
 
+    connect(dmxChannel,
+            SIGNAL(levelChanged(int)),
+            dmxOutput,
+            SLOT(setLevel(int)));
+
     connect(dmxOutput,
             SIGNAL(levelChanged(int,int)),
             this,
             SLOT(onOutputLevelChanged(int,int)));
+
+
   }
 }
 

@@ -48,8 +48,7 @@ void DmxChannel::setLevel(const int t_level)
     return;
 
   m_level = t_level;
-  emit levelChanged(m_channelID,
-                    m_level);
+  emit levelChanged(m_level);
 }
 
 void DmxChannel::addDmxOutput(DmxOutput *t_dmxOutput)

@@ -40,7 +40,6 @@ public:
   int getOutputID() const { return m_outputID; }
 
   // setters
-  void setLevel(int t_level);
   void setMaxLevel(int t_maxLevel);
   void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
   void setOutputID(int t_outputID) { m_outputID = t_outputID; }
@@ -50,6 +49,10 @@ signals:
   void levelChanged(int, // output id
                     int); // level
   void maxLevelChanged(int);
+
+public slots:
+
+  void setLevel(int t_level);
 
 private:
 
