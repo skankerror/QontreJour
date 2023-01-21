@@ -48,9 +48,14 @@ public slots:
   void setModel(DmxChannelOutputTableModel *t_model);
   void setDelegate(DmxChannelOutputTableDelegate *t_delegate);
 
+private slots :
+
+  void repaintTableView();
+
 private:
 
-  DmxChannelOutputTableView *m_tableView;
+//  DmxChannelOutputTableView *m_tableView;
+  QTableView *m_tableView;
   QSpinBox *m_universeSpinBox;
   int m_universeCount;
 
@@ -58,17 +63,17 @@ private:
 
 /********************************************************************/
 
-class DmxChannelOutputTableView
-    : public QTableView
-{
+//class DmxChannelOutputTableView
+//    : public QTableView
+//{
 
-  Q_OBJECT
+//  Q_OBJECT
 
-public:
+//public:
 
-  DmxChannelOutputTableView(QWidget *parent);
+//  DmxChannelOutputTableView(QWidget *parent);
 
-};
+//};
 
 /********************************************************************/
 
@@ -98,6 +103,10 @@ public:
   bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role) override;
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+public slots :
+
+  void onChannelLevelChanged() {/*update();*/}
+
 private:
 
   QList<DmxChannel *> m_L_dmxChannel;
@@ -124,6 +133,15 @@ public:
   void paint(QPainter *painter,
              const QStyleOptionViewItem &option,
              const QModelIndex &index) const override;
+  QWidget *createEditor(QWidget *parent,
+                        const QStyleOptionViewItem &option,
+                        const QModelIndex &index) const override;
+  void setEditorData(QWidget *editor,
+                     const QModelIndex &index) const override;
+  void setModelData(QWidget *editor,
+                    QAbstractItemModel *model,
+                    const QModelIndex &index) const override;
+
 
 private:
 

@@ -63,6 +63,8 @@ signals:
   void L_dmxOutputChanged();
   void levelChanged(int); // level
 
+
+
 private:
 
   QList<DmxOutput *> m_L_dmxOutput;

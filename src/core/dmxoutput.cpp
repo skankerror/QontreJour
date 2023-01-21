@@ -16,6 +16,7 @@
  */
 
 #include "dmxoutput.h"
+#include <QDebug>
 
 DmxOutput::DmxOutput(int t_universeID,
                      int t_outputID,
@@ -29,9 +30,17 @@ DmxOutput::DmxOutput(int t_universeID,
 
 void DmxOutput::setLevel(int t_level)
 {
-  if (m_level == t_level || t_level > m_maxLevel)
+  if ((m_level == t_level)
+      || (t_level > m_maxLevel))
     return;
+
   m_level = t_level;
+
+  qDebug() << "level changed in DmxOutput::setLevel : "
+           << m_level
+           << "in output : "
+           << m_outputID;
+
   emit levelChanged(m_outputID,
                     m_level);
 }

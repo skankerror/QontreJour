@@ -66,7 +66,21 @@ void MainWindow::addDmxManagerWidget()
   // we get his universe to get *DmxChannel to set
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
-  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();  
+  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+
+  // we connect to update views
+  for (const auto &item : std::as_const(L_dmxChannel))
+  {
+    connect(item,
+            SIGNAL(levelChanged(int)),
+            m_dmxChannelOutputWidget,
+            SLOT(repaintTableView()));
+
+//    connect(item,
+//            SIGNAL(levelChanged(int)),
+//            m_dmxChannelOutputTableModel,
+//            SLOT(QAbstractItemModel::layoutChanged()));
+  }
 
   m_dmxChannelOutputTableModel->setL_dmxChannel(L_dmxChannel);
   m_dmxChannelOutputTableModel->setUniverseID(m_universeCount);// count has not been ++ yet
@@ -127,7 +141,7 @@ void MainWindow::CreateDockWidgets()
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
   m_dmxChannelOutputWidget->setModel(m_dmxChannelOutputTableModel);
-  m_dmxChannelOutputWidget->setDelegate(m_dmxChannelOutputTableDelegate);
+//  m_dmxChannelOutputWidget->setDelegate(m_dmxChannelOutputTableDelegate);
   auto bottomDock = new QDockWidget(this);
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
   bottomDock->setWidget(m_dmxChannelOutputWidget);

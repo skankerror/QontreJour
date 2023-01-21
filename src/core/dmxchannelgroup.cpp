@@ -61,12 +61,13 @@ bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
 bool DmxChannelGroup::setDmxChannelLevel(QPair<DmxChannel *, int> t_P_dmxChannel)
 {
   if (!t_P_dmxChannel.first) return false;
-  for (const auto &item : std::as_const(m_L_P_dmxChannel))
+  for (auto &item : m_L_P_dmxChannel)
   {
     auto dmxChannel = item.first;
-    if (t_P_dmxChannel.first == dmxChannel)
+    if (t_P_dmxChannel.first == dmxChannel) //
     {
-      dmxChannel->setLevel(t_P_dmxChannel.second);
+      item.second = t_P_dmxChannel.second;
+//      dmxChannel->setLevel(t_P_dmxChannel.second);
       return true;
     }
   }
@@ -94,7 +95,11 @@ void DmxChannelGroup::updateLevel(int t_level)
     auto dmxChannel = item.first;
     auto level = item.second;
     double coef = double(t_level)/255.0f;
-    dmxChannel->setLevel((int)coef * level);
+    qDebug() << "coef : "
+             << coef
+             << " (int)coef * level) : "
+             << (int)(coef * level);
+    dmxChannel->setLevel((int)(coef * level));
   }
 
 //  emit levelChanged(m_level);

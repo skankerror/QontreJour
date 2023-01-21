@@ -174,6 +174,8 @@ void DmxManagerWidget::onOutputLevelChanged(int t_output,
   m_dmxManager->writeData(m_universeID,
                           t_output,
                           t_level);
+
+  qDebug() << "writeData(" << m_universeID << t_output << t_level;
 //  emit universeClaimsUpdate(m_universeID,
 //                            t_output,
 //                            t_level);

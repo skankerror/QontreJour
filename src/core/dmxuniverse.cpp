@@ -84,7 +84,7 @@ DmxUniverse::~DmxUniverse()
 
 bool DmxUniverse::setOutputLevel(int t_outputID,
                                  int t_level)
-{
+{// TODO : en a-t-on vraiment besoin ?
   if (t_outputID < m_outputCount)
   {
     auto dmxOutput = m_L_dmxOutput.at(t_outputID);

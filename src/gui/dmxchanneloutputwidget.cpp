@@ -22,11 +22,13 @@
 #include <QLabel>
 #include <QHeaderView>
 #include <QPainter>
+#include <QSlider>
 
 
 DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
   : QWidget(parent),
-    m_tableView(new DmxChannelOutputTableView(this)),
+//    m_tableView(new DmxChannelOutputTableView(this)),
+    m_tableView(new QTableView(parent)),
     m_universeSpinBox(new QSpinBox(this))
 {
   auto totalLayout = new QVBoxLayout();
@@ -44,6 +46,20 @@ DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
   totalLayout->addWidget(m_tableView);
 
   setLayout(totalLayout);
+
+
+  m_tableView->setSortingEnabled(false);
+  m_tableView->horizontalHeader()->setMinimumSectionSize(49);
+//  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  m_tableView->verticalHeader()->setMinimumSectionSize(49);
+  m_tableView->horizontalHeader()->hide();
+  m_tableView->verticalHeader()->hide();
+//  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
+//  {
+//    setColumnWidth(i, 10);
+//  }
+
+
   m_tableView->resizeColumnsToContents();
 }
 
@@ -68,30 +84,38 @@ void DmxChannelOutputWidget::setDelegate(DmxChannelOutputTableDelegate *t_delega
   m_tableView->resizeColumnsToContents();
 }
 
+void DmxChannelOutputWidget::repaintTableView()
+{
+  qDebug() << "DmxChannelOutputWidget::repaintTableView() BANG !";
+  m_tableView->resizeColumnsToContents();
+  m_tableView->update();
+}
+
 /**********************************************************************/
 
-DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
-  : QTableView(parent)
-{
-  setSortingEnabled(false);
-  horizontalHeader()->setMinimumSectionSize(49);
-//  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-  verticalHeader()->setMinimumSectionSize(49);
-  horizontalHeader()->hide();
-  verticalHeader()->hide();
-//  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
-//  {
-//    setColumnWidth(i, 10);
-//  }
-  resizeColumnsToContents();
-
-}
+//DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
+//  : QTableView(parent)
+//{
+//  setSortingEnabled(false);
+//  horizontalHeader()->setMinimumSectionSize(49);
+////  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+//  verticalHeader()->setMinimumSectionSize(49);
+//  horizontalHeader()->hide();
+//  verticalHeader()->hide();
+////  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
+////  {
+////    setColumnWidth(i, 10);
+////  }
+//  resizeColumnsToContents();
+//}
 
 /*************************************************************************/
 
 DmxChannelOutputTableModel::DmxChannelOutputTableModel(QObject *parent)
   : QAbstractTableModel(parent)
-{}
+{
+
+}
 
 //DmxChannelOutputTableModel::DmxChannelOutputTableModel(const QList<DmxChannel *> &t_L_dmxChannel
 //                                                       , QObject *parent)
@@ -122,15 +146,50 @@ QVariant DmxChannelOutputTableModel::data(const QModelIndex &index, int role) co
         + index.column();
     if (channelID < 0 || channelID >= m_L_dmxChannel.size())
       return QVariant();
+
     auto dmxChannel = m_L_dmxChannel.at(channelID);
-    return dmxChannel->getLevel();
+
+    switch(role)
+    {
+    case Qt::DisplayRole :
+    case Qt::EditRole :
+      return dmxChannel->getLevel();
+      break;
+    case Qt::TextAlignmentRole :
+      return Qt::AlignCenter;
+      break;
+    case Qt::BackgroundRole:
+      return QBrush(QColor("#BA6D2B"));
+      break;
+    default:
+      return QVariant();
+      break;
+    }
+
 //    return dmxChannel->getChannelID(); // just to test it
   }
   else
   {
     int ret = ((index.row() / 2 ) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column() + 1;
-    return ret > 512 ? QVariant() : ret;
+    switch(role)
+    {
+    case Qt::DisplayRole :
+    case Qt::EditRole :
+      return ret > 512 ? QVariant() : ret;
+      break;
+    case Qt::TextAlignmentRole :
+      return Qt::AlignCenter;
+      break;
+    case Qt::BackgroundRole:
+      return QBrush(QColor("#3C559A"));
+      break;
+    default:
+      return QVariant();
+      break;
+    }
+
+//    return ret > 512 ? QVariant() : ret;
   }
   // TODO : ajouter roles :
   //     case Qt::TextAlignmentRole: return Qt::AlignCenter;
@@ -145,10 +204,14 @@ bool DmxChannelOutputTableModel::setData(const QModelIndex &index, const QVarian
   if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
     return false;
 
-  int channelID = ((index.row() - 1) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+  int channelID = (((index.row() - 1)/2) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
+  qDebug() << "channelID i, model : " << channelID;
   auto dmxChannel = m_L_dmxChannel.at(channelID);
   dmxChannel->setLevel(value.toInt());
+
+//  emit QAbstractTableModel::dataChanged();
+
   return true;
 
 }
@@ -192,7 +255,12 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
                                           const QModelIndex &index) const
 {
   painter->save();
-  if (!index.isValid()) return;
+  if (!index.isValid())
+  {
+    painter->restore();
+    QStyledItemDelegate::paint(painter, option, index);
+    return;
+  }
   if (!(index.row()%2)) // ligne paire. channel ID
   {
     painter->setBackgroundMode(Qt::OpaqueMode);
@@ -221,6 +289,7 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
                       QString::number(dmxChannel->getLevel()),
                       textOption);
 
+//    qDebug() << "delegate::paint bang";
 
 //    painter->drawText(option.rect,
 //                      QString::number(((index.row() / 2 ) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
@@ -229,6 +298,47 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
 
   }
   painter->restore();
-//  QStyledItemDelegate::paint(painter, option, index);
 
+}
+
+
+QWidget *DmxChannelOutputTableDelegate::createEditor(QWidget *parent,
+                                                     const QStyleOptionViewItem &option,
+                                                     const QModelIndex &index) const
+{
+  if (index.isValid())
+  {
+    auto slider = new QSlider(parent);
+//    slider->setwi
+    slider->setMaximum(255);
+    slider->setMinimum(0);
+    slider->setValue(index.data().toInt()); // TODO : dangerous !
+    return slider;
+  }
+  return QStyledItemDelegate::createEditor(parent, option, index);
+}
+
+void DmxChannelOutputTableDelegate::setEditorData(QWidget *editor,
+                                                  const QModelIndex &index) const
+{
+  if (index.isValid())
+  {
+    auto slider = qobject_cast<QSlider *>(editor);
+    slider->setValue(index.data().toInt()); // TODO : dangerous !
+    return;
+  }
+  QStyledItemDelegate::setEditorData(editor, index);
+}
+
+void DmxChannelOutputTableDelegate::setModelData(QWidget *editor,
+                                                 QAbstractItemModel *model,
+                                                 const QModelIndex &index) const
+{
+  if (index.isValid())
+  {
+    auto slider = qobject_cast<QSlider *>(editor);
+    model->setData(index, QVariant::fromValue(slider->value()));
+    return;
+  }
+  QStyledItemDelegate::setModelData(editor, model, index);
 }

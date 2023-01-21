@@ -47,6 +47,11 @@ void DmxChannel::setLevel(const int t_level)
       || (t_level > 255))
     return;
 
+  qDebug() << "dmx channel is changed. his ID : "
+           << m_channelID
+           << "level : "
+           << t_level;
+
   m_level = t_level;
   emit levelChanged(m_level);
 }
