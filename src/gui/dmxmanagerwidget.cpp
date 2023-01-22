@@ -107,7 +107,7 @@ void DmxManagerWidget::Connect()
   // TODO: this if is really ugly, bad work !
   if (m_dmxDevicesComboBox->currentText() == "No device")
   {
-    qDebug() << "no device to connect !";
+    qWarning() << "no device to connect !";
   }
   else
   {
@@ -176,7 +176,5 @@ void DmxManagerWidget::onOutputLevelChanged(int t_output,
                           t_level);
 
   qDebug() << "writeData(" << m_universeID << t_output << t_level;
-//  emit universeClaimsUpdate(m_universeID,
-//                            t_output,
-//                            t_level);
+
 }

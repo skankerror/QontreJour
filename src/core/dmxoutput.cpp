@@ -36,10 +36,10 @@ void DmxOutput::setLevel(int t_level)
 
   m_level = t_level;
 
-  qDebug() << "level changed in DmxOutput::setLevel : "
-           << m_level
-           << "in output : "
-           << m_outputID;
+//  qDebug() << "level changed in DmxOutput::setLevel : "
+//           << m_level
+//           << "in output : "
+//           << m_outputID;
 
   emit levelChanged(m_outputID,
                     m_level);

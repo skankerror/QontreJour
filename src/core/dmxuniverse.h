@@ -50,8 +50,8 @@ public:
 
   // setters
   void setID(int t_ID) { m_ID = t_ID; }
-  bool setOutputLevel(int t_outputID,
-                      int t_level);
+//  bool setOutputLevel(int t_outputID,
+//                      int t_level);
   void setDmxDevice(QDmxDevice *t_dmxDevice) { m_dmxDevice = t_dmxDevice; }
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 

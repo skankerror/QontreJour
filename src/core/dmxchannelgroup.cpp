@@ -31,7 +31,7 @@ void DmxChannelGroup::setLevel(int t_level)
   emit levelChanged(m_level); // ?
 }
 
-bool DmxChannelGroup::addDmxChannel(QPair<DmxChannel *, int> t_P_dmxChannel)
+bool DmxChannelGroup::addDmxChannel(std::pair<DmxChannel *, int> t_P_dmxChannel)
 {
 //  auto dmxChannel = t_P_dmxChannel.first
   if (!(t_P_dmxChannel.first) || t_P_dmxChannel.second < 1)
@@ -58,7 +58,7 @@ bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
   return false;
 }
 
-bool DmxChannelGroup::setDmxChannelLevel(QPair<DmxChannel *, int> t_P_dmxChannel)
+bool DmxChannelGroup::setDmxChannelLevel(std::pair<DmxChannel *, int> t_P_dmxChannel)
 {
   if (!t_P_dmxChannel.first) return false;
   for (auto &item : m_L_P_dmxChannel)
@@ -95,10 +95,10 @@ void DmxChannelGroup::updateLevel(int t_level)
     auto dmxChannel = item.first;
     auto level = item.second;
     double coef = double(t_level)/255.0f;
-    qDebug() << "coef : "
-             << coef
-             << " (int)coef * level) : "
-             << (int)(coef * level);
+//    qDebug() << "coef : "
+//             << coef
+//             << " (int)coef * level) : "
+//             << (int)(coef * level);
     dmxChannel->setLevel((int)(coef * level));
   }
 

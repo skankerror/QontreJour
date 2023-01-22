@@ -59,8 +59,8 @@ DmxUniverse::DmxUniverse(int t_universeID,
 
 DmxUniverse::~DmxUniverse()
 {
-//  m_dmxDevice->stop();
   // TODO : check that !
+
   // détruire output et channel !
   for (const auto &item : std::as_const(m_L_dmxOutput))
   {
@@ -79,21 +79,20 @@ DmxUniverse::~DmxUniverse()
 //  if (DmxUniverse::isConnected)
 //    m_dmxDevice->deleteLater();
 
-//  STATIC_UNIVERSE_COUNT--;
 }
 
-bool DmxUniverse::setOutputLevel(int t_outputID,
-                                 int t_level)
-{// TODO : en a-t-on vraiment besoin ?
-  if (t_outputID < m_outputCount)
-  {
-    auto dmxOutput = m_L_dmxOutput.at(t_outputID);
-    dmxOutput->setLevel(t_level);
-    return true;
-  }
-  qWarning() << "try to set an output out of range in this universe";
-  return false;
-}
+//bool DmxUniverse::setOutputLevel(int t_outputID,
+//                                 int t_level)
+//{// TODO : en a-t-on vraiment besoin ?
+//  if (t_outputID < m_outputCount)
+//  {
+//    auto dmxOutput = m_L_dmxOutput.at(t_outputID);
+//    dmxOutput->setLevel(t_level);
+//    return true;
+//  }
+//  qWarning() << "try to set an output out of range in this universe";
+//  return false;
+//}
 
 void DmxUniverse::onOutputLevelChanged(int t_outputID, int t_level)
 {

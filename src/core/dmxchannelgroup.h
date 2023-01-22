@@ -33,15 +33,15 @@ public:
   explicit DmxChannelGroup(QObject *parent = nullptr);
 
   // getters
-  QList<QPair<DmxChannel *, int> > getL_P_dmxChannel() const { return m_L_P_dmxChannel; }
+  QList<std::pair<DmxChannel *, int> > getL_P_dmxChannel() const { return m_L_P_dmxChannel; }
   int getLevel() const { return m_level; }
 
   // setters
   void setLevel(int t_level);
 
-  bool addDmxChannel(QPair<DmxChannel *, int> t_P_dmxChannel);
+  bool addDmxChannel(std::pair<DmxChannel *, int> t_P_dmxChannel);
   bool removeDmxChannel(DmxChannel *t_dmxChannel);
-  bool setDmxChannelLevel(QPair<DmxChannel *, int> t_P_dmxChannel);
+  bool setDmxChannelLevel(std::pair<DmxChannel *, int> t_P_dmxChannel);
 
   void clear();
 
@@ -49,8 +49,7 @@ public:
 signals:
 
   void v_p_dmxChannelChanged();
-  void levelChanged(int); // TODO : pas besoin il faut bouleguer dans update level,
-  // jouer avec les levels pour envoyer la bonne valeur au channel
+  void levelChanged(int);
 
 public slots:
 
@@ -58,8 +57,7 @@ public slots:
 
 private:
 
-  // TODO : transformer QPair en struct ?
-  QList<QPair<DmxChannel*, int>> m_L_P_dmxChannel; // un channel et son level
+  QList<std::pair<DmxChannel*, int>> m_L_P_dmxChannel; // un channel et son level
   int m_level;
 
   Q_PROPERTY(int getLevel

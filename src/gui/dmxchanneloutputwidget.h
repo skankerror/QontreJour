@@ -63,20 +63,6 @@ private:
 
 /********************************************************************/
 
-//class DmxChannelOutputTableView
-//    : public QTableView
-//{
-
-//  Q_OBJECT
-
-//public:
-
-//  DmxChannelOutputTableView(QWidget *parent);
-
-//};
-
-/********************************************************************/
-
 class DmxChannelOutputTableModel
     : public QAbstractTableModel
 {
@@ -105,7 +91,7 @@ public:
 
 public slots :
 
-  void onChannelLevelChanged() {/*update();*/}
+//  void onChannelLevelChanged() {/*update();*/}
 
 private:
 

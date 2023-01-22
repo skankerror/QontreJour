@@ -27,7 +27,6 @@
 
 DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
   : QWidget(parent),
-//    m_tableView(new DmxChannelOutputTableView(this)),
     m_tableView(new QTableView(parent)),
     m_universeSpinBox(new QSpinBox(this))
 {
@@ -50,16 +49,9 @@ DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
 
   m_tableView->setSortingEnabled(false);
   m_tableView->horizontalHeader()->setMinimumSectionSize(49);
-//  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
   m_tableView->verticalHeader()->setMinimumSectionSize(49);
   m_tableView->horizontalHeader()->hide();
   m_tableView->verticalHeader()->hide();
-//  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
-//  {
-//    setColumnWidth(i, 10);
-//  }
-
-
   m_tableView->resizeColumnsToContents();
 }
 
@@ -86,43 +78,16 @@ void DmxChannelOutputWidget::setDelegate(DmxChannelOutputTableDelegate *t_delega
 
 void DmxChannelOutputWidget::repaintTableView()
 {
-  qDebug() << "DmxChannelOutputWidget::repaintTableView() BANG !";
-  m_tableView->resizeColumnsToContents();
-  m_tableView->update();
+  // NOTE : ugly workaround to refresh view when channel changed
+  m_tableView->hide();
+  m_tableView->show();
 }
 
 /**********************************************************************/
 
-//DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
-//  : QTableView(parent)
-//{
-//  setSortingEnabled(false);
-//  horizontalHeader()->setMinimumSectionSize(49);
-////  horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-//  verticalHeader()->setMinimumSectionSize(49);
-//  horizontalHeader()->hide();
-//  verticalHeader()->hide();
-////  for (int i = 0; i < DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; i++)
-////  {
-////    setColumnWidth(i, 10);
-////  }
-//  resizeColumnsToContents();
-//}
-
-/*************************************************************************/
-
 DmxChannelOutputTableModel::DmxChannelOutputTableModel(QObject *parent)
   : QAbstractTableModel(parent)
-{
-
-}
-
-//DmxChannelOutputTableModel::DmxChannelOutputTableModel(const QList<DmxChannel *> &t_L_dmxChannel
-//                                                       , QObject *parent)
-//  : QAbstractTableModel(parent),
-//    m_L_dmxChannel(t_L_dmxChannel)
-//{}
-
+{}
 
 int DmxChannelOutputTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -159,7 +124,7 @@ QVariant DmxChannelOutputTableModel::data(const QModelIndex &index, int role) co
       return Qt::AlignCenter;
       break;
     case Qt::BackgroundRole:
-      return QBrush(QColor("#BA6D2B"));
+      return QBrush(QColor(186, 109, 43));
       break;
     default:
       return QVariant();
@@ -182,21 +147,13 @@ QVariant DmxChannelOutputTableModel::data(const QModelIndex &index, int role) co
       return Qt::AlignCenter;
       break;
     case Qt::BackgroundRole:
-      return QBrush(QColor("#3C559A"));
+      return QBrush(QColor(60, 85, 164));
       break;
     default:
       return QVariant();
       break;
     }
-
-//    return ret > 512 ? QVariant() : ret;
   }
-  // TODO : ajouter roles :
-  //     case Qt::TextAlignmentRole: return Qt::AlignCenter;
-  //     case Qt::DisplayRole: case Qt::EditRole:
-//     case Qt::BackgroundRole:
-
-
 }
 
 bool DmxChannelOutputTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -206,14 +163,10 @@ bool DmxChannelOutputTableModel::setData(const QModelIndex &index, const QVarian
 
   int channelID = (((index.row() - 1)/2) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-  qDebug() << "channelID i, model : " << channelID;
+//  qDebug() << "channelID i, model : " << channelID;
   auto dmxChannel = m_L_dmxChannel.at(channelID);
   dmxChannel->setLevel(value.toInt());
-
-//  emit QAbstractTableModel::dataChanged();
-
   return true;
-
 }
 
 QVariant DmxChannelOutputTableModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -267,7 +220,7 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
     QTextOption textOption;
     textOption.setAlignment(Qt::AlignCenter);
     painter->fillRect(option.rect,
-                      QBrush(QColor("#3C559A")));
+                      QBrush(QColor(186, 109, 43)));
     painter->drawText(option.rect,
                       QString::number(((index.row() / 2 ) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
                                       + index.column() + 1),
@@ -279,7 +232,7 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
     QTextOption textOption;
     textOption.setAlignment(Qt::AlignCenter);
     painter->fillRect(option.rect,
-                      QBrush(QColor("#BA6D2B")));
+                      QBrush(QColor(60, 85, 164)));
     int channelID = (((index.row() -1)/2) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column();
     if (channelID < 0 || channelID >= m_L_dmxChannel.size())
@@ -288,14 +241,6 @@ void DmxChannelOutputTableDelegate::paint(QPainter *painter,
     painter->drawText(option.rect,
                       QString::number(dmxChannel->getLevel()),
                       textOption);
-
-//    qDebug() << "delegate::paint bang";
-
-//    painter->drawText(option.rect,
-//                      QString::number(((index.row() / 2 ) * DMX_CHANNEL_OUTPUT_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-//                                      + index.column() + 1),
-//                      textOption);
-
   }
   painter->restore();
 
@@ -309,10 +254,9 @@ QWidget *DmxChannelOutputTableDelegate::createEditor(QWidget *parent,
   if (index.isValid())
   {
     auto slider = new QSlider(parent);
-//    slider->setwi
     slider->setMaximum(255);
     slider->setMinimum(0);
-    slider->setValue(index.data().toInt()); // TODO : dangerous !
+    slider->setValue(index.data().toInt()); // NOTE : dangerous !
     return slider;
   }
   return QStyledItemDelegate::createEditor(parent, option, index);
@@ -324,7 +268,7 @@ void DmxChannelOutputTableDelegate::setEditorData(QWidget *editor,
   if (index.isValid())
   {
     auto slider = qobject_cast<QSlider *>(editor);
-    slider->setValue(index.data().toInt()); // TODO : dangerous !
+    slider->setValue(index.data().toInt()); // NOTE : dangerous !
     return;
   }
   QStyledItemDelegate::setEditorData(editor, index);

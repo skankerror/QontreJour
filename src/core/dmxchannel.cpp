@@ -47,10 +47,10 @@ void DmxChannel::setLevel(const int t_level)
       || (t_level > 255))
     return;
 
-  qDebug() << "dmx channel is changed. his ID : "
-           << m_channelID
-           << "level : "
-           << t_level;
+//  qDebug() << "dmx channel is changed. his ID : "
+//           << m_channelID
+//           << "level : "
+//           << t_level;
 
   m_level = t_level;
   emit levelChanged(m_level);
@@ -91,7 +91,7 @@ bool DmxChannel::removeDmxOutput(const DmxOutput *t_dmxOutput)
       return true;
     }
   }
-  qDebug() << "pointer is null or output is not in the list."
+  qWarning() << "pointer is null or output is not in the list."
            << "can't remove it from channel";
   return false;
 

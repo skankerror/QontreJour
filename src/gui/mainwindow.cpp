@@ -75,11 +75,6 @@ void MainWindow::addDmxManagerWidget()
             SIGNAL(levelChanged(int)),
             m_dmxChannelOutputWidget,
             SLOT(repaintTableView()));
-
-//    connect(item,
-//            SIGNAL(levelChanged(int)),
-//            m_dmxChannelOutputTableModel,
-//            SLOT(QAbstractItemModel::layoutChanged()));
   }
 
   m_dmxChannelOutputTableModel->setL_dmxChannel(L_dmxChannel);
@@ -178,7 +173,7 @@ void MainWindow::CreateCentralWidget()
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     auto dmxChannelGroup = new DmxChannelGroup(m_submasterWidget);
-    dmxChannelGroup->addDmxChannel(QPair(item, 255));
+    dmxChannelGroup->addDmxChannel(std::pair(item, 255));
     // créer sliders
     auto subMasterSlider = new SubMasterSlider(dmxChannelGroup
                                                );
