@@ -45,8 +45,8 @@ signals:
 public slots:
 
   void onUniverseCountChanged(int t_universeCount);
-  void setModel(DmxChannelOutputTableModel *t_model);
-  void setDelegate(DmxChannelOutputTableDelegate *t_delegate);
+  void setL_dmxChannel(const QList<DmxChannel *> t_L_dmxChannel);
+  void setUniverseID(const int t_ID);
 
 private slots :
 
@@ -54,11 +54,41 @@ private slots :
 
 private:
 
-//  DmxChannelOutputTableView *m_tableView;
-  QTableView *m_tableView;
+  DmxChannelOutputTableView *m_tableView;
+  //  QTableView *m_tableView;
+  DmxChannelOutputTableModel *m_model;
+  DmxChannelOutputTableDelegate *m_delegate;
   QSpinBox *m_universeSpinBox;
   int m_universeCount;
 
+};
+
+/********************************************************************/
+
+class DmxChannelOutputTableView
+    : public QTableView
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit DmxChannelOutputTableView(QWidget *parent = nullptr);
+
+  // override
+//  bool event(QEvent *event) override;
+
+  // QWidget interface
+protected :
+
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+
+private :
+
+  bool isEditing = false;
 };
 
 /********************************************************************/
@@ -111,6 +141,7 @@ class DmxChannelOutputTableDelegate
 public:
 
   explicit DmxChannelOutputTableDelegate(QObject *parent = nullptr);
+
   void setL_dmxChannel(const QList<DmxChannel *> &t_L_dmxChannel){ m_L_dmxChannel = t_L_dmxChannel; }
   int getUniverseID() const { return m_universeID; }
   void setUniverseID(int t_universeID) { m_universeID = t_universeID; }

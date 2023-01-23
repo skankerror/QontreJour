@@ -23,11 +23,15 @@
 #include <QHeaderView>
 #include <QPainter>
 #include <QSlider>
+#include <QMouseEvent>
 
 
 DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
   : QWidget(parent),
-    m_tableView(new QTableView(parent)),
+//    m_tableView(new QTableView(parent)),
+    m_tableView(new DmxChannelOutputTableView(this)),
+    m_model(new DmxChannelOutputTableModel(this)),
+    m_delegate(new DmxChannelOutputTableDelegate(this)),
     m_universeSpinBox(new QSpinBox(this))
 {
   auto totalLayout = new QVBoxLayout();
@@ -35,6 +39,7 @@ DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
 
   auto label = new QLabel("Dmx Channels output from universe :  ", this);
 
+  // TODO : connect this spinbox to the world !
   m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
   m_universeSpinBox->setMinimum(1);// there's always one universe
 
@@ -53,6 +58,12 @@ DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
   m_tableView->horizontalHeader()->hide();
   m_tableView->verticalHeader()->hide();
   m_tableView->resizeColumnsToContents();
+
+  m_tableView->setModel(m_model);
+  m_tableView->setItemDelegate(m_delegate);
+
+  m_tableView->resizeColumnsToContents();
+
 }
 
 void DmxChannelOutputWidget::onUniverseCountChanged(int t_universeCount)
@@ -63,18 +74,18 @@ void DmxChannelOutputWidget::onUniverseCountChanged(int t_universeCount)
 
 }
 
-void DmxChannelOutputWidget::setModel(DmxChannelOutputTableModel *t_model)
+void DmxChannelOutputWidget::setL_dmxChannel(const QList<DmxChannel *> t_L_dmxChannel)
 {
-  m_tableView->setModel(t_model);
-  m_tableView->resizeColumnsToContents();
-
+  m_model->setL_dmxChannel(t_L_dmxChannel);
+  m_delegate->setL_dmxChannel(t_L_dmxChannel);
 }
 
-void DmxChannelOutputWidget::setDelegate(DmxChannelOutputTableDelegate *t_delegate)
+void DmxChannelOutputWidget::setUniverseID(const int t_ID)
 {
-  m_tableView->setItemDelegate(t_delegate);
-  m_tableView->resizeColumnsToContents();
+  m_model->setUniverseID(t_ID);
+  m_delegate->setUniverseID(t_ID);
 }
+
 
 void DmxChannelOutputWidget::repaintTableView()
 {
@@ -82,6 +93,49 @@ void DmxChannelOutputWidget::repaintTableView()
   m_tableView->hide();
   m_tableView->show();
 }
+
+/*********************************************************************/
+
+DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
+  :QTableView(parent)
+{}
+
+void DmxChannelOutputTableView::mousePressEvent(QMouseEvent *event)
+{
+  if (event->button() == Qt::LeftButton)
+  {
+    auto position = event->position().toPoint();
+    auto index = indexAt(position);
+    if (index.isValid()
+        && index.flags() == Qt::ItemIsEditable)
+    {
+      isEditing = true;
+      // TODO :
+      // chopper le canal et l'éditer
+    }
+  }
+  QTableView::mousePressEvent(event);
+}
+
+void DmxChannelOutputTableView::mouseReleaseEvent(QMouseEvent *event)
+{
+  QTableView::mouseReleaseEvent(event);
+}
+
+void DmxChannelOutputTableView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+  QTableView::mouseDoubleClickEvent(event);
+}
+
+void DmxChannelOutputTableView::mouseMoveEvent(QMouseEvent *event)
+{
+  QTableView::mouseMoveEvent(event);
+}
+//bool DmxChannelOutputTableView::event(QEvent *event)
+//{
+
+//}
+
 
 /**********************************************************************/
 
@@ -286,3 +340,7 @@ void DmxChannelOutputTableDelegate::setModelData(QWidget *editor,
   }
   QStyledItemDelegate::setModelData(editor, model, index);
 }
+
+
+
+

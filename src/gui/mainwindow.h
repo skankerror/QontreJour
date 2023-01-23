@@ -90,14 +90,11 @@ private:
   SequencerWidget *m_sequencerWidget;
 //  DmxOutputWidget *m_dmxOutputWidget;
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
-  DmxChannelOutputTableModel *m_dmxChannelOutputTableModel;
-  DmxChannelOutputTableDelegate *m_dmxChannelOutputTableDelegate;
 
   QDmxManager *m_dmxManager;
 
   QList<DmxChannelGroup *> m_L_dmxChannelGroup;
 
-  int m_universeCount; // a copy of static one cos I have troubles
-
+  int m_universeCount; //s
 };
 #endif // MAINWINDOW_H

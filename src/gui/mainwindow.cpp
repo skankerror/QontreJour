@@ -30,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
-    m_dmxChannelOutputTableModel(new DmxChannelOutputTableModel(this)),
-    m_dmxChannelOutputTableDelegate(new DmxChannelOutputTableDelegate(this)),
     m_submasterWidget(new SubMasterWidget(this)),
     m_dmxManagerContainerWidget(new QWidget(this)),
     m_dmxManagerContainerLayout(new QVBoxLayout()),
@@ -77,10 +75,8 @@ void MainWindow::addDmxManagerWidget()
             SLOT(repaintTableView()));
   }
 
-  m_dmxChannelOutputTableModel->setL_dmxChannel(L_dmxChannel);
-  m_dmxChannelOutputTableModel->setUniverseID(m_universeCount);// count has not been ++ yet
-  m_dmxChannelOutputTableDelegate->setL_dmxChannel(L_dmxChannel);
-  m_dmxChannelOutputTableDelegate->setUniverseID(m_universeCount);
+  m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+  m_dmxChannelOutputWidget->setUniverseID(m_universeCount); // count has not been ++ yet
 
   m_universeCount++;
 
@@ -97,6 +93,20 @@ void MainWindow::removeDmxManagerWidget()
     dmxManagerWidget->deleteLater();
 
     emit universeCountChanged(--m_universeCount);
+
+    // on remet le channel output widget au bon endroit
+    dmxManagerWidget = m_L_dmxManagerWidget.first(); // we get first universe
+    auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
+    auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+    for (const auto &item : std::as_const(L_dmxChannel))
+    {
+      connect(item,
+              SIGNAL(levelChanged(int)),
+              m_dmxChannelOutputWidget,
+              SLOT(repaintTableView()));
+    }
+    m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+    m_dmxChannelOutputWidget->setUniverseID(m_universeCount - 1);
   }
 }
 
@@ -135,8 +145,6 @@ void MainWindow::CreateDockWidgets()
   topDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
-  m_dmxChannelOutputWidget->setModel(m_dmxChannelOutputTableModel);
-//  m_dmxChannelOutputWidget->setDelegate(m_dmxChannelOutputTableDelegate);
   auto bottomDock = new QDockWidget(this);
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
   bottomDock->setWidget(m_dmxChannelOutputWidget);
@@ -168,7 +176,9 @@ void MainWindow::createDmxManagerContainerWidget()
 void MainWindow::CreateCentralWidget()
 {
   // create channel group (1-1) and add them to widget for testing purpose
-  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)->getDmxUniverse()->getL_dmxChannel();
+  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
+      ->getDmxUniverse()
+      ->getL_dmxChannel();
   auto L_subMasterSlider = QList<SubMasterSlider *>();
   for (const auto &item : std::as_const(L_dmxChannel))
   {

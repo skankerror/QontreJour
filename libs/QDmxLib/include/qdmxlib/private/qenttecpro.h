@@ -3,7 +3,8 @@
 
 #include "qdmxusbinterface.h"
 
-#include <QMutex>
+//#include <QMutex>
+#include <QRecursiveMutex>
 
 class QEnttecPro;
 class QEnttecProInput : public QDmxUsbThread
@@ -50,7 +51,8 @@ protected slots:
 
 protected:
     QEnttecProInput* _inputThread = nullptr;
-    QMutex _newData;
+//    QMutex _newData;
+    QRecursiveMutex _newData;
 };
 
 #endif // QENTTECPRO_H
