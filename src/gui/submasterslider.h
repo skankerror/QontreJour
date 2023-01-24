@@ -37,14 +37,7 @@ public:
   DmxChannelGroup *getDmxChannelGroup() const { return m_dmxChannelGroup; }
   void setDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup) { m_dmxChannelGroup = t_dmxChannelGroup; }
 
-  // faire signal et slot pour updater
-
-//public slots:
-
-//  void updateChannelGroupLevel()
-
 private:
-
 
   DmxChannelGroup* m_dmxChannelGroup;
 };

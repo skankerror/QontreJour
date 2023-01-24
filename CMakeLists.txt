@@ -40,6 +40,8 @@ set(PROJECT_SOURCES
         src/qontrejour.h
         src/core/dmxuniverse.h
         src/core/dmxuniverse.cpp
+        src/core/dmxvalue.h
+        src/core/dmxvalue.cpp
         src/core/dmxoutput.h
         src/core/dmxoutput.cpp
         src/core/dmxchannel.h

@@ -94,43 +94,76 @@ void DmxChannelOutputWidget::repaintTableView()
   m_tableView->show();
 }
 
+void DmxChannelOutputWidget::mousePressEvent(QMouseEvent *event)
+{
+//  if (event->button() == Qt::LeftButton)
+//  {
+//    if (m_tableView->rect().contains(event->position().toPoint()))
+//    {
+//      m_tableView->mousePressEvent(event);
+//      return;
+//    }
+//    if (m_universeSpinBox->rect().contains(event->position().toPoint()))
+//    {
+//      m_universeSpinBox->mousePressEvent(event);
+//      return;
+//    }
+//  }
+  QWidget::mousePressEvent(event);
+}
+
+void DmxChannelOutputWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+  QWidget::mouseReleaseEvent(event);
+}
+
+void DmxChannelOutputWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+  QWidget::mouseDoubleClickEvent(event);
+}
+
+void DmxChannelOutputWidget::mouseMoveEvent(QMouseEvent *event)
+{
+  QWidget::mouseMoveEvent(event);
+}
+
 /*********************************************************************/
 
 DmxChannelOutputTableView::DmxChannelOutputTableView(QWidget *parent)
   :QTableView(parent)
 {}
 
-void DmxChannelOutputTableView::mousePressEvent(QMouseEvent *event)
-{
-  if (event->button() == Qt::LeftButton)
-  {
-    auto position = event->position().toPoint();
-    auto index = indexAt(position);
-    if (index.isValid()
-        && index.flags() == Qt::ItemIsEditable)
-    {
-      isEditing = true;
-      // TODO :
-      // chopper le canal et l'éditer
-    }
-  }
-  QTableView::mousePressEvent(event);
-}
+//void DmxChannelOutputTableView::mousePressEvent(QMouseEvent *event)
+//{
+//  if (event->button() == Qt::LeftButton)
+//  {
+//    auto position = event->position().toPoint();
+//    auto index = indexAt(position);
+//    if (index.isValid()
+//        && index.flags() == Qt::ItemIsEditable)
+//    {
+//      isEditing = true;
+//      // TODO :
+//      // chopper le canal et l'éditer
+//    }
+//  }
+//  QTableView::mousePressEvent(event);
+//}
 
-void DmxChannelOutputTableView::mouseReleaseEvent(QMouseEvent *event)
-{
-  QTableView::mouseReleaseEvent(event);
-}
+//void DmxChannelOutputTableView::mouseReleaseEvent(QMouseEvent *event)
+//{
+//  QTableView::mouseReleaseEvent(event);
+//}
 
-void DmxChannelOutputTableView::mouseDoubleClickEvent(QMouseEvent *event)
-{
-  QTableView::mouseDoubleClickEvent(event);
-}
+//void DmxChannelOutputTableView::mouseDoubleClickEvent(QMouseEvent *event)
+//{
+//  QTableView::mouseDoubleClickEvent(event);
+//}
 
-void DmxChannelOutputTableView::mouseMoveEvent(QMouseEvent *event)
-{
-  QTableView::mouseMoveEvent(event);
-}
+//void DmxChannelOutputTableView::mouseMoveEvent(QMouseEvent *event)
+//{
+//  QTableView::mouseMoveEvent(event);
+//}
 //bool DmxChannelOutputTableView::event(QEvent *event)
 //{
 
@@ -219,7 +252,8 @@ bool DmxChannelOutputTableModel::setData(const QModelIndex &index, const QVarian
       + index.column();
 //  qDebug() << "channelID i, model : " << channelID;
   auto dmxChannel = m_L_dmxChannel.at(channelID);
-  dmxChannel->setLevel(value.toInt());
+  dmxChannel->setLevel(channelID,
+                       value.toInt());
   return true;
 }
 
@@ -340,6 +374,8 @@ void DmxChannelOutputTableDelegate::setModelData(QWidget *editor,
   }
   QStyledItemDelegate::setModelData(editor, model, index);
 }
+
+
 
 
 

@@ -44,14 +44,14 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_L_dmxOutput.append(dmxOutput);
 
     connect(dmxChannel,
-            SIGNAL(levelChanged(int)),
+            SIGNAL(levelChanged(int,quint8)),
             dmxOutput,
-            SLOT(setLevel(int)));
+            SLOT(setLevel(int,quint8)));
 
     connect(dmxOutput,
-            SIGNAL(levelChanged(int,int)),
+            SIGNAL(levelChanged(int,quint8)),
             this,
-            SLOT(onOutputLevelChanged(int,int)));
+            SLOT(onOutputLevelChanged(int,quint8)));
 
 
   }
@@ -94,7 +94,7 @@ DmxUniverse::~DmxUniverse()
 //  return false;
 //}
 
-void DmxUniverse::onOutputLevelChanged(int t_outputID, int t_level)
+void DmxUniverse::onOutputLevelChanged(int t_outputID, quint8 t_level)
 {
   emit dmxOutputUpdateRequired(t_outputID,
                                t_level);

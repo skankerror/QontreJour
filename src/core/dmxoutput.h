@@ -18,11 +18,13 @@
 #ifndef DMXOUTPUT_H
 #define DMXOUTPUT_H
 
-#include <QObject>
+//#include <QObject>
 //#include <QByteArray>
+#include "dmxvalue.h"
+
 
 class DmxOutput
-    : public QObject
+    : public DmxValue
 {
 
   Q_OBJECT
@@ -30,42 +32,29 @@ class DmxOutput
 public:
 
   explicit DmxOutput(int t_universeID,
-                     int t_outputID,
+                     int t_ID,
                      QObject *parent = nullptr);
 
+  ~DmxOutput()/* override*/;
+
   // getters
-  int getLevel() const { return m_level; }
-  int getMaxLevel() const { return m_maxLevel; }
+  quint8 getMaxLevel() const { return m_maxLevel; }
   int getUniverseID() const { return m_universeID; }
-  int getOutputID() const { return m_outputID; }
 
   // setters
-  void setMaxLevel(int t_maxLevel);
+  void setMaxLevel(quint8 t_maxLevel);
   void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
-  void setOutputID(int t_outputID) { m_outputID = t_outputID; }
 
 signals:
 
-  void levelChanged(int, // output id
-                    int); // level
-  void maxLevelChanged(int);
-
-public slots:
-
-  void setLevel(int t_level);
+  void maxLevelChanged(quint8);
 
 private:
 
-  int m_level;
-  int m_maxLevel;
+  quint8 m_maxLevel;
   int m_universeID;
-  int m_outputID;
   // TODO : add curves output
 
-  Q_PROPERTY(int getLevel
-             READ getLevel
-             WRITE setLevel
-             NOTIFY levelChanged)
 };
 
 #endif // DMXOUTPUT_H

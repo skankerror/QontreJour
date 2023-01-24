@@ -38,7 +38,7 @@ public:
   ~DmxManagerWidget();
 
   // getters
-  DmxUniverse *getDmxUniverse() /*const */{ return m_dmxUniverse; }
+  DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
 
   // setters
 //  void setDmxUniverse(DmxUniverse *t_dmxUniverse) { m_dmxUniverse = t_dmxUniverse; }
@@ -60,7 +60,7 @@ private slots:
   void Connect();
   void disConnect();
   void onOutputLevelChanged(int t_output,
-                            int t_level);
+                            quint8 t_level);
 
 private:
 

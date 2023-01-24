@@ -19,33 +19,20 @@
 #include <QDebug>
 
 DmxOutput::DmxOutput(int t_universeID,
-                     int t_outputID,
+                     int t_ID,
                      QObject *parent)
-  : QObject(parent),
-    m_level(0),
+  : DmxValue(t_ID,
+             parent),
     m_maxLevel(255),
-    m_universeID(t_universeID),
-    m_outputID(t_outputID)
-{}
-
-void DmxOutput::setLevel(int t_level)
+    m_universeID(t_universeID)
 {
-  if ((m_level == t_level)
-      || (t_level > m_maxLevel))
-    return;
-
-  m_level = t_level;
-
-//  qDebug() << "level changed in DmxOutput::setLevel : "
-//           << m_level
-//           << "in output : "
-//           << m_outputID;
-
-  emit levelChanged(m_outputID,
-                    m_level);
+  m_level = 0;
 }
 
-void DmxOutput::setMaxLevel(int t_maxLevel)
+DmxOutput::~DmxOutput()
+{}
+
+void DmxOutput::setMaxLevel(quint8 t_maxLevel)
 {
   if (m_maxLevel == t_maxLevel)
     return;

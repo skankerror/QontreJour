@@ -167,7 +167,7 @@ void DmxManagerWidget::disConnect()
 }
 
 void DmxManagerWidget::onOutputLevelChanged(int t_output,
-                                            int t_level)
+                                            quint8 t_level)
 {
   m_dmxManager->writeData(m_universeID,
                           t_output,
@@ -175,8 +175,8 @@ void DmxManagerWidget::onOutputLevelChanged(int t_output,
 
   qDebug() << "writeData(" << m_universeID << t_output << t_level << ")";
 
-  QByteArray outputData = m_dmxManager->readOutputData(0 /* universe */);
-  qDebug() << "read output data : " << outputData;
+//  QByteArray outputData = m_dmxManager->readOutputData(0 /* universe */);
+//  qDebug() << "read output data : " << outputData;
 
 
 }

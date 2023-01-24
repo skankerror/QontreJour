@@ -39,6 +39,12 @@ public:
 
   explicit DmxChannelOutputWidget(QWidget *parent = nullptr);
 
+  // QWidget interface
+protected:
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
 
@@ -61,6 +67,7 @@ private:
   QSpinBox *m_universeSpinBox;
   int m_universeCount;
 
+
 };
 
 /********************************************************************/
@@ -81,14 +88,14 @@ public :
   // QWidget interface
 protected :
 
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
-  void mouseMoveEvent(QMouseEvent *event) override;
+//  void mousePressEvent(QMouseEvent *event) override;
+//  void mouseReleaseEvent(QMouseEvent *event) override;
+//  void mouseDoubleClickEvent(QMouseEvent *event) override;
+//  void mouseMoveEvent(QMouseEvent *event) override;
 
 private :
 
-  bool isEditing = false;
+//  bool isEditing = false;
 };
 
 /********************************************************************/

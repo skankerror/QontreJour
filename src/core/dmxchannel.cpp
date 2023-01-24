@@ -19,13 +19,14 @@
 #include <QDebug>
 
 DmxChannel::DmxChannel(int t_universeID,
-                       int t_channelID,
+                       int t_ID,
                        QObject *parent)
-  : QObject(parent),
-    m_level(0),
-    m_universeID(t_universeID),
-    m_channelID(t_channelID)
-{}
+  : DmxValue(t_ID,
+             parent),
+    m_universeID(t_universeID)
+{
+  m_level = 0;
+}
 
 DmxChannel::~DmxChannel()
 {
@@ -38,22 +39,6 @@ DmxOutput *DmxChannel::getL_dmxOutputAt(int t_index)
     return m_L_dmxOutput.at(t_index);
   else
     return nullptr;
-}
-
-void DmxChannel::setLevel(const int t_level)
-{
-  if (m_level == t_level
-      || (t_level < 0)
-      || (t_level > 255))
-    return;
-
-//  qDebug() << "dmx channel is changed. his ID : "
-//           << m_channelID
-//           << "level : "
-//           << t_level;
-
-  m_level = t_level;
-  emit levelChanged(m_level);
 }
 
 void DmxChannel::addDmxOutput(DmxOutput *t_dmxOutput)
@@ -118,4 +103,6 @@ void DmxChannel::clear()
   m_L_dmxOutput.clear();
   // emit signal ?
   m_L_dmxOutput.squeeze();
+  // NOTE : do not destroy outputs they may be very usefull.
+  // universe have to do it.
 }

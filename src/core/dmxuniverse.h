@@ -64,7 +64,7 @@ signals:
 private slots:
 
   void onOutputLevelChanged(int t_outputID,
-                            int t_level);
+                            quint8 t_level);
 
 private:
 

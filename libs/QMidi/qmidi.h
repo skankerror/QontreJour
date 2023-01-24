@@ -274,13 +274,6 @@ enum ManuID // for sysex
   AKAI = 0x45
 };
 
-// number range defines
-// because it's sometimes hard to remember these  ...
-// TODO: replace this with a method in QMidiMessage ?
-//#define MIN_BEND       0
-//#define MAX_BEND       16383
-//#define MIN_TIMECODE 0
-//#define MAX_TIMECODE 16383
 
 /*! \cond */
 #define QUEUE_SIZE_LIMIT 1024

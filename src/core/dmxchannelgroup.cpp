@@ -18,20 +18,16 @@
 #include "dmxchannelgroup.h"
 #include <QDebug>
 
-DmxChannelGroup::DmxChannelGroup(QObject *parent)
-  : QObject(parent)
+DmxChannelGroup::DmxChannelGroup(int t_ID,
+                                 QObject *parent)
+  : DmxValue(t_ID,
+             parent)
 {}
 
-void DmxChannelGroup::setLevel(int t_level)
-{
-  if (m_level == t_level)
-    return;
-  m_level = t_level;
+DmxChannelGroup::~DmxChannelGroup()
+{}
 
-  emit levelChanged(m_level); // ?
-}
-
-bool DmxChannelGroup::addDmxChannel(std::pair<DmxChannel *, int> t_P_dmxChannel)
+bool DmxChannelGroup::addDmxChannel(std::pair<DmxChannel *, quint8> t_P_dmxChannel)
 {
 //  auto dmxChannel = t_P_dmxChannel.first
   if (!(t_P_dmxChannel.first) || t_P_dmxChannel.second < 1)
@@ -58,7 +54,7 @@ bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
   return false;
 }
 
-bool DmxChannelGroup::setDmxChannelLevel(std::pair<DmxChannel *, int> t_P_dmxChannel)
+bool DmxChannelGroup::setDmxChannelLevel(std::pair<DmxChannel *, quint8> t_P_dmxChannel)
 {
   if (!t_P_dmxChannel.first) return false;
   for (auto &item : m_L_P_dmxChannel)
@@ -83,6 +79,7 @@ void DmxChannelGroup::clear()
 
 void DmxChannelGroup::updateLevel(int t_level)
 {
+
   if ((m_level == t_level)
       || (t_level < 0)
       || (t_level > 255))
@@ -99,7 +96,8 @@ void DmxChannelGroup::updateLevel(int t_level)
 //             << coef
 //             << " (int)coef * level) : "
 //             << (int)(coef * level);
-    dmxChannel->setLevel((int)(coef * level));
+    dmxChannel->setLevel(m_ID,
+                         (quint8)(coef * level));
   }
 
 //  emit levelChanged(m_level);
