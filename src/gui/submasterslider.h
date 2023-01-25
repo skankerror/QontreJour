@@ -39,7 +39,7 @@ public:
 
 private:
 
-  DmxChannelGroup* m_dmxChannelGroup;
+  DmxChannelGroup *m_dmxChannelGroup;
 };
 
 #endif // SUBMASTERSLIDER_H

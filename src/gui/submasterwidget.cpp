@@ -63,8 +63,10 @@ void SubMasterWidget::populateWidget()
 //    m_stackedLayout->addChildLayout(pageLayout);
     m_changePageComboBox->addItem(tr("page %1").arg(i + 1));
   }
-  connect(m_changePageComboBox, &QComboBox::activated,
-          m_stackedLayout, &QStackedLayout::setCurrentIndex);
+  connect(m_changePageComboBox,
+          &QComboBox::activated,
+          m_stackedLayout,
+          &QStackedLayout::setCurrentIndex);
 }
 
 

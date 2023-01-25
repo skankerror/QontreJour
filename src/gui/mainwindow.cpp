@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include <QDockWidget>
+#include <QWindow>
 #include "qdmxlib/QDmxManager"
 #include "qdmxlib/QDmxUsbDriver"
 
@@ -36,7 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_addDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
     m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
     m_universeCount(0)
+//    m_dmxOutputWindow(new QWindow())
 {
+//  m_dmxOutputWindow->show();
 //  CreateActions();
 //  CreateMenubar();
 //  CreateToolBars();
@@ -65,18 +68,23 @@ void MainWindow::addDmxManagerWidget()
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
   auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+  QList<DmxValue *> L_dmxValue;
 
   // we connect to update views
+//  for (const auto &item : std::as_const(L_dmxChannel))
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     connect(item,
-            SIGNAL(levelChanged(int,
-                                quint8)),
+            SIGNAL(levelChanged(int,quint8)),
             m_dmxChannelOutputWidget,
             SLOT(repaintTableView()));
+
+    DmxValue *value = item;
+    L_dmxValue.append(value);
   }
 
-  m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+//  m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+  m_dmxChannelOutputWidget->setL_dmxValue(L_dmxValue);
   m_dmxChannelOutputWidget->setUniverseID(m_universeCount); // count has not been ++ yet
 
   m_universeCount++;
@@ -99,14 +107,19 @@ void MainWindow::removeDmxManagerWidget()
     dmxManagerWidget = m_L_dmxManagerWidget.first(); // we get first universe
     auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
     auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+    QList<DmxValue *> L_dmxValue;
+
     for (const auto &item : std::as_const(L_dmxChannel))
     {
       connect(item,
               SIGNAL(levelChanged(int,quint8)),
               m_dmxChannelOutputWidget,
               SLOT(repaintTableView()));
+      DmxValue *value = item;
+      L_dmxValue.append(value);
     }
-    m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+//    m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
+    m_dmxChannelOutputWidget->setL_dmxValue(L_dmxValue);
     m_dmxChannelOutputWidget->setUniverseID(m_universeCount - 1);
   }
 }
@@ -146,7 +159,7 @@ void MainWindow::CreateDockWidgets()
   topDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
-  auto bottomDock = new QDockWidget(this);
+  auto bottomDock = new QDockWidget();
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
   bottomDock->setWidget(m_dmxChannelOutputWidget);
   bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
@@ -187,8 +200,7 @@ void MainWindow::CreateCentralWidget()
                                                m_submasterWidget);
     dmxChannelGroup->addDmxChannel(std::pair(item, 255));
     // créer sliders
-    auto subMasterSlider = new SubMasterSlider(dmxChannelGroup
-                                               );
+    auto subMasterSlider = new SubMasterSlider(dmxChannelGroup);
     L_subMasterSlider.append(subMasterSlider);
   }
   // les donner aux widgets

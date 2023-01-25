@@ -91,6 +91,8 @@ private:
 //  DmxOutputWidget *m_dmxOutputWidget;
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
 
+//  QWindow *m_dmxOutputWindow;
+
   QDmxManager *m_dmxManager;
 
   QList<DmxChannelGroup *> m_L_dmxChannelGroup;

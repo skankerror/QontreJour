@@ -58,6 +58,8 @@ set(PROJECT_SOURCES
         src/gui/dmxmanagerwidget.cpp
         src/gui/sequencerwidget.h
         src/gui/sequencerwidget.cpp
+        src/gui/dmxvaluewidget.h
+        src/gui/dmxvaluewidget.cpp
         src/gui/dmxchanneloutputwidget.h
         src/gui/dmxchanneloutputwidget.cpp
         src/gui/grandmasterwidget.h
