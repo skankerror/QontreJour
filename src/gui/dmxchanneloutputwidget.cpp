@@ -17,17 +17,10 @@
 
 #include "dmxchanneloutputwidget.h"
 #include "../qontrejour.h"
-//#include <QLayout>
-//#include <QDebug>
-//#include <QLabel>
-//#include <QHeaderView>
-//#include <QPainter>
-//#include <QSlider>
-//#include <QMouseEvent>
 
 
 DmxChannelOutputWidget::DmxChannelOutputWidget(QWidget *parent)
-  : DmxValueWidget(parent)
+  : DmxValueTableWidget(parent)
 {
   m_label->setText("Dmx Channels output from universe :  ");
 }

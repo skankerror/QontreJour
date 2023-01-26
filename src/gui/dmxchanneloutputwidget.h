@@ -18,12 +18,12 @@
 #ifndef DMXCHANNELOUTPUTWIDGET_H
 #define DMXCHANNELOUTPUTWIDGET_H
 
-#include "dmxvaluewidget.h"
-#include "../core/dmxchannel.h"
+#include "dmxvaluetablewidget.h"
+//#include "../core/dmxchannel.h"
 
 
 class DmxChannelOutputWidget
-    : public DmxValueWidget
+    : public DmxValueTableWidget
 {
 
   Q_OBJECT

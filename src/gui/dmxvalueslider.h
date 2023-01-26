@@ -35,7 +35,7 @@ public:
 
   virtual ~DmxValueSlider();
 
-  DmxValue *dmxValue() const{ return m_dmxValue; }
+  DmxValue *getDmxValue() const{ return m_dmxValue; }
   void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }
 
 protected slots:

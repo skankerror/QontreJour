@@ -125,6 +125,24 @@ void MainWindow::removeDmxManagerWidget()
   }
 }
 
+void MainWindow::setDirectChannelWidget(int t_universeID)
+{
+  auto L_dmxChannel = m_L_dmxManagerWidget.at(t_universeID)
+      ->getDmxUniverse()
+      ->getL_dmxChannel();
+  auto L_directChannelSlider = QList<DmxValueSlider *>();
+  for (const auto &item : std::as_const(L_dmxChannel))
+  {
+    auto directChannelSlider = new DmxValueSlider(item,
+                                                  m_directChannelWidget);
+    L_directChannelSlider.append(directChannelSlider);
+  }
+  // les donner aux widgets
+  m_directChannelWidget->setL_sliders(L_directChannelSlider);
+  m_directChannelWidget->populateWidget();
+
+}
+
 void MainWindow::CreateActions()
 {
 
@@ -190,23 +208,20 @@ void MainWindow::createDmxManagerContainerWidget()
 
 void MainWindow::CreateCentralWidget()
 {
-  // create channel group (1-1) and add them to widget for testing purpose
-  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
-      ->getDmxUniverse()
-      ->getL_dmxChannel();
-  auto L_directChannelSlider = QList<DmxValueSlider *>();
-  for (const auto &item : std::as_const(L_dmxChannel))
-  {
-//    auto dmxChannelGroup = new DmxChannelGroup(item->getID(),
-//                                               m_submasterWidget);
-//    dmxChannelGroup->addDmxChannel(std::pair(item, 255));
-    // créer sliders
-    auto directChannelSlider = new DmxValueSlider(item);
-    L_directChannelSlider.append(directChannelSlider);
-  }
-  // les donner aux widgets
-  m_directChannelWidget->setL_sliders(L_directChannelSlider);
-  m_directChannelWidget->populateWidget();
+//  // create direct channel widget
+//  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
+//      ->getDmxUniverse()
+//      ->getL_dmxChannel();
+//  auto L_directChannelSlider = QList<DmxValueSlider *>();
+//  for (const auto &item : std::as_const(L_dmxChannel))
+//  {
+//    auto directChannelSlider = new DmxValueSlider(item);
+//    L_directChannelSlider.append(directChannelSlider);
+//  }
+//  // les donner aux widgets
+//  m_directChannelWidget->setL_sliders(L_directChannelSlider);
+//  m_directChannelWidget->populateWidget();
+  setDirectChannelWidget(0); // set for first universe
 
   m_tabWidget->addTab(m_directChannelWidget, "Direct Channels");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
@@ -238,6 +253,11 @@ void MainWindow::createConnections()
           SIGNAL(universeCountChanged(int)),
           m_dmxChannelOutputWidget,
           SLOT(onUniverseCountChanged(int)));
+
+  connect(m_dmxChannelOutputWidget,
+          SIGNAL(askForUniverseChanged(int)),
+          this,
+          SLOT(setDirectChannelWidget(int)));
 
 }
 

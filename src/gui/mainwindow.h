@@ -66,6 +66,7 @@ private slots:
 
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
+  void setDirectChannelWidget(int t_universeID);
 
 private:
 

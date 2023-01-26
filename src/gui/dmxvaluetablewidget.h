@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DMXVALUEWIDGET_H
-#define DMXVALUEWIDGET_H
+#ifndef DMXVALUETABLEWIDGET_H
+#define DMXVALUETABLEWIDGET_H
 
 #include <QWidget>
 #include <QLabel>
@@ -29,7 +29,7 @@
 class DmxValueTableView;
 class DmxValueTableModel;
 
-class DmxValueWidget
+class DmxValueTableWidget
     : public QWidget
 {
 
@@ -37,9 +37,13 @@ class DmxValueWidget
 
 public:
 
-  explicit DmxValueWidget(QWidget *parent = nullptr);
+  explicit DmxValueTableWidget(QWidget *parent = nullptr);
 
-  virtual ~DmxValueWidget();
+  virtual ~DmxValueTableWidget();
+
+signals :
+
+  void askForUniverseChanged(int); // universeID to ask to mainwindow
 
 public slots:
 
@@ -49,6 +53,7 @@ public slots:
 
 protected slots :
 
+  void onSpinboxSelected(int t_universeID);
   void repaintTableView();
 
 protected :
@@ -82,7 +87,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
-  void wheelEvent(QWheelEvent *event) override;
+//  void wheelEvent(QWheelEvent *event) override;
 
 signals :
 
@@ -132,4 +137,4 @@ protected :
 
 };
 
-#endif // DMXVALUEWIDGET_H
+#endif // DMXVALUETABLEWIDGET_H

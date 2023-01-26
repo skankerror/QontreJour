@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dmxvaluewidget.h"
+#include "dmxvaluetablewidget.h"
 #include "../qontrejour.h"
 #include <QLayout>
 #include <QHeaderView>
 #include <QPainter>
-#include <QSlider>
+//#include <QSlider>
 #include <QMouseEvent>
-#include <QWheelEvent>
+//#include <QWheelEvent>
 #include <QDebug>
 
 
-DmxValueWidget::DmxValueWidget(QWidget *parent)
+DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
   : QWidget(parent),
     m_tableView(new DmxValueTableView(this)),
     m_model(new DmxValueTableModel(this)),
@@ -40,6 +40,7 @@ DmxValueWidget::DmxValueWidget(QWidget *parent)
   m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
   m_universeSpinBox->setMinimum(1);// there's always one universe
 
+  headerLayout->addStretch();
   headerLayout->addWidget(m_label);
   headerLayout->addWidget(m_universeSpinBox);
 
@@ -61,13 +62,17 @@ DmxValueWidget::DmxValueWidget(QWidget *parent)
 
   m_tableView->resizeColumnsToContents();
 
+  connect(m_universeSpinBox,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(onSpinboxSelcted(int)));
 
 }
 
-DmxValueWidget::~DmxValueWidget()
+DmxValueTableWidget::~DmxValueTableWidget()
 {}
 
-void DmxValueWidget::onUniverseCountChanged(int t_universeCount)
+void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
 {
   m_universeCount = t_universeCount;
   m_universeSpinBox->setMaximum(t_universeCount);
@@ -75,19 +80,36 @@ void DmxValueWidget::onUniverseCountChanged(int t_universeCount)
 
 }
 
-void DmxValueWidget::setL_dmxValue(const QList<DmxValue *> t_L_dmxValue)
+void DmxValueTableWidget::setL_dmxValue(const QList<DmxValue *> t_L_dmxValue)
 {
   m_model->setL_dmxValue(t_L_dmxValue);
 
 }
 
-void DmxValueWidget::setUniverseID(const int t_ID)
+void DmxValueTableWidget::setUniverseID(const int t_ID)
 {
   m_model->setUniverseID(t_ID);
 
+  disconnect(m_universeSpinBox,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(onSpinboxSelected(int)));
+
+  m_universeSpinBox->setValue(t_ID + 1);
+
+  connect(m_universeSpinBox,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(onSpinboxSelected(int)));
+
 }
 
-void DmxValueWidget::repaintTableView()
+void DmxValueTableWidget::onSpinboxSelected(int t_universeID)
+{
+  emit askForUniverseChanged(t_universeID - 1);
+}
+
+void DmxValueTableWidget::repaintTableView()
 {
   emit m_model->layoutChanged();
 }
@@ -151,10 +173,10 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
   QTableView::mouseMoveEvent(event);
 }
 
-void DmxValueTableView::wheelEvent(QWheelEvent *event)
-{
-  QTableView::wheelEvent(event);
-}
+//void DmxValueTableView::wheelEvent(QWheelEvent *event)
+//{
+//  QTableView::wheelEvent(event);
+//}
 
 /************************************************************************/
 

@@ -17,6 +17,7 @@
 
 #include "directchannelwidget.h"
 #include "../qontrejour.h"
+#include <QLabel>
 
 DirectChannelWidget::DirectChannelWidget(QWidget *parent)
   : QWidget(parent),
@@ -44,6 +45,7 @@ void DirectChannelWidget::populateWidget()
   if (m_L_sliders.size() > page_count * SLIDERS_PER_PAGE)
     page_count++;
 
+  // TODO : probably crashes with with non 512ch universe.
   for (int i = 0; i < page_count; i++) // for each page
   {
     auto widget = new QWidget(this);
@@ -51,13 +53,24 @@ void DirectChannelWidget::populateWidget()
 
     for (int j = 0; j < SLIDERS_PER_PAGE; j++) // for each slider
     {
+      auto layout = new QVBoxLayout();
+      auto label = new QLabel(QString::number(j + (i * SLIDERS_PER_PAGE) + 1),
+                              widget);
+      label->setAlignment(Qt::AlignHCenter);
       auto slider = m_L_sliders.at(j + (i * SLIDERS_PER_PAGE));
-      pageLayout->addWidget(slider);
+
+      layout->addWidget(slider);
+      layout->addWidget(label);
+      layout->setAlignment(slider,
+                           Qt::AlignHCenter);
+      pageLayout->addLayout(layout);
     }
     widget->setLayout(pageLayout);
     m_stackedLayout->addWidget(widget);
-//    m_stackedLayout->addChildLayout(pageLayout);
-    m_changePageComboBox->addItem(tr("page %1").arg(i + 1));
+    m_changePageComboBox->addItem(tr("page %1 --> Ch %2 - %3")
+                                  .arg(i + 1)
+                                  .arg((i * SLIDERS_PER_PAGE) + 1)
+                                  .arg((i + 1) * SLIDERS_PER_PAGE));
   }
   connect(m_changePageComboBox,
           &QComboBox::activated,
