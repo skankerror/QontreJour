@@ -29,7 +29,8 @@
 #include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
-#include "submasterwidget.h"
+//#include "submasterwidget.h"
+#include "directchannelwidget.h"
 #include "dmxchanneloutputwidget.h"
 
 #include "../core/dmxchannelgroup.h"
@@ -78,7 +79,8 @@ private:
   QAction *m_aboutQtAct;
 
   QTabWidget *m_tabWidget;
-  SubMasterWidget *m_submasterWidget;
+//  SubMasterWidget *m_submasterWidget;
+  DirectChannelWidget *m_directChannelWidget;
   QWidget *m_dmxManagerContainerWidget;
   QPushButton *m_addDmxManagerWidgetButton;
   QPushButton *m_removeDmxManagerWidgetButton;

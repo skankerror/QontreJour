@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "submasterwidget.h"
-#include <QLayout>
-#include <QDebug>
+#include "directchannelwidget.h"
+#include "../qontrejour.h"
 
-SubMasterWidget::SubMasterWidget(QWidget *parent)
+DirectChannelWidget::DirectChannelWidget(QWidget *parent)
   : QWidget(parent),
     m_stackedLayout(new QStackedLayout()),
     m_changePageComboBox(new QComboBox(this))
@@ -28,19 +27,16 @@ SubMasterWidget::SubMasterWidget(QWidget *parent)
   totalLayout->addWidget(m_changePageComboBox);
   totalLayout->addLayout(m_stackedLayout);
   setLayout(totalLayout);
+
 }
 
-void SubMasterWidget::setL_sliders(const QList<SubMasterSlider *> &t_L_sliders)
+void DirectChannelWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders)
 {
   m_L_sliders = t_L_sliders;
-}
-
-void SubMasterWidget::clear()
-{
 
 }
 
-void SubMasterWidget::populateWidget()
+void DirectChannelWidget::populateWidget()
 {
   // on crée le 1er widget pour contenir 32 sliders
   int page_count = m_L_sliders.size() / SLIDERS_PER_PAGE;
@@ -67,10 +63,5 @@ void SubMasterWidget::populateWidget()
           &QComboBox::activated,
           m_stackedLayout,
           &QStackedLayout::setCurrentIndex);
+
 }
-
-
-//QSize SubMasterWidget::sizeHint() const
-//{
-//  return QSize(800, 300);
-//}

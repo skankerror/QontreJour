@@ -60,16 +60,16 @@ set(PROJECT_SOURCES
         src/gui/sequencerwidget.cpp
         src/gui/dmxvaluewidget.h
         src/gui/dmxvaluewidget.cpp
+        src/gui/dmxvalueslider.h
+        src/gui/dmxvalueslider.cpp
+        src/gui/directchannelwidget.h
+        src/gui/directchannelwidget.cpp
         src/gui/dmxchanneloutputwidget.h
         src/gui/dmxchanneloutputwidget.cpp
         src/gui/grandmasterwidget.h
         src/gui/grandmasterwidget.cpp
         src/gui/playbackwidget.h
         src/gui/playbackwidget.cpp
-        src/gui/submasterwidget.h
-        src/gui/submasterwidget.cpp
-        src/gui/submasterslider.h
-        src/gui/submasterslider.cpp
         ${TS_FILES}
 )
 

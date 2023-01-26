@@ -92,7 +92,7 @@ signals :
 protected :
 
   bool m_isEditing = false;
-  QPoint/*F*/ m_originEditingPoint;
+  QPoint m_originEditingPoint;
   QModelIndex m_editedIndex;
 };
 

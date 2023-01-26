@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUBMASTERSLIDER_H
-#define SUBMASTERSLIDER_H
+#ifndef DMXVALUESLIDER_H
+#define DMXVALUESLIDER_H
 
 #include <QSlider>
-#include "../core/dmxchannelgroup.h"
+#include "../core/dmxvalue.h"
 
-class SubMasterSlider
+class DmxValueSlider
     : public QSlider
 {
 
@@ -29,17 +29,24 @@ class SubMasterSlider
 
 public:
 
-  SubMasterSlider(QWidget *parent = nullptr);
-  SubMasterSlider(DmxChannelGroup *t_dmxChannelGroup,
-                  QWidget *parent = nullptr);
+  explicit DmxValueSlider(QWidget *parent = nullptr);
+  DmxValueSlider(DmxValue *t_dmxValue,
+                 QWidget *parent = nullptr);
 
+  virtual ~DmxValueSlider();
 
-  DmxChannelGroup *getDmxChannelGroup() const { return m_dmxChannelGroup; }
-  void setDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup) { m_dmxChannelGroup = t_dmxChannelGroup; }
+  DmxValue *dmxValue() const{ return m_dmxValue; }
+  void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }
 
-private:
+protected slots:
 
-  DmxChannelGroup *m_dmxChannelGroup;
+  void updateLevel(int t_level);
+  void onValueLevelChanged(int t_ID,
+                           quint8 t_level);
+
+protected :
+
+  DmxValue *m_dmxValue;
 };
 
-#endif // SUBMASTERSLIDER_H
+#endif // DMXVALUESLIDER_H

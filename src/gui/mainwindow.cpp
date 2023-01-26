@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
-    m_submasterWidget(new SubMasterWidget(this)),
+//    m_submasterWidget(new SubMasterWidget(this)),
+    m_directChannelWidget(new DirectChannelWidget(this)),
     m_dmxManagerContainerWidget(new QWidget(this)),
     m_dmxManagerContainerLayout(new QVBoxLayout()),
     m_addDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
@@ -193,21 +194,21 @@ void MainWindow::CreateCentralWidget()
   auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
       ->getDmxUniverse()
       ->getL_dmxChannel();
-  auto L_subMasterSlider = QList<SubMasterSlider *>();
+  auto L_directChannelSlider = QList<DmxValueSlider *>();
   for (const auto &item : std::as_const(L_dmxChannel))
   {
-    auto dmxChannelGroup = new DmxChannelGroup(item->getID(),
-                                               m_submasterWidget);
-    dmxChannelGroup->addDmxChannel(std::pair(item, 255));
+//    auto dmxChannelGroup = new DmxChannelGroup(item->getID(),
+//                                               m_submasterWidget);
+//    dmxChannelGroup->addDmxChannel(std::pair(item, 255));
     // créer sliders
-    auto subMasterSlider = new SubMasterSlider(dmxChannelGroup);
-    L_subMasterSlider.append(subMasterSlider);
+    auto directChannelSlider = new DmxValueSlider(item);
+    L_directChannelSlider.append(directChannelSlider);
   }
   // les donner aux widgets
-  m_submasterWidget->setL_sliders(L_subMasterSlider);
-  m_submasterWidget->populateWidget();
+  m_directChannelWidget->setL_sliders(L_directChannelSlider);
+  m_directChannelWidget->populateWidget();
 
-  m_tabWidget->addTab(m_submasterWidget, "Submasters");
+  m_tabWidget->addTab(m_directChannelWidget, "Direct Channels");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
 //  m_tabWidget->setMaximumSize(1024, 600);
 

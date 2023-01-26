@@ -15,19 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUBMASTERWIDGET_H
-#define SUBMASTERWIDGET_H
+#ifndef DIRECTCHANNELWIDGET_H
+#define DIRECTCHANNELWIDGET_H
 
 #include <QWidget>
 #include <QStackedLayout>
 #include <QComboBox>
-//#include <QLayout>
-#include "../qontrejour.h"
-#include "submasterslider.h"
+#include "dmxvalueslider.h"
 
 // sliders are created in mainwindow and pass to widget
 
-class SubMasterWidget
+
+class DirectChannelWidget
     : public QWidget
 {
 
@@ -35,17 +34,14 @@ class SubMasterWidget
 
 public:
 
-  explicit SubMasterWidget(QWidget *parent = nullptr);
+  explicit DirectChannelWidget(QWidget *parent = nullptr);
 
   // getters
-  QList<SubMasterSlider *> getL_sliders() const { return m_L_sliders; }
+  QList<DmxValueSlider *> getL_sliders() const { return m_L_sliders; }
 
   // setters
-  void setL_sliders(const QList<SubMasterSlider *> &t_L_sliders);
+  void setL_sliders(const QList<DmxValueSlider *> &t_L_sliders);
 
-  void clear();
-
-  //  QSize sizeHint() const override;
 
 signals:
 
@@ -53,14 +49,14 @@ public slots:
 
   void populateWidget();
 
-private:
+private :
 
   QStackedLayout *m_stackedLayout;
   QComboBox *m_changePageComboBox;
-//  QList<QWidget *> m_L_widget;
 
-  QList<SubMasterSlider *> m_L_sliders;
+  QList<DmxValueSlider *> m_L_sliders;
+
 
 };
 
-#endif // SUBMASTERWIDGET_H
+#endif // DIRECTCHANNELWIDGET_H

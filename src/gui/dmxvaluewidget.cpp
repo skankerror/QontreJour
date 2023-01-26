@@ -51,8 +51,8 @@ DmxValueWidget::DmxValueWidget(QWidget *parent)
 
   m_tableView->setSortingEnabled(false);
   m_tableView->setUpdatesEnabled(true);
-  m_tableView->horizontalHeader()->setMinimumSectionSize(49);
-  m_tableView->verticalHeader()->setMinimumSectionSize(49);
+  m_tableView->horizontalHeader()->setMinimumSectionSize(30);
+  m_tableView->verticalHeader()->setMinimumSectionSize(20);
   m_tableView->horizontalHeader()->hide();
   m_tableView->verticalHeader()->hide();
   m_tableView->resizeColumnsToContents();
@@ -140,8 +140,10 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
   {
     auto value = m_editedIndex.data().toInt();
     auto yValue = event->pos().y() - m_originEditingPoint.y();
-    qDebug() << "y value in DmxValueTableView::mouseMoveEvent " << yValue;
+//    qDebug() << "y value in DmxValueTableView::mouseMoveEvent " << yValue;
     value -= yValue;
+    if (value > 255) value = 255;
+    if (value < 0) value = 0;
     model()->setData(m_editedIndex, value, Qt::EditRole);
     m_originEditingPoint = event->pos();
     return;
