@@ -33,9 +33,11 @@ DmxUniverse::DmxUniverse(int t_universeID,
     auto dmxOutput = new DmxValue(m_ID,
                                   i, // first output will be id 0
                                   this);
+    dmxOutput->setType(DmxValue::Output);
     auto dmxChannel = new DmxValue(m_ID,
                                    i,
                                    this);
+    dmxChannel->setType(DmxValue::Channel);
     // we start with straight patch
     dmxChannel->addDmxValue(dmxOutput);
     m_L_dmxChannel.append(dmxChannel);

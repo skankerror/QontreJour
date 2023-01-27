@@ -58,7 +58,8 @@ signals:
 
 public slots:
 
-  void updateLevel(int t_level);
+//  void updateLevel(int t_level);
+  void updateLevel(quint8 t_level);
 
 protected :
 

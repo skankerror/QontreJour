@@ -21,9 +21,9 @@
 #include <QObject>
 #include <QString>
 
-// NOTE : mother class for :
-// dmxoutput
-// dmxchannel
+// NOTE : class for : dmxoutput, dmxchannel
+//
+// mother of :
 // dmxchannelgroup, mother of :
 // ** dmxscene
 
@@ -34,6 +34,17 @@ class DmxValue
   Q_OBJECT
 
 public:
+
+  enum ValueType
+  {
+    Output,
+    Channel,
+    ChannelGroup,
+    Scene,
+    Unknown
+  };
+  Q_ENUM(ValueType)
+
 
   explicit DmxValue(int t_ID,
                     QObject *parent = nullptr);
@@ -62,6 +73,9 @@ public:
   QString getName() const{ return m_name; }
   QList<DmxValue *> getL_dmxValue() const{ return m_L_dmxValue; }
   DmxValue* getL_dmxValueAt(int t_index);
+  ValueType getType() const{ return m_type; }
+  quint8 getStoredLevel() const{ return m_storedLevel; }
+  int getValuesCount() const { return m_L_dmxValue.size(); }
 
   // setters
   void setMaxLevel(quint8 t_maxLevel);
@@ -70,6 +84,8 @@ public:
   void setPropertyLevel(int t_level); // setter different from the slot, needed by property
   void setName(const QString &t_name) { m_name = t_name; }
   void setL_dmxValue(const QList<DmxValue *> &t_L_dmxValue){ m_L_dmxValue = t_L_dmxValue; }
+  void setType(ValueType t_type){ m_type = t_type; }
+  void setStoredLevel(quint8 t_storedLevel){ m_storedLevel = t_storedLevel; }
 
 
   void addDmxValue(DmxValue *t_dmxValue);
@@ -77,8 +93,6 @@ public:
   bool removeDmxValue(const DmxValue *t_dmxValue);
   bool removeDmxValues(const QList<DmxValue *> t_L_dmxValue);
   void clearList();
-
-  int getValuesCount() const { return m_L_dmxValue.size(); }
 
 
 
@@ -104,6 +118,7 @@ protected :
   int m_universeID;
   QString m_name;
   QList<DmxValue *> m_L_dmxValue;
+  ValueType m_type = Unknown;
 
 //private:
 

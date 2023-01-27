@@ -22,13 +22,15 @@ GrandMasterWidget::GrandMasterWidget(QWidget *parent)
   : QWidget(parent),
     m_grandMasterslider(new QSlider(this)),
     m_blackOutButton(new QPushButton(this)),
-    m_grandMasterLabel(new QLabel(this))
+    m_grandMasterLabel(new QLabel("GM",this))
 {
   auto layout = new QVBoxLayout();
 
   m_blackOutButton->setText("Black Out");
+  m_grandMasterLabel->setAlignment(Qt::AlignHCenter);
   layout->addWidget(m_blackOutButton);
   layout->addWidget(m_grandMasterslider);
   layout->addWidget(m_grandMasterLabel);
+  layout->setAlignment(m_grandMasterslider, Qt::AlignHCenter);
   setLayout(layout);
 }

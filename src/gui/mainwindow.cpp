@@ -160,15 +160,21 @@ void MainWindow::CreateToolBars()
 
 void MainWindow::CreateDockWidgets()
 {
-  auto leftDock = new QDockWidget(this);
-  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
-  leftDock->setWidget(m_grandMasterWidget);
-  leftDock->setFeatures(QDockWidget::DockWidgetFloatable);
-  addDockWidget(Qt::LeftDockWidgetArea, leftDock);
+//  auto leftDock = new QDockWidget(this);
+//  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+//  leftDock->setWidget(m_grandMasterWidget);
+//  leftDock->setFeatures(QDockWidget::DockWidgetFloatable);
+//  addDockWidget(Qt::LeftDockWidgetArea, leftDock);
 
   auto rightDock = new QDockWidget(this);
+  auto rightDockWidget = new QWidget(rightDock);
+  auto layout = new QVBoxLayout();
+  layout->addWidget(m_grandMasterWidget);
+  layout->addWidget(m_playbackWidget);
+  rightDockWidget->setLayout(layout);
   rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
-  rightDock->setWidget(m_playbackWidget);
+//  rightDock->setWidget(m_playbackWidget);
+  rightDock->setWidget(rightDockWidget);
   rightDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::RightDockWidgetArea, rightDock);
 

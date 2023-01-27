@@ -23,7 +23,8 @@
 #include <QPushButton>
 #include <QLabel>
 
-class GrandMasterWidget : public QWidget
+class GrandMasterWidget
+    : public QWidget
 {
 
   Q_OBJECT

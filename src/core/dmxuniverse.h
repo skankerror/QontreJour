@@ -18,8 +18,8 @@
 #ifndef DMXUNIVERSE_H
 #define DMXUNIVERSE_H
 
-#include <QObject>
-#include <QList>
+//#include <QObject>
+//#include <QList>
 #include "dmxvalue.h"
 #include "../qontrejour.h"
 #include "qdmxlib/QDmxManager"

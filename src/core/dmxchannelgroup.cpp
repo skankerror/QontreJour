@@ -22,7 +22,9 @@ DmxChannelGroup::DmxChannelGroup(int t_ID,
                                  QObject *parent)
   : DmxValue(t_ID,
              parent)
-{}
+{
+  m_type = DmxValue::ChannelGroup;
+}
 
 DmxChannelGroup::DmxChannelGroup(int t_ID,
                                  QString &t_name,
@@ -30,14 +32,15 @@ DmxChannelGroup::DmxChannelGroup(int t_ID,
   : DmxValue(t_ID,
              t_name,
              parent)
-{}
+{
+  m_type = DmxValue::ChannelGroup;
+}
 
 DmxChannelGroup::~DmxChannelGroup()
 {}
 
 bool DmxChannelGroup::addDmxChannel(std::pair<DmxValue *, quint8> t_P_dmxChannel)
 {
-//  auto dmxChannel = t_P_dmxChannel.first
   if (!(t_P_dmxChannel.first) || t_P_dmxChannel.second < 1)
     return false;
   if (m_L_P_dmxChannel.contains(t_P_dmxChannel))
@@ -85,7 +88,8 @@ void DmxChannelGroup::clear()
   m_L_P_dmxChannel.squeeze();
 }
 
-void DmxChannelGroup::updateLevel(int t_level)
+//void DmxChannelGroup::updateLevel(int t_level)
+void DmxChannelGroup::updateLevel(quint8 t_level)
 {
 
   if ((m_level == t_level)

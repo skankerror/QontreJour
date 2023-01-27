@@ -65,7 +65,7 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
   connect(m_universeSpinBox,
           SIGNAL(valueChanged(int)),
           this,
-          SLOT(onSpinboxSelcted(int)));
+          SLOT(onSpinboxSelected(int)));
 
 }
 

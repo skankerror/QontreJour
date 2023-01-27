@@ -21,8 +21,10 @@
 #include <QWidget>
 #include <QSlider>
 #include <QPushButton>
+#include <QLabel>
 
-class PlaybackWidget : public QWidget
+class PlaybackWidget
+    : public QWidget
 {
 
   Q_OBJECT
@@ -36,7 +38,9 @@ signals:
 private:
 
   QSlider *m_ASlider;
+  QLabel *m_ALabel;
   QSlider *m_BSlider;
+  QLabel *m_BLabel;
   QPushButton *m_seqInfButton;
   QPushButton *m_seqSupButton;
   QPushButton *m_pauseButton;
