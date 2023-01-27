@@ -30,14 +30,16 @@ DmxUniverse::DmxUniverse(int t_universeID,
   for (int i = 0; i < m_outputCount; i++)
   {
     // create output and channel
-    auto dmxOutput = new DmxValue(m_ID,
+    auto dmxOutput = new DmxValue(m_ID, // universeID
                                   i, // first output will be id 0
-                                  this);
-    dmxOutput->setType(DmxValue::Output);
+                                  this,
+                                  DmxValue::Output);
+//    dmxOutput->setType(DmxValue::Output);
     auto dmxChannel = new DmxValue(m_ID,
                                    i,
-                                   this);
-    dmxChannel->setType(DmxValue::Channel);
+                                   this,
+                                   DmxValue::Channel);
+//    dmxChannel->setType(DmxValue::Channel);
     // we start with straight patch
     dmxChannel->addDmxValue(dmxOutput);
     m_L_dmxChannel.append(dmxChannel);
@@ -64,6 +66,7 @@ DmxUniverse::DmxUniverse(int t_universeID,
 DmxUniverse::~DmxUniverse()
 {
   // TODO : check that !
+  // do not delete if universe is involved in scene or channel group !
 
   // détruire output et channel !
   for (const auto &item : std::as_const(m_L_dmxOutput))
@@ -99,21 +102,3 @@ void DmxUniverse::onRequestDmxUpdate(int t_ID,
 
 }
 
-//bool DmxUniverse::setOutputLevel(int t_outputID,
-//                                 int t_level)
-//{// TODO : en a-t-on vraiment besoin ?
-//  if (t_outputID < m_outputCount)
-//  {
-//    auto dmxOutput = m_L_dmxOutput.at(t_outputID);
-//    dmxOutput->setLevel(t_level);
-//    return true;
-//  }
-//  qWarning() << "try to set an output out of range in this universe";
-//  return false;
-//}
-
-//void DmxUniverse::onOutputLevelChanged(DmxValue::SignalSenderType t_type, quint8 t_level)
-//{
-//  emit dmxOutputUpdateRequired(t_type,
-//                               t_level);
-//}

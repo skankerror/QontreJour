@@ -97,7 +97,8 @@ case Unknown : default :
 }
 }
 
-void DmxValue::setChannelLevel(SignalSenderType t_senderType, quint8 t_level)
+void DmxValue::setChannelLevel(SignalSenderType t_senderType,
+                               quint8 t_level)
 {
   switch(t_senderType)
   {
@@ -226,12 +227,12 @@ void DmxValue::setLevel(SignalSenderType t_senderType,
       || (t_level > 255))
     return;
 
-  if (m_type = Channel)
+  if (m_type == Channel)
   {
     return setChannelLevel(t_senderType,
                            t_level);
   }
-  if (m_type = Output)
+  if (m_type == Output)
   {
     return setOutputLevel(t_senderType,
                           t_level);

@@ -149,8 +149,7 @@ signals:
 
 public slots:
 
-  void setLevel(/*int t_ID,*/
-                DmxValue::SignalSenderType t_senderType,
+  void setLevel(DmxValue::SignalSenderType t_senderType,
                 quint8 t_level);
   void setDirectChannelEditLevel(quint8 t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
