@@ -21,7 +21,7 @@
 //#include <QObject>
 #include <QList>
 #include "dmxvalue.h"
-#include "dmxchannel.h"
+//#include "dmxchannel.h"
 
 class DmxChannelGroup
     : public DmxValue
@@ -33,30 +33,37 @@ public:
 
   explicit DmxChannelGroup(int t_ID,
                            QObject *parent = nullptr);
-  ~DmxChannelGroup()/* override*/;
+
+  explicit DmxChannelGroup(int t_ID,
+                           QString &t_name,
+                           QObject *parent = nullptr);
+
+
+  virtual ~DmxChannelGroup();
 
   // getters
-  QList<std::pair<DmxChannel *, quint8> > getL_P_dmxChannel() const { return m_L_P_dmxChannel; }
+  QList<std::pair<DmxValue *, quint8> > getL_P_dmxChannel() const { return m_L_P_dmxChannel; }
 
   // public fonctions
-  bool addDmxChannel(std::pair<DmxChannel *, quint8> t_P_dmxChannel);
-  bool removeDmxChannel(DmxChannel *t_dmxChannel);
-  bool setDmxChannelLevel(std::pair<DmxChannel *, quint8> t_P_dmxChannel);
+  bool addDmxChannel(std::pair<DmxValue *, quint8> t_P_dmxChannel);
+  bool removeDmxChannel(DmxValue *t_dmxChannel);
+  bool setDmxChannelLevel(std::pair<DmxValue *, quint8> t_P_dmxChannel);
 
   void clear();
 
 
 signals:
 
-  void v_p_dmxChannelChanged();
+  void L_P_dmxChannelChanged();
 
 public slots:
 
   void updateLevel(int t_level);
 
-private:
+protected :
 
-  QList<std::pair<DmxChannel*, quint8>> m_L_P_dmxChannel; // un channel et son level
+  QList<std::pair<DmxValue *, quint8>> m_L_P_dmxChannel; // un channel et son level
+
 };
 
 #endif // DMXCHANNELGROUP_H

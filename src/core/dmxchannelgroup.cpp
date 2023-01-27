@@ -24,10 +24,18 @@ DmxChannelGroup::DmxChannelGroup(int t_ID,
              parent)
 {}
 
+DmxChannelGroup::DmxChannelGroup(int t_ID,
+                                 QString &t_name,
+                                 QObject *parent)
+  : DmxValue(t_ID,
+             t_name,
+             parent)
+{}
+
 DmxChannelGroup::~DmxChannelGroup()
 {}
 
-bool DmxChannelGroup::addDmxChannel(std::pair<DmxChannel *, quint8> t_P_dmxChannel)
+bool DmxChannelGroup::addDmxChannel(std::pair<DmxValue *, quint8> t_P_dmxChannel)
 {
 //  auto dmxChannel = t_P_dmxChannel.first
   if (!(t_P_dmxChannel.first) || t_P_dmxChannel.second < 1)
@@ -39,7 +47,7 @@ bool DmxChannelGroup::addDmxChannel(std::pair<DmxChannel *, quint8> t_P_dmxChann
   return true;
 }
 
-bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
+bool DmxChannelGroup::removeDmxChannel(DmxValue *t_dmxChannel)
 {
   for (const auto &item : std::as_const(m_L_P_dmxChannel))
   {
@@ -54,7 +62,7 @@ bool DmxChannelGroup::removeDmxChannel(DmxChannel *t_dmxChannel)
   return false;
 }
 
-bool DmxChannelGroup::setDmxChannelLevel(std::pair<DmxChannel *, quint8> t_P_dmxChannel)
+bool DmxChannelGroup::setDmxChannelLevel(std::pair<DmxValue *, quint8> t_P_dmxChannel)
 {
   if (!t_P_dmxChannel.first) return false;
   for (auto &item : m_L_P_dmxChannel)

@@ -20,8 +20,7 @@
 
 #include <QObject>
 #include <QList>
-#include "dmxoutput.h"
-#include "dmxchannel.h"
+#include "dmxvalue.h"
 #include "../qontrejour.h"
 #include "qdmxlib/QDmxManager"
 
@@ -46,7 +45,7 @@ public:
   int getOutputCount() const { return m_outputCount; }
   QDmxDevice* getDmxDevice() const { return m_dmxDevice; }
   bool isConnected() const { return m_isConnected; }
-  QList<DmxChannel *> getL_dmxChannel() const { return m_L_dmxChannel; }
+  QList<DmxValue *> getL_dmxChannel() const { return m_L_dmxChannel; }
 
   // setters
   void setID(int t_ID) { m_ID = t_ID; }
@@ -68,8 +67,8 @@ private slots:
 
 private:
 
-  QList<DmxOutput *> m_L_dmxOutput;
-  QList<DmxChannel *> m_L_dmxChannel;
+  QList<DmxValue *> m_L_dmxOutput;
+  QList<DmxValue *> m_L_dmxChannel;
   int m_ID;
   int m_outputCount;
 

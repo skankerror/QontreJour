@@ -18,13 +18,23 @@
 #ifndef DMXSCENE_H
 #define DMXSCENE_H
 
-#include <QObject>
+//#include <QObject>
+#include "dmxchannelgroup.h"
 
-class DmxScene : public QObject
+
+class DmxScene :
+    public DmxChannelGroup
 {
+
   Q_OBJECT
+
 public:
-  explicit DmxScene(QObject *parent = nullptr);
+
+  explicit DmxScene(int t_ID,
+                    QString &t_name,
+                    QObject *parent = nullptr);
+
+  ~DmxScene();
 
 signals:
 

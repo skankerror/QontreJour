@@ -27,19 +27,17 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_isConnected(false),
     m_dmxDevice(nullptr)
 {
-//  qDebug() << "static universe count in dmxuniverse cstr ; "
-//           << STATIC_UNIVERSE_COUNT;
   for (int i = 0; i < m_outputCount; i++)
   {
     // create output and channel
-    auto dmxOutput = new DmxOutput(m_ID,
-                                   i, // first output will be id 0
+    auto dmxOutput = new DmxValue(m_ID,
+                                  i, // first output will be id 0
+                                  this);
+    auto dmxChannel = new DmxValue(m_ID,
+                                   i,
                                    this);
-    auto dmxChannel = new DmxChannel(m_ID,
-                                     i,
-                                     this);
     // we start with straight patch
-    dmxChannel->addDmxOutput(dmxOutput);
+    dmxChannel->addDmxValue(dmxOutput);
     m_L_dmxChannel.append(dmxChannel);
     m_L_dmxOutput.append(dmxOutput);
 

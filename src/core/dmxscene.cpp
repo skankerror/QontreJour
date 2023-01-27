@@ -17,8 +17,13 @@
 
 #include "dmxscene.h"
 
-DmxScene::DmxScene(QObject *parent)
-  : QObject{parent}
-{
+DmxScene::DmxScene(int t_ID,
+                   QString &t_name,
+                   QObject *parent)
+  : DmxChannelGroup(t_ID,
+                    t_name,
+                    parent)
+{}
 
-}
+DmxScene::~DmxScene()
+{}

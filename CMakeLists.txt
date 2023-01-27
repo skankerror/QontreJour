@@ -42,10 +42,8 @@ set(PROJECT_SOURCES
         src/core/dmxuniverse.cpp
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-        src/core/dmxoutput.h
-        src/core/dmxoutput.cpp
-        src/core/dmxchannel.h
-        src/core/dmxchannel.cpp
+#        src/core/dmxchannel.h
+#        src/core/dmxchannel.cpp
         src/core/dmxchannelgroup.h
         src/core/dmxchannelgroup.cpp
         src/core/dmxscene.h
