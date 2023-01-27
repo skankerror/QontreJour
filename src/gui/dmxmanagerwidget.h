@@ -26,7 +26,8 @@
 #include "qdmxlib/QDmxManager"
 #include "../core/dmxuniverse.h"
 
-class DmxManagerWidget : public QWidget
+class DmxManagerWidget
+    : public QWidget
 {
 
   Q_OBJECT
@@ -40,9 +41,6 @@ public:
   // getters
   DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
 
-  // setters
-//  void setDmxUniverse(DmxUniverse *t_dmxUniverse) { m_dmxUniverse = t_dmxUniverse; }
-
 private:
 
   void CreateWidget();
@@ -50,18 +48,11 @@ private:
 
 signals:
 
-//  void universeClaimsUpdate(int, //universe ID
-//                            int, //output ID
-//                            int); // level
-
 private slots:
 
   void PopulateDevices(const QString &t_driverString = "dummy");
   void Connect();
   void disConnect();
-  void onOutputLevelChanged(int t_output,
-                            quint8 t_level);
-
 private:
 
   QLabel *m_universeIDLabel;

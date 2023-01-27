@@ -19,22 +19,22 @@
 #include <QDebug>
 
 DmxChannelGroup::DmxChannelGroup(int t_ID,
-                                 QObject *parent)
+                                 QObject *parent,
+                                 ValueType t_type)
   : DmxValue(t_ID,
-             parent)
-{
-  m_type = DmxValue::ChannelGroup;
-}
+             parent,
+             t_type)
+{}
 
 DmxChannelGroup::DmxChannelGroup(int t_ID,
                                  QString &t_name,
-                                 QObject *parent)
+                                 QObject *parent,
+                                 ValueType t_type)
   : DmxValue(t_ID,
              t_name,
-             parent)
-{
-  m_type = DmxValue::ChannelGroup;
-}
+             parent,
+             t_type)
+{}
 
 DmxChannelGroup::~DmxChannelGroup()
 {}

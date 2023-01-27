@@ -131,11 +131,6 @@ void DmxManagerWidget::Connect()
                        SIGNAL(clicked(bool)),
                        this,
                        SLOT(disConnect()));
-//      QObject::connect(m_dmxUniverse,
-//                       SIGNAL(dmxOutputUpdateRequired(int,int)),
-//                       this,
-//                       SLOT(onOutputLevelChanged(int,int)));
-
     }
   }
 }
@@ -164,19 +159,4 @@ void DmxManagerWidget::disConnect()
 
     }
   }
-}
-
-void DmxManagerWidget::onOutputLevelChanged(int t_output,
-                                            quint8 t_level)
-{
-  m_dmxManager->writeData(m_universeID,
-                          t_output,
-                          t_level);
-
-  qDebug() << "writeData(" << m_universeID << t_output << t_level << ")";
-
-//  QByteArray outputData = m_dmxManager->readOutputData(0 /* universe */);
-//  qDebug() << "read output data : " << outputData;
-
-
 }

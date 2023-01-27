@@ -16,16 +16,70 @@
  */
 
 #include "dmxscene.h"
+#include <QDebug>
 
 DmxScene::DmxScene(int t_ID,
                    QString &t_name,
-                   QObject *parent)
+                   QObject *parent,
+                   ValueType t_type)
   : DmxChannelGroup(t_ID,
                     t_name,
-                    parent)
-{
-  m_type = DmxValue::Scene;
-}
+                    parent,
+                    t_type)
+{}
 
 DmxScene::~DmxScene()
 {}
+
+DmxChannelGroup *DmxScene::fromSceneToChannelGroup()
+{
+  return nullptr;
+// TODO : change channel group in channel
+}
+
+void DmxScene::addDmxChannelGroup(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup)
+{
+  if (!(t_P_dmxChannelGroup.first) || t_P_dmxChannelGroup.second < 1)
+    return;
+  if (m_L_P_dmxChannelGroup.contains(t_P_dmxChannelGroup))
+    return setDmxChannelGroupLevel(t_P_dmxChannelGroup);
+
+  m_L_P_dmxChannel.append(t_P_dmxChannelGroup);
+  return ;
+
+}
+
+void DmxScene::removeDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup)
+{
+  for (const auto &item : std::as_const(m_L_P_dmxChannelGroup))
+  {
+    auto dmxChannelGroup = item.first;
+    if (dmxChannelGroup == t_dmxChannelGroup)
+    {
+      m_L_P_dmxChannelGroup.removeOne(item);
+      return;
+    }
+  }
+  qWarning () << "Can't remove channel group, it's not in the scene";
+  return;
+
+}
+
+void DmxScene::setDmxChannelGroupLevel(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup)
+{
+  if (!t_P_dmxChannelGroup.first) return;
+  for (auto &item : m_L_P_dmxChannelGroup)
+  {
+    auto dmxChannelGroup = item.first;
+    if (t_P_dmxChannelGroup.first == dmxChannelGroup) //
+    {
+      item.second = t_P_dmxChannelGroup.second;
+      // NOTE : don't emit signal, this is internal
+//      dmxChannel->setLevel(t_P_dmxChannel.second);
+      return;
+    }
+  }
+    qWarning () << "Can't find channel group to edit, it's not in the scene";
+    return;
+
+}

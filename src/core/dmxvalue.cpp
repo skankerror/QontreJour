@@ -222,7 +222,6 @@ void DmxValue::setMaxLevel(quint8 t_maxLevel)
 void DmxValue::setLevel(SignalSenderType t_senderType,
                         quint8 t_level)
 {
-
   if ((t_level < 0)
       || (t_level > 255))
     return;

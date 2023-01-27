@@ -18,10 +18,7 @@
 #ifndef DMXCHANNELGROUP_H
 #define DMXCHANNELGROUP_H
 
-//#include <QObject>
-#include <QList>
 #include "dmxvalue.h"
-//#include "dmxchannel.h"
 
 class DmxChannelGroup
     : public DmxValue
@@ -32,12 +29,13 @@ class DmxChannelGroup
 public:
 
   explicit DmxChannelGroup(int t_ID,
-                           QObject *parent = nullptr);
+                           QObject *parent = nullptr,
+                           DmxValue::ValueType t_type = ChannelGroup);
 
   explicit DmxChannelGroup(int t_ID,
                            QString &t_name,
-                           QObject *parent = nullptr);
-
+                           QObject *parent = nullptr,
+                           DmxValue::ValueType = ChannelGroup);
 
   virtual ~DmxChannelGroup();
 
@@ -58,7 +56,6 @@ signals:
 
 public slots:
 
-//  void updateLevel(int t_level);
   void updateLevel(quint8 t_level);
 
 protected :

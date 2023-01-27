@@ -31,9 +31,13 @@ public:
 
   explicit DmxScene(int t_ID,
                     QString &t_name,
-                    QObject *parent = nullptr);
+                    QObject *parent = nullptr,
+                    DmxValue::ValueType t_type = Scene);
 
   ~DmxScene();
+
+  // transform in DmxChannelGroup
+  DmxChannelGroup *fromSceneToChannelGroup();
 
   // getters
   QString getNotes() const{ return m_notes; }
@@ -41,6 +45,7 @@ public:
   double getTimeOut() const{ return m_timeOut; }
   double getDelayIn() const{ return m_delayIn; }
   double getDelayOut() const{ return m_delayOut; }
+  QList<std::pair<DmxChannelGroup *, quint8>> getL_P_dmxChannelGroup() const{ return m_L_P_dmxChannelGroup; }
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
@@ -49,10 +54,23 @@ public:
   void setDelayIn(double t_delayIn){ m_delayIn = t_delayIn; }
   void setDelayOut(double t_delayOut){ m_delayOut = t_delayOut; }
 
+  //
+  void addDmxChannelGroup(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
+  void removeDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup);
+  void setDmxChannelGroupLevel(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
+
+
+
+public slots :
+
+  void setL_P_dmxChannelGroup(const QList<std::pair<DmxChannelGroup *, quint8>> &t_L_P_dmxChannelGroup)
+  { m_L_P_dmxChannelGroup = t_L_P_dmxChannelGroup; }
+
 signals:
 
 protected :
 
+  QList<std::pair<DmxChannelGroup *, quint8>> m_L_P_dmxChannelGroup;
   QString m_notes;
   double m_timeIn;
   double m_timeOut;

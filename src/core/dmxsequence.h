@@ -30,12 +30,22 @@ public :
 
   explicit DmxSequence(QObject *parent = nullptr);
 
+  // getter
+  DmxScene *getSelectedScene();
+  DmxScene *getNextScene();
+  DmxScene *getScene(int t_step);
+
+  void addScene(DmxScene *t_scene);
+  void removeScene(DmxScene *t_scene);
+  void removeScene(int t_step);
+
 signals:
 
 private :
 
+  // TODO : always keep a void root scene;
   QList<DmxScene *> m_L_dmxScene;
-
+  int m_selectedScene;
 };
 
 #endif // DMXSEQUENCE_H
