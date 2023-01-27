@@ -38,9 +38,9 @@ DmxValueSlider::DmxValueSlider(DmxValue *t_dmxValue,
           SLOT(updateLevel(int)));
 
   connect(m_dmxValue,
-          SIGNAL(levelChanged(int,quint8)),
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
           this,
-          SLOT(onValueLevelChanged(int,quint8)));
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,quint8)));
 
 }
 
@@ -51,13 +51,15 @@ void DmxValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
-  m_dmxValue->setLevel(m_dmxValue->getID(),
+  // TODO : only works for direct channel !
+  m_dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                        t_level);
 }
 
-void DmxValueSlider::onValueLevelChanged(int t_ID, quint8 t_level)
+void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
+                                         quint8 t_level)
 {
-  Q_UNUSED(t_ID)
+  Q_UNUSED(t_type)
 
   // we disconnect to avoid connecting loop
   disconnect(this,

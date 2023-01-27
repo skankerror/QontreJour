@@ -76,7 +76,7 @@ void MainWindow::addDmxManagerWidget()
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     connect(item,
-            SIGNAL(levelChanged(int,quint8)),
+            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
             m_dmxChannelOutputWidget,
             SLOT(repaintTableView()));
 

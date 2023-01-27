@@ -19,41 +19,181 @@
 #include <QDebug>
 
 DmxValue::DmxValue(int t_ID,
-                   QObject *parent)
+                   QObject *parent,
+                   ValueType t_type)
   : QObject(parent),
     m_ID(t_ID),
+    m_type(t_type),
     m_level(0)
-{}
+{
+  constructorMethod();
+}
 
 DmxValue::DmxValue(int t_ID,
                    QString &t_name,
-                   QObject *parent)
+                   QObject *parent,
+                   ValueType t_type)
   : QObject(parent),
     m_ID(t_ID),
     m_name(t_name),
+    m_type(t_type),
     m_level(0)
-{}
+{
+  constructorMethod();
+}
 
 DmxValue::DmxValue(int t_universeID,
                    int t_ID,
-                   QObject *parent)
-
+                   QObject *parent,
+                   ValueType t_type)
   : QObject(parent),
   m_universeID(t_universeID),
   m_ID(t_ID),
+  m_type(t_type),
   m_level(0)
-{}
+{
+  constructorMethod();
+}
 
 DmxValue::DmxValue(int t_universeID,
                    int t_ID,
                    QString &t_name,
-                   QObject *parent)
+                   QObject *parent,
+                   ValueType t_type)
   : QObject(parent),
   m_universeID(t_universeID),
   m_ID(t_ID),
   m_name(t_name),
+  m_type(t_type),
   m_level(0)
 {}
+
+void DmxValue::constructorMethod()
+{
+switch(m_type)
+{
+case Output :
+  m_level = 0;
+  m_maxLevel = 255;
+  break;
+case Channel :
+  m_level = 0;
+  m_directChannelEditLevel = 0;
+  m_channelGroupLevel = 0;
+  m_selectedSceneLevel = 0;
+  m_nextSceneLevel = 0;
+  m_isDirectChannelEdited = false;
+  break;
+case ChannelGroup :
+  m_level = 0;
+  m_universeID = -1;
+  break;
+case Scene :
+  m_level = 0;
+  m_universeID = -1;
+  break;
+case Unknown : default :
+  break;
+}
+}
+
+void DmxValue::setChannelLevel(SignalSenderType t_senderType, quint8 t_level)
+{
+  switch(t_senderType)
+  {
+  case ChannelGroupSender :
+    if (m_channelGroupLevel == t_level)
+      return;
+    m_channelGroupLevel = t_level;
+    break;
+  case DirectChannelEditSender :
+    if (m_directChannelEditLevel == t_level)
+      return;
+    m_directChannelEditLevel = t_level;
+    m_isDirectChannelEdited = true;
+    break;
+  case SelectedSceneSender :
+    if (m_selectedSceneLevel == t_level)
+      return;
+    m_selectedSceneLevel = t_level;
+    break;
+  case NextSceneSender :
+    if (m_nextSceneLevel == t_level)
+      return;
+    m_nextSceneLevel = t_level;
+    break;
+  case UnknownSender : default :
+    break;
+  }
+
+  // here we determine if output level change
+  int level; // final set
+  if (m_isDirectChannelEdited)
+  {
+    if(m_directChannelEditLevel > m_channelGroupLevel)
+    {
+      level = m_directChannelEditLevel;
+      m_flag = DirectChannelFlag;
+    }
+    else
+    {
+      level = m_channelGroupLevel;
+      m_flag = ChannelGroupFlag;
+    }
+  }
+  else
+  {
+    if(m_channelGroupLevel > m_selectedSceneLevel)
+    {
+      level = m_channelGroupLevel;
+      m_flag = ChannelGroupFlag;
+    }
+    else
+    {
+      level = m_selectedSceneLevel;
+      m_flag = SelectedSceneFlag;
+    }
+  }
+  if (m_level == level
+      || (level < 0)
+      || (level > 255))
+    return;
+
+  m_level = level;
+
+  emit levelChanged(ChannelToOutputSender,
+                    m_level);
+  return;
+}
+
+void DmxValue::setOutputLevel(SignalSenderType t_senderType,
+                              quint8 t_level)
+{
+  if (m_flag == ParkedFlag)
+    return;
+  if ((m_flag == IndependantFlag)
+      && (t_senderType != IndependantSender))
+    return;
+
+  double coef;
+  if (m_maxLevel == 0)
+    coef = 0;
+  else
+    coef = double(m_maxLevel)/255.0f;
+
+  quint8 level = (quint8)(coef * t_level);
+
+  if (m_level == level
+      || (level < 0)
+      || (level > 255))
+    return;
+
+  m_level = level;
+
+  emit requestDmxUpdate(m_ID,
+                        m_level);
+
+}
 
 DmxValue::~DmxValue()
 {
@@ -74,23 +214,73 @@ void DmxValue::setMaxLevel(quint8 t_maxLevel)
   if (m_maxLevel == t_maxLevel)
     return;
   m_maxLevel = t_maxLevel;
-  emit maxLevelChanged(m_ID,
-                       m_maxLevel);
+//  emit maxLevelChanged(/*m_ID,*/
+//                       m_maxLevel);
 }
 
-void DmxValue::setLevel(int t_ID,
+void DmxValue::setLevel(SignalSenderType t_senderType,
                         quint8 t_level)
 {
-  Q_UNUSED(t_ID)
+
+  if ((t_level < 0)
+      || (t_level > 255))
+    return;
+
+  if (m_type = Channel)
+  {
+    return setChannelLevel(t_senderType,
+                           t_level);
+  }
+  if (m_type = Output)
+  {
+    return setOutputLevel(t_senderType,
+                          t_level);
+  }
+  // TODO, implement other type
+
   if (m_level == t_level
       || (t_level < 0)
       || (t_level > 255))
     return;
 
-  m_level = t_level;
+//  m_level = t_level;
 
-  emit levelChanged(m_ID,
-                    m_level);
+//  emit levelChanged(m_type,
+//                    m_level);
+
+
+}
+
+void DmxValue::setDirectChannelEditLevel(quint8 t_directChannelEditLevel)
+{
+  if (m_directChannelEditLevel == t_directChannelEditLevel)
+    return;
+  m_directChannelEditLevel = t_directChannelEditLevel;
+  emit directChannelEditLevelChanged(m_directChannelEditLevel);
+}
+
+void DmxValue::setChannelGroupLevel(quint8 t_channelGroupLevel)
+{
+  if (m_channelGroupLevel == t_channelGroupLevel)
+    return;
+  m_channelGroupLevel = t_channelGroupLevel;
+  emit channelGroupLevelChanged(m_channelGroupLevel);
+}
+
+void DmxValue::setSelectedSceneLevel(quint8 t_selectedSceneLevel)
+{
+  if (m_selectedSceneLevel == t_selectedSceneLevel)
+    return;
+  m_selectedSceneLevel = t_selectedSceneLevel;
+  emit selectedSceneLevelChanged(m_selectedSceneLevel);
+}
+
+void DmxValue::setNextSceneLevel(quint8 t_nextSceneLevel)
+{
+  if (m_nextSceneLevel == t_nextSceneLevel)
+    return;
+  m_nextSceneLevel = t_nextSceneLevel;
+  emit nextSceneLevelChanged(m_nextSceneLevel);
 }
 
 void DmxValue::setID(int t_ID)
@@ -108,9 +298,9 @@ void DmxValue::setPropertyLevel(int t_level)
     return;
 
   m_level = t_level;
-
-  emit levelChanged(m_ID,
-                    m_level);
+  // TODO : implement that
+//  emit levelChanged(/*m_ID,*/
+//                    m_level);
 
 }
 
@@ -184,3 +374,4 @@ void DmxValue::clearList()
   // universe or ? have to do it.
 
 }
+

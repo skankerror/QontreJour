@@ -62,8 +62,10 @@ signals:
 
 private slots:
 
-  void onOutputLevelChanged(int t_outputID,
-                            quint8 t_level);
+//  void onOutputLevelChanged(DmxValue::SignalSenderType t_type,
+//                            quint8 t_level);
+  void onRequestDmxUpdate(int t_ID,
+                          quint8 t_level);
 
 private:
 

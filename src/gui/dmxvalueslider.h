@@ -41,7 +41,7 @@ public:
 protected slots:
 
   void updateLevel(int t_level);
-  void onValueLevelChanged(int t_ID,
+  void onValueLevelChanged(DmxValue::SignalSenderType t_type,
                            quint8 t_level);
 
 protected :

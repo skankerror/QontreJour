@@ -19,14 +19,22 @@
 #define DMXSEQUENCE_H
 
 #include <QObject>
+#include "dmxscene.h"
 
-class DmxSequence : public QObject
+class DmxSequence
+    : public QObject
 {
   Q_OBJECT
-public:
+
+public :
+
   explicit DmxSequence(QObject *parent = nullptr);
 
 signals:
+
+private :
+
+  QList<DmxScene *> m_L_dmxScene;
 
 };
 

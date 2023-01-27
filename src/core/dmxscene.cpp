@@ -22,8 +22,7 @@ DmxScene::DmxScene(int t_ID,
                    QObject *parent)
   : DmxChannelGroup(t_ID,
                     t_name,
-                    parent)/*,
-    m_type(DmxValue::Scene)*/
+                    parent)
 {
   m_type = DmxValue::Scene;
 }

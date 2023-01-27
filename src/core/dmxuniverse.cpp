@@ -44,14 +44,18 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_L_dmxOutput.append(dmxOutput);
 
     connect(dmxChannel,
-            SIGNAL(levelChanged(int,quint8)),
+            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
             dmxOutput,
-            SLOT(setLevel(int,quint8)));
+            SLOT(setLevel(DmxValue::SignalSenderType,quint8)));
 
+//    connect(dmxOutput,
+//            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+//            this,
+//            SLOT(onOutputLevelChanged(DmxValue::SignalSenderType,quint8)));
     connect(dmxOutput,
-            SIGNAL(levelChanged(int,quint8)),
+            SIGNAL(requestDmxUpdate(int,quint8)),
             this,
-            SLOT(onOutputLevelChanged(int,quint8)));
+            SLOT(onRequestDmxUpdate(int,quint8)));
 
 
   }
@@ -81,6 +85,20 @@ DmxUniverse::~DmxUniverse()
 
 }
 
+void DmxUniverse::onRequestDmxUpdate(int t_ID,
+                                     quint8 t_level)
+{
+  if (!m_isConnected)
+    return;
+
+  QDmxManager::instance()->writeData(m_ID,
+                                     t_ID,
+                                     t_level);
+
+  qDebug() << "writeData(" << m_ID << t_ID << t_level << ")";
+
+}
+
 //bool DmxUniverse::setOutputLevel(int t_outputID,
 //                                 int t_level)
 //{// TODO : en a-t-on vraiment besoin ?
@@ -94,8 +112,8 @@ DmxUniverse::~DmxUniverse()
 //  return false;
 //}
 
-void DmxUniverse::onOutputLevelChanged(int t_outputID, quint8 t_level)
-{
-  emit dmxOutputUpdateRequired(t_outputID,
-                               t_level);
-}
+//void DmxUniverse::onOutputLevelChanged(DmxValue::SignalSenderType t_type, quint8 t_level)
+//{
+//  emit dmxOutputUpdateRequired(t_type,
+//                               t_level);
+//}

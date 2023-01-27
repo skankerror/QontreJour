@@ -30,6 +30,9 @@
 
 #define SLIDERS_PER_PAGE 32
 
+#define DEFAULT_IN_TIME 5.0f
+#define DEFAULT_OUT_TIME 5.0f
+
 
 
 #endif // QONTREJOUR_H

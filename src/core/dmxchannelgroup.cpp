@@ -108,7 +108,7 @@ void DmxChannelGroup::updateLevel(quint8 t_level)
 //             << coef
 //             << " (int)coef * level) : "
 //             << (int)(coef * level);
-    dmxChannel->setLevel(m_ID,
+    dmxChannel->setLevel(DmxValue::ChannelGroupSender,
                          (quint8)(coef * level));
   }
 

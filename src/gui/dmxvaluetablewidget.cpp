@@ -263,7 +263,7 @@ bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value
       + index.column();
   //  qDebug() << "channelID i, model : " << channelID;
   auto dmxValue = m_L_dmxValue.at(valueID);
-  dmxValue->setLevel(valueID,
+  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());
 
   emit dataChanged(index,index);

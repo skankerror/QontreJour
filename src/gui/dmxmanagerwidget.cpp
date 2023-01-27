@@ -131,10 +131,10 @@ void DmxManagerWidget::Connect()
                        SIGNAL(clicked(bool)),
                        this,
                        SLOT(disConnect()));
-      QObject::connect(m_dmxUniverse,
-                       SIGNAL(dmxOutputUpdateRequired(int,int)),
-                       this,
-                       SLOT(onOutputLevelChanged(int,int)));
+//      QObject::connect(m_dmxUniverse,
+//                       SIGNAL(dmxOutputUpdateRequired(int,int)),
+//                       this,
+//                       SLOT(onOutputLevelChanged(int,int)));
 
     }
   }
