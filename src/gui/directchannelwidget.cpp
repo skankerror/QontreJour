@@ -29,6 +29,7 @@ DirectChannelWidget::DirectChannelWidget(QWidget *parent)
   totalLayout->addLayout(m_stackedLayout);
   setLayout(totalLayout);
 
+  setMinimumHeight(200);
 }
 
 void DirectChannelWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders)

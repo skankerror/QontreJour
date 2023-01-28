@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   createConnections();
 
+//  setMinimumWidth(1200);
+//  resize(1300,800);
 }
 
 MainWindow::~MainWindow()
@@ -258,6 +260,7 @@ void MainWindow::CreateCentralWidget()
 
   setCentralWidget(m_tabWidget);
 
+//  m_tabWidget->setMinimumWidth(800);
 //  resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 //  setGeometry(0, 0, 1280, 720);
 }

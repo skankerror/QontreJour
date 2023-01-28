@@ -61,6 +61,8 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
   m_tableView->setModel(m_model);
 
   m_tableView->resizeColumnsToContents();
+  m_tableView->resizeRowsToContents();
+  m_tableView->setMinimumSize(800, 200);
 
   connect(m_universeSpinBox,
           SIGNAL(valueChanged(int)),
@@ -77,6 +79,7 @@ void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
   m_universeCount = t_universeCount;
   m_universeSpinBox->setMaximum(t_universeCount);
   m_tableView->resizeColumnsToContents();
+  m_tableView->resizeRowsToContents();
 
 }
 
@@ -210,6 +213,8 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return QVariant();
 
     auto dmxValue = m_L_dmxValue.at(valueID);
+    DmxValue::ChannelFlag flag = dmxValue->getFlag();
+
 
     switch(role)
     {
@@ -221,8 +226,35 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return Qt::AlignCenter;
       break;
     case Qt::BackgroundRole:
-      return QBrush(QColor(186, 109, 43));
+//      return QBrush(QColor(ORANGE_COLOR));
+//      return QBrush(QColor(LIGHT_BROWN_COLOR));
+      return QBrush(QColor(BLACK_COLOR));
       break;
+    case Qt::ForegroundRole :
+      switch(flag)
+      {
+      case DmxValue::SelectedSceneFlag :
+        return QBrush(QColor(LIGHT_GREEN_COLOR));
+        break;
+      case DmxValue::DirectChannelFlag :
+        return QBrush(QColor(LIGHT_YELLOW_COLOR));
+        break;
+      case DmxValue::ChannelGroupFlag :
+        return QBrush(QColor(LIGHT_BLUE_COLOR));
+        break;
+      case DmxValue::ParkedFlag :
+        return QBrush(QColor(RED_COLOR));
+        break;
+      case DmxValue::IndependantFlag :
+        return QBrush(QColor(PURPLE_COLOR));
+        break;
+      case DmxValue::UnknownFlag :
+        return QBrush(QColor(LIGHT_GREY_COLOR));
+        break;
+      default:
+        break;
+      }
+
     default:
       return QVariant();
       break;
@@ -244,7 +276,7 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return Qt::AlignCenter;
       break;
     case Qt::BackgroundRole:
-      return QBrush(QColor(60, 85, 164));
+      return QBrush(LIGHT_BLUE_COLOR);
       break;
     default:
       return QVariant();

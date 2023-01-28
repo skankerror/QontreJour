@@ -107,6 +107,7 @@ public:
   quint8 getchannelGroupLevel() const{ return m_channelGroupLevel; }
   quint8 getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   quint8 getnextSceneLevel() const{ return m_nextSceneLevel; }
+  ChannelFlag getFlag() const{ return m_flag; }
   int getValuesCount() const { return m_L_dmxValue.size(); }
 
   // setters
@@ -123,6 +124,7 @@ public:
   bool removeDmxValue(const DmxValue *t_dmxValue);
   bool removeDmxValues(const QList<DmxValue *> t_L_dmxValue);
   void clearList();
+
 
 private :
 
@@ -156,6 +158,8 @@ public slots:
   void setChannelGroupLevel(quint8 t_channelGroupLevel);
   void setSelectedSceneLevel(quint8 t_selectedSceneLevel);
   void setNextSceneLevel(quint8 t_nextSceneLevel);
+
+  void setFlag(DmxValue::ChannelFlag t_flag){ m_flag = t_flag; }
 
 protected :
 

@@ -164,6 +164,10 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
 
   m_level = level;
 
+  // NOTE : je sais pas en cas de gm à 0 ?
+  // faut-il garder les couleurs même à 0 ?
+  if (m_level == 0) m_flag = UnknownFlag;
+
   emit levelChanged(ChannelToOutputSender,
                     m_level);
   return;
