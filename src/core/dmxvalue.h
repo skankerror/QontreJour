@@ -145,6 +145,8 @@ signals:
   void selectedSceneLevelChanged(quint8 selectedSceneLevel);
   void nextSceneLevelChanged(quint8 nextSceneLevel);
 
+  void blockDirectChannelSlider(quint8 t_level);
+
 public slots:
 
   virtual void setLevel(DmxValue::SignalSenderType t_senderType,

@@ -135,6 +135,10 @@ void MainWindow::setDirectChannelWidget(int t_universeID)
   {
     auto directChannelSlider = new DmxValueSlider(item,
                                                   m_directChannelWidget);
+    connect(item,
+            SIGNAL(blockDirectChannelSlider(quint8)),
+            directChannelSlider,
+            SLOT(unMoveSlider(quint8)));
     L_directChannelSlider.append(directChannelSlider);
   }
   // les donner aux widgets

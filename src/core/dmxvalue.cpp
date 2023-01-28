@@ -140,6 +140,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
     {
       level = m_channelGroupLevel;
       m_flag = ChannelGroupFlag;
+      emit blockDirectChannelSlider(level);
     }
   }
   else
@@ -148,6 +149,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
     {
       level = m_channelGroupLevel;
       m_flag = ChannelGroupFlag;
+      emit blockDirectChannelSlider(level);
     }
     else
     {

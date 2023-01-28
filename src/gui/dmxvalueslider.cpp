@@ -47,6 +47,23 @@ DmxValueSlider::DmxValueSlider(DmxValue *t_dmxValue,
 DmxValueSlider::~DmxValueSlider()
 {}
 
+void DmxValueSlider::unMoveSlider(quint8 t_level)
+{
+  // we disconnect to avoid connecting loop
+  disconnect(this,
+             SIGNAL(valueChanged(int)),
+             this,
+             SLOT(updateLevel(int)));
+
+  this->setValue(t_level);
+
+  // we reconnect
+  connect(this,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(updateLevel(int)));
+}
+
 void DmxValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
@@ -63,9 +80,9 @@ void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
 
   // we disconnect to avoid connecting loop
   disconnect(this,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(updateLevel(int)));
+             SIGNAL(valueChanged(int)),
+             this,
+             SLOT(updateLevel(int)));
 
   this->setValue(t_level);
 

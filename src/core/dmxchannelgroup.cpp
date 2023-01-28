@@ -113,10 +113,10 @@ void DmxChannelGroup::setLevel(SignalSenderType t_senderType,
       //             << " (int)coef * level) : "
       //             << (int)(coef * level);
       if (t_senderType != NextSceneSender)
-        return dmxChannel->setLevel(DmxValue::ChannelGroupSender,
+        dmxChannel->setLevel(DmxValue::ChannelGroupSender,
                              (quint8)(coef * level));
-      else
-        return;
+//      else
+//        return;
     }
   }
 

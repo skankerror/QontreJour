@@ -40,7 +40,11 @@ public:
   DmxValue *getDmxValue() const{ return m_dmxValue; }
   void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }
 
-protected slots:
+public slots :
+
+  void unMoveSlider(quint8 t_level);
+
+protected slots :
 
   virtual void updateLevel(int t_level);
   virtual void onValueLevelChanged(DmxValue::SignalSenderType t_type,
