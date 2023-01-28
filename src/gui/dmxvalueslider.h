@@ -20,6 +20,7 @@
 
 #include <QSlider>
 #include "../core/dmxvalue.h"
+#include "../core/dmxchannelgroup.h"
 
 class DmxValueSlider
     : public QSlider
@@ -30,6 +31,7 @@ class DmxValueSlider
 public:
 
   explicit DmxValueSlider(QWidget *parent = nullptr);
+
   DmxValueSlider(DmxValue *t_dmxValue,
                  QWidget *parent = nullptr);
 
@@ -40,13 +42,48 @@ public:
 
 protected slots:
 
-  void updateLevel(int t_level);
-  void onValueLevelChanged(DmxValue::SignalSenderType t_type,
-                           quint8 t_level);
+  virtual void updateLevel(int t_level);
+  virtual void onValueLevelChanged(DmxValue::SignalSenderType t_type,
+                                   quint8 t_level);
 
 protected :
 
   DmxValue *m_dmxValue;
 };
+
+/*********************************************************************/
+
+class SubmasterSlider
+    : public DmxValueSlider
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit SubmasterSlider(QWidget *parent = nullptr);
+
+  explicit SubmasterSlider(DmxChannelGroup *t_dmxChannelGroup,
+                           QWidget *parent = nullptr);
+
+  ~SubmasterSlider();
+
+  DmxChannelGroup *getchannelGroup() const{ return m_channelGroup; }
+
+public slots:
+
+  void setChannelGroup(DmxChannelGroup *t_channelGroup){ m_channelGroup = t_channelGroup; }
+
+protected slots:
+
+  void updateLevel(int t_level) override;
+
+private :
+
+  DmxChannelGroup *m_channelGroup;
+
+};
+
+
 
 #endif // DMXVALUESLIDER_H

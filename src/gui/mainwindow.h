@@ -29,7 +29,7 @@
 #include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
-//#include "submasterwidget.h"
+#include "submasterwidget.h"
 #include "directchannelwidget.h"
 #include "dmxchanneloutputwidget.h"
 
@@ -67,6 +67,7 @@ private slots:
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
   void setDirectChannelWidget(int t_universeID);
+  void setSubmasterWidget();
 
 private:
 
@@ -80,7 +81,7 @@ private:
   QAction *m_aboutQtAct;
 
   QTabWidget *m_tabWidget;
-//  SubMasterWidget *m_submasterWidget;
+  SubmasterWidget *m_submasterWidget;
   DirectChannelWidget *m_directChannelWidget;
   QWidget *m_dmxManagerContainerWidget;
   QPushButton *m_addDmxManagerWidgetButton;

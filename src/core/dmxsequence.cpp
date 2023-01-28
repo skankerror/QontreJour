@@ -45,7 +45,7 @@ DmxScene *DmxSequence::getNextScene()
     return nullptr;
 }
 
-DmxScene *DmxSequence::getScene(int t_step)
+DmxScene *DmxSequence::getScene(const int t_step)
 {
   if ((t_step > -1)
       && (t_step < m_L_dmxScene.size()))

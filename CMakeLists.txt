@@ -42,8 +42,6 @@ set(PROJECT_SOURCES
         src/core/dmxuniverse.cpp
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-#        src/core/dmxchannel.h
-#        src/core/dmxchannel.cpp
         src/core/dmxchannelgroup.h
         src/core/dmxchannelgroup.cpp
         src/core/dmxscene.h
@@ -60,6 +58,8 @@ set(PROJECT_SOURCES
         src/gui/dmxvaluetablewidget.cpp
         src/gui/dmxvalueslider.h
         src/gui/dmxvalueslider.cpp
+        src/gui/submasterwidget.h
+        src/gui/submasterwidget.cpp
         src/gui/directchannelwidget.h
         src/gui/directchannelwidget.cpp
         src/gui/dmxchanneloutputwidget.h

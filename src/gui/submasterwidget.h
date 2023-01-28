@@ -15,37 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DMXSEQUENCE_H
-#define DMXSEQUENCE_H
+#ifndef SUBMASTERWIDGET_H
+#define SUBMASTERWIDGET_H
 
-#include <QObject>
-#include "dmxscene.h"
+#include <QWidget>
+#include <QStackedLayout>
+#include <QComboBox>
+#include "dmxvalueslider.h"
 
-class DmxSequence
-    : public QObject
+class SubmasterWidget
+    : public QWidget
 {
   Q_OBJECT
 
-public :
+public:
 
-  explicit DmxSequence(QObject *parent = nullptr);
+  explicit SubmasterWidget(QWidget *parent = nullptr);
 
-  // getter
-  DmxScene *getSelectedScene();
-  DmxScene *getNextScene();
-  DmxScene *getScene(const int t_step);
+  // getters
+  QList<SubmasterSlider *> getL_sliders() const{ return m_L_sliders; }
 
-  void addScene(DmxScene *t_scene);
-  void removeScene(DmxScene *t_scene);
-  void removeScene(int t_step);
+  // setters
+  void setL_sliders(const QList<SubmasterSlider *> &t_L_sliders);
 
 signals:
 
+public slots:
+
+  void populateWidget();
+
 private :
 
-  // TODO : always keep a void root scene;
-  QList<DmxScene *> m_L_dmxScene;
-  int m_selectedScene;
+  QStackedLayout *m_stackedLayout;
+  QComboBox *m_changePageComboBox;
+
+  QList<SubmasterSlider *> m_L_sliders;
+
 };
 
-#endif // DMXSEQUENCE_H
+#endif // SUBMASTERWIDGET_H

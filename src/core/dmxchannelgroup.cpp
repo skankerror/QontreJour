@@ -88,29 +88,36 @@ void DmxChannelGroup::clear()
   m_L_P_dmxChannel.squeeze();
 }
 
-//void DmxChannelGroup::updateLevel(int t_level)
-void DmxChannelGroup::updateLevel(quint8 t_level)
+void DmxChannelGroup::setLevel(SignalSenderType t_senderType,
+                               quint8 t_level)
 {
 
-  if ((m_level == t_level)
-      || (t_level < 0)
-      || (t_level > 255))
-    return;
-
-  m_level = t_level;
-
-  for (const auto &item : std::as_const(m_L_P_dmxChannel))
+  if ((t_senderType == SubmasterSliderSender)
+      || (t_senderType == SelectedSceneSender)
+      || (t_senderType == NextSceneSender))
   {
-    auto dmxChannel = item.first;
-    auto level = item.second;
-    double coef = double(t_level)/255.0f;
-//    qDebug() << "coef : "
-//             << coef
-//             << " (int)coef * level) : "
-//             << (int)(coef * level);
-    dmxChannel->setLevel(DmxValue::ChannelGroupSender,
-                         (quint8)(coef * level));
+    if ((m_level == t_level)
+        || (t_level < 0)
+        || (t_level > 255))
+      return;
+
+    m_level = t_level;
+
+    for (const auto &item : std::as_const(m_L_P_dmxChannel))
+    {
+      auto dmxChannel = item.first;
+      auto level = item.second;
+      double coef = double(m_level)/255.0f;
+      //    qDebug() << "coef : "
+      //             << coef
+      //             << " (int)coef * level) : "
+      //             << (int)(coef * level);
+      if (t_senderType != NextSceneSender)
+        return dmxChannel->setLevel(DmxValue::ChannelGroupSender,
+                             (quint8)(coef * level));
+      else
+        return;
+    }
   }
 
-//  emit levelChanged(m_level);
 }

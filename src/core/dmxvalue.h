@@ -48,6 +48,7 @@ public:
   // enum for dmx channels
   enum SignalSenderType
   {
+    SubmasterSliderSender,
     ChannelGroupSender,
     DirectChannelEditSender,
     SelectedSceneSender,
@@ -102,7 +103,6 @@ public:
   QList<DmxValue *> getL_dmxValue() const{ return m_L_dmxValue; }
   DmxValue* getL_dmxValueAt(int t_index);
   ValueType getType() const{ return m_type; }
-//  quint8 getStoredLevel() const{ return m_storedLevel; }
   quint8 getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   quint8 getchannelGroupLevel() const{ return m_channelGroupLevel; }
   quint8 getselectedSceneLevel() const{ return m_selectedSceneLevel; }
@@ -117,7 +117,6 @@ public:
   void setName(const QString &t_name) { m_name = t_name; }
   void setL_dmxValue(const QList<DmxValue *> &t_L_dmxValue){ m_L_dmxValue = t_L_dmxValue; }
   void setType(ValueType t_type){ m_type = t_type; }
-//  void setStoredLevel(quint8 t_storedLevel){ m_storedLevel = t_storedLevel; }
 
   void addDmxValue(DmxValue *t_dmxValue);
   void addDmxValues(const QList<DmxValue *> t_L_dmxValue);
@@ -137,7 +136,6 @@ signals:
 
   void levelChanged(DmxValue::SignalSenderType,
                     quint8);  //m_level
-//  void maxLevelChanged(quint8);// m_maxLevel
   void requestDmxUpdate(int, // m_outputID
                         quint8); // level
   void L_dmxValueChanged();
@@ -149,8 +147,8 @@ signals:
 
 public slots:
 
-  void setLevel(DmxValue::SignalSenderType t_senderType,
-                quint8 t_level);
+  virtual void setLevel(DmxValue::SignalSenderType t_senderType,
+                        quint8 t_level);
   void setDirectChannelEditLevel(quint8 t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
   void setChannelGroupLevel(quint8 t_channelGroupLevel);
@@ -165,7 +163,6 @@ protected :
   quint8 m_channelGroupLevel;
   quint8 m_selectedSceneLevel;
   quint8 m_nextSceneLevel;
-//  quint8 m_storedLevel;
   int m_ID;
   int m_universeID;
   QString m_name;

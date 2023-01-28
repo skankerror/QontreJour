@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_playbackWidget(new PlaybackWidget(this)),
     m_sequencerWidget(new SequencerWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
-//    m_submasterWidget(new SubMasterWidget(this)),
+    m_submasterWidget(new SubmasterWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
     m_dmxManagerContainerWidget(new QWidget(this)),
     m_dmxManagerContainerLayout(new QVBoxLayout()),
@@ -143,6 +143,36 @@ void MainWindow::setDirectChannelWidget(int t_universeID)
 
 }
 
+void MainWindow::setSubmasterWidget()
+{
+// NOTE : for testing purposes we create some channel group
+  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
+      ->getDmxUniverse()
+      ->getL_dmxChannel();
+  auto L_submasterSlider = QList<SubmasterSlider *>();
+
+  for (int i = 0; i < 60; i++)
+  {
+    auto channelGroup = new DmxChannelGroup(i,
+                                            m_submasterWidget,
+                                            DmxValue::ChannelGroup);
+    auto dmxChannel1 = L_dmxChannel.at(i + 10);
+    quint8 value1 = i +100;
+    auto pair1 = std::pair<DmxValue *, quint8>(dmxChannel1, value1);
+    channelGroup->addDmxChannel(pair1);
+    auto dmxChannel2 = L_dmxChannel.at(i + 100);
+    quint8 value2 = i + 150;
+    auto pair2 = std::pair<DmxValue *, quint8>(dmxChannel2, value2);
+    channelGroup->addDmxChannel(pair2);
+
+    auto slider = new SubmasterSlider(channelGroup,
+                                      m_submasterWidget);
+    L_submasterSlider.append(slider);
+  }
+  m_submasterWidget->setL_sliders(L_submasterSlider);
+  m_submasterWidget->populateWidget();
+}
+
 void MainWindow::CreateActions()
 {
 
@@ -214,21 +244,10 @@ void MainWindow::createDmxManagerContainerWidget()
 
 void MainWindow::CreateCentralWidget()
 {
-//  // create direct channel widget
-//  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
-//      ->getDmxUniverse()
-//      ->getL_dmxChannel();
-//  auto L_directChannelSlider = QList<DmxValueSlider *>();
-//  for (const auto &item : std::as_const(L_dmxChannel))
-//  {
-//    auto directChannelSlider = new DmxValueSlider(item);
-//    L_directChannelSlider.append(directChannelSlider);
-//  }
-//  // les donner aux widgets
-//  m_directChannelWidget->setL_sliders(L_directChannelSlider);
-//  m_directChannelWidget->populateWidget();
+  setSubmasterWidget();
   setDirectChannelWidget(0); // set for first universe
 
+  m_tabWidget->addTab(m_submasterWidget, "Submasters");
   m_tabWidget->addTab(m_directChannelWidget, "Direct Channels");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
 //  m_tabWidget->setMaximumSize(1024, 600);

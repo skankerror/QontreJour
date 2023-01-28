@@ -51,7 +51,7 @@ void DmxValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
-  // TODO : only works for direct channel !
+  if (m_dmxValue->getLevel() == t_level) return;
   m_dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                        t_level);
 }
@@ -75,5 +75,41 @@ void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
           this,
           SLOT(updateLevel(int)));
 
+
+}
+
+/**************************************************************/
+
+SubmasterSlider::SubmasterSlider(QWidget *parent)
+  : DmxValueSlider(parent)
+{}
+
+SubmasterSlider::SubmasterSlider(DmxChannelGroup *t_dmxChannelGroup,
+                                 QWidget *parent)
+  : DmxValueSlider(parent),
+    m_channelGroup(t_dmxChannelGroup)
+{
+  connect(this,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(updateLevel(int)));
+
+  connect(m_channelGroup,
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+          this,
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,quint8)));
+
+}
+
+SubmasterSlider::~SubmasterSlider()
+{}
+
+void SubmasterSlider::updateLevel(int t_level)
+{
+  if (t_level < 0) t_level = 0;
+  if (t_level > 255) t_level = 255;
+  if (m_channelGroup->getLevel() == t_level) return;
+  m_channelGroup->setLevel(DmxValue::SubmasterSliderSender,
+                           t_level);
 
 }

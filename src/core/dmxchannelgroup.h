@@ -56,7 +56,8 @@ signals:
 
 public slots:
 
-  void updateLevel(quint8 t_level);
+  virtual void setLevel(DmxValue::SignalSenderType t_senderType,
+                        quint8 t_level) override;
 
 protected :
 
