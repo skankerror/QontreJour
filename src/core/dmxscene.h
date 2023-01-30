@@ -29,6 +29,16 @@ class DmxScene :
 
 public:
 
+  enum SceneType
+  {
+    RootScene,
+    MainScene,
+    SubScene,
+    Unknow_type
+  };
+  Q_ENUM(SceneType)
+
+
   explicit DmxScene(int t_ID,
                     QString &t_name,
                     QObject *parent = nullptr,
@@ -46,6 +56,12 @@ public:
   double getDelayIn() const{ return m_delayIn; }
   double getDelayOut() const{ return m_delayOut; }
   QList<std::pair<DmxChannelGroup *, quint8>> getL_P_dmxChannelGroup() const{ return m_L_P_dmxChannelGroup; }
+  SceneType getType() const{ return m_type; }
+  QList<DmxScene *> getL_subScene() const{ return m_L_subScene; }
+  DmxScene *getParentSCene() const{ return m_parentSCene; }
+  int getStepNumber() const{ return m_stepNumber; }
+  int getSize() const{ return m_L_subScene.size(); }
+
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
@@ -60,11 +76,21 @@ public:
   void setDmxChannelGroupLevel(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
 
 
-
 public slots :
 
   void setL_P_dmxChannelGroup(const QList<std::pair<DmxChannelGroup *, quint8>> &t_L_P_dmxChannelGroup)
   { m_L_P_dmxChannelGroup = t_L_P_dmxChannelGroup; }
+
+  void setType(DmxScene::SceneType t_type){ m_type = t_type; }
+
+  void setL_subScene(const QList<DmxScene *> &t_L_subScene)
+  { m_L_subScene = t_L_subScene; }
+
+  void setParentSCene(DmxScene *t_parentSCene)
+  { m_parentSCene = t_parentSCene; }
+
+  void setStepNumber(int t_stepNumber)
+  { m_stepNumber = t_stepNumber; }
 
 signals:
 
@@ -76,6 +102,12 @@ protected :
   double m_timeOut;
   double m_delayIn;
   double m_delayOut;
+  int m_stepNumber;
+
+  SceneType m_type;
+  QList<DmxScene *> m_L_subScene;
+
+  DmxScene *m_parentSCene;
 
 };
 

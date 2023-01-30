@@ -34,6 +34,7 @@
 #include "dmxchanneloutputwidget.h"
 
 #include "../core/dmxchannelgroup.h"
+#include "../core/dmxsequence.h"
 
 
 class MainWindow
@@ -100,6 +101,8 @@ private:
   QDmxManager *m_dmxManager;
 
   QList<DmxChannelGroup *> m_L_dmxChannelGroup;
+  QList<DmxScene *> m_L_scene;
+  QList<DmxSequence *> m_L_sequence;
 
   int m_universeCount; //s
 };

@@ -18,7 +18,6 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include <QDockWidget>
-#include <QWindow>
 #include "qdmxlib/QDmxManager"
 #include "qdmxlib/QDmxUsbDriver"
 
@@ -29,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_dmxManager(QDmxManager::instance()),
     m_grandMasterWidget(new GrandMasterWidget(this)),
     m_playbackWidget(new PlaybackWidget(this)),
-    m_sequencerWidget(new SequencerWidget(this)),
+//    m_sequencerWidget(new SequencerWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
     m_submasterWidget(new SubmasterWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
@@ -216,6 +215,20 @@ void MainWindow::CreateDockWidgets()
 
   auto topDock = new QDockWidget(this);
   topDock->setAllowedAreas(Qt::TopDockWidgetArea);
+  // NOTE : to test
+  auto name = QString("accueil public");
+  auto scene = new DmxScene(10, name, this);
+  scene->setTimeIn(5.0);
+  scene->setTimeOut(5.0);
+  scene->setDelayIn(0);
+  scene->setDelayOut(0);
+  scene->setType(DmxScene::MainScene);
+
+  auto sequence = new DmxSequence(this);
+  sequence->addScene(scene);
+  m_sequencerWidget = new SequencerWidget(sequence,
+                                          this);
+
   topDock->setWidget(m_sequencerWidget);
   topDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::TopDockWidgetArea, topDock);

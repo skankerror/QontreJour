@@ -20,9 +20,7 @@
 #include <QLayout>
 #include <QHeaderView>
 #include <QPainter>
-//#include <QSlider>
 #include <QMouseEvent>
-//#include <QWheelEvent>
 #include <QDebug>
 
 

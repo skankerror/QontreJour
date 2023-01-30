@@ -99,3 +99,11 @@ void DmxSequence::removeScene(int t_step)
                << "can't remove scene";
 
 }
+
+void DmxSequence::setSelectedScene(int t_selectedScene)
+{
+  if (m_selectedScene == t_selectedScene)
+    return;
+  m_selectedScene = t_selectedScene;
+  emit selectedSceneChanged(m_selectedScene);
+}
