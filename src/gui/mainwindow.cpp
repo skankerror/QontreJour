@@ -28,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_dmxManager(QDmxManager::instance()),
     m_grandMasterWidget(new GrandMasterWidget(this)),
     m_playbackWidget(new PlaybackWidget(this)),
-//    m_sequencerWidget(new SequencerWidget(this)),
     m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
     m_submasterWidget(new SubmasterWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
@@ -38,18 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
     m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
     m_universeCount(0)
 {
-//  CreateActions();
-//  CreateMenubar();
-//  CreateToolBars();
   createDmxManagerContainerWidget();
-  CreateDockWidgets();
-  CreateCentralWidget();
-//  CreateStatusBar();
+  createDockWidgets();
+  createCentralWidget();
 
   createConnections();
-
-//  setMinimumWidth(1200);
-//  resize(1300,800);
 }
 
 MainWindow::~MainWindow()
@@ -118,7 +110,6 @@ void MainWindow::removeDmxManagerWidget()
       DmxValue *value = item;
       L_dmxValue.append(value);
     }
-//    m_dmxChannelOutputWidget->setL_dmxChannel(L_dmxChannel);
     m_dmxChannelOutputWidget->setL_dmxValue(L_dmxValue);
     m_dmxChannelOutputWidget->setUniverseID(m_universeCount - 1);
   }
@@ -156,17 +147,25 @@ void MainWindow::setSubmasterWidget()
 
   for (int i = 0; i < 60; i++)
   {
-    auto channelGroup = new DmxChannelGroup(i,
-                                            m_submasterWidget,
-                                            DmxValue::ChannelGroup);
+//    auto channelGroup = new DmxChannelGroup(i,
+//                                            m_submasterWidget,
+//                                            DmxValue::ChannelGroup);
+    auto channelGroup = new /*DmxChannelGroup*/DmxValue(DmxValue::ChannelGroup);
+    channelGroup->setID(i);
+
     auto dmxChannel1 = L_dmxChannel.at(i + 10);
     quint8 value1 = i +100;
-    auto pair1 = std::pair<DmxValue *, quint8>(dmxChannel1, value1);
-    channelGroup->addDmxChannel(pair1);
+//    auto pair1 = std::pair<DmxValue *, quint8>(dmxChannel1, value1);
+//    channelGroup->addDmxChannel(pair1);
+    channelGroup->addChild(dmxChannel1);
+    channelGroup->setStoredLevel(0, value1);
     auto dmxChannel2 = L_dmxChannel.at(i + 100);
     quint8 value2 = i + 150;
-    auto pair2 = std::pair<DmxValue *, quint8>(dmxChannel2, value2);
-    channelGroup->addDmxChannel(pair2);
+//    auto pair2 = std::pair<DmxValue *, quint8>(dmxChannel2, value2);
+//    channelGroup->addDmxChannel(pair2);
+    channelGroup->addChild(dmxChannel2);
+    channelGroup->setStoredLevel(1 , value2);
+
 
     auto slider = new SubmasterSlider(channelGroup,
                                       m_submasterWidget);
@@ -176,29 +175,8 @@ void MainWindow::setSubmasterWidget()
   m_submasterWidget->populateWidget();
 }
 
-void MainWindow::CreateActions()
+void MainWindow::createDockWidgets()
 {
-
-}
-
-void MainWindow::CreateMenubar()
-{
-
-}
-
-void MainWindow::CreateToolBars()
-{
-
-}
-
-void MainWindow::CreateDockWidgets()
-{
-//  auto leftDock = new QDockWidget(this);
-//  leftDock->setAllowedAreas(Qt::LeftDockWidgetArea);
-//  leftDock->setWidget(m_grandMasterWidget);
-//  leftDock->setFeatures(QDockWidget::DockWidgetFloatable);
-//  addDockWidget(Qt::LeftDockWidgetArea, leftDock);
-
   auto rightDock = new QDockWidget(this);
   auto rightDockWidget = new QWidget(rightDock);
   auto layout = new QVBoxLayout();
@@ -206,26 +184,13 @@ void MainWindow::CreateDockWidgets()
   layout->addWidget(m_playbackWidget);
   rightDockWidget->setLayout(layout);
   rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
-//  rightDock->setWidget(m_playbackWidget);
   rightDock->setWidget(rightDockWidget);
   rightDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::RightDockWidgetArea, rightDock);
 
   auto topDock = new QDockWidget(this);
   topDock->setAllowedAreas(Qt::TopDockWidgetArea);
-  // NOTE : to test
-//  auto name = QString("accueil public");
-//  auto scene = new DmxScene(10, name, this);
-//  scene->setTimeIn(5.0);
-//  scene->setTimeOut(5.0);
-//  scene->setDelayIn(0);
-//  scene->setDelayOut(0);
-//  scene->setType(DmxScene::MainScene);
-
-//  auto sequence = new DmxSequence(this);
-//  sequence->addScene(scene);
-  m_sequencerWidget = new SequencerWidget(/*sequence,*/
-                                          this);
+  m_sequencerWidget = new SequencerWidget(this);
 
   topDock->setWidget(m_sequencerWidget);
   topDock->setFeatures(QDockWidget::DockWidgetFloatable);
@@ -259,7 +224,7 @@ void MainWindow::createDmxManagerContainerWidget()
   m_dmxManagerContainerWidget->setLayout(m_dmxManagerContainerLayout);
 }
 
-void MainWindow::CreateCentralWidget()
+void MainWindow::createCentralWidget()
 {
   setSubmasterWidget();
   setDirectChannelWidget(0); // set for first universe
@@ -267,18 +232,8 @@ void MainWindow::CreateCentralWidget()
   m_tabWidget->addTab(m_submasterWidget, "Submasters");
   m_tabWidget->addTab(m_directChannelWidget, "Direct Channels");
   m_tabWidget->addTab(m_dmxManagerContainerWidget, "DMX Connections");
-//  m_tabWidget->setMaximumSize(1024, 600);
 
   setCentralWidget(m_tabWidget);
-
-//  m_tabWidget->setMinimumWidth(800);
-//  resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-//  setGeometry(0, 0, 1280, 720);
-}
-
-void MainWindow::CreateStatusBar()
-{
-
 }
 
 void MainWindow::createConnections()

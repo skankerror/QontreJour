@@ -37,11 +37,12 @@ public:
 
   enum ValueType
   {
+    RootValue,
     Output,
     Channel,
     ChannelGroup,
     Scene,
-    Unknown
+    UnknownValueType
   };
   Q_ENUM(ValueType)
 
@@ -71,26 +72,8 @@ public:
   };
   Q_ENUM(ChannelFlag)
 
-  explicit DmxValue(int t_ID,
-                    QObject *parent = nullptr,
-                    ValueType t_type = Unknown);
-
-  explicit DmxValue(int t_ID,
-                    QString &t_name,
-                    QObject *parent = nullptr,
-                    ValueType t_type = Unknown);
-
-  explicit DmxValue(int t_universeID,
-                    int t_ID,
-                    QObject *parent = nullptr,
-                    ValueType t_type = Unknown);
-
-  explicit DmxValue(int t_universeID,
-                    int t_ID,
-                    QString &t_name,
-                    QObject *parent = nullptr,
-                    ValueType t_type = Unknown);
-
+  explicit DmxValue(ValueType t_type = UnknownValueType,
+                    DmxValue *t_parent = nullptr);
 
   virtual ~DmxValue();
 
@@ -101,14 +84,15 @@ public:
   int getID() const { return m_ID; }
   QString getName() const{ return m_name; }
   QList<DmxValue *> getL_dmxValue() const{ return m_L_dmxValue; }
-  DmxValue* getL_dmxValueAt(int t_index);
+  DmxValue* getChild(int t_index);
   ValueType getType() const{ return m_type; }
   quint8 getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   quint8 getchannelGroupLevel() const{ return m_channelGroupLevel; }
   quint8 getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   quint8 getnextSceneLevel() const{ return m_nextSceneLevel; }
-  ChannelFlag getFlag() const{ return m_flag; }
+  ChannelFlag getChannelFlag() const{ return m_flag; }
   int getValuesCount() const { return m_L_dmxValue.size(); }
+  quint8 getChildLevel(int t_index);
 
   // setters
   void setMaxLevel(quint8 t_maxLevel);
@@ -119,20 +103,22 @@ public:
   void setL_dmxValue(const QList<DmxValue *> &t_L_dmxValue){ m_L_dmxValue = t_L_dmxValue; }
   void setType(ValueType t_type){ m_type = t_type; }
 
-  void addDmxValue(DmxValue *t_dmxValue);
-  void addDmxValues(const QList<DmxValue *> t_L_dmxValue);
-  bool removeDmxValue(const DmxValue *t_dmxValue);
-  bool removeDmxValues(const QList<DmxValue *> t_L_dmxValue);
+  // methods to handle children
+  void addChild(DmxValue *t_dmxValue);
+  void addChildren(const QList<DmxValue *> t_L_dmxValue);
+  bool removeChild(const DmxValue *t_dmxValue);
+  bool removeChildren(const QList<DmxValue *> t_L_dmxValue);
   void clearList();
 
 
 private :
 
-  void constructorMethod();
   void setChannelLevel(SignalSenderType t_senderType,
                        quint8 t_level);
   void setOutputLevel(SignalSenderType t_senderType,
                       quint8 t_level);
+  void setChannelGroupLevel(SignalSenderType t_senderType,
+                            quint8 t_level);
 
 signals:
 
@@ -151,13 +137,18 @@ signals:
 
 public slots:
 
-  virtual void setLevel(DmxValue::SignalSenderType t_senderType,
+  /*virtual */void setLevel(DmxValue::SignalSenderType t_senderType,
                         quint8 t_level);
   void setDirectChannelEditLevel(quint8 t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
   void setChannelGroupLevel(quint8 t_channelGroupLevel);
   void setSelectedSceneLevel(quint8 t_selectedSceneLevel);
   void setNextSceneLevel(quint8 t_nextSceneLevel);
+  void setChildLevel(DmxValue::SignalSenderType t_senderType,
+                     int t_index,
+                     quint8 t_level);
+  void setStoredLevel(int t_childIndex,
+                      quint8 t_level);
 
   void setFlag(DmxValue::ChannelFlag t_flag){ m_flag = t_flag; }
 
@@ -173,11 +164,11 @@ protected :
   int m_universeID;
   QString m_name;
   QList<DmxValue *> m_L_dmxValue;
-  ValueType m_type = Unknown;
+  QList<quint8> m_L_storedLevels; // for settings in scene or channelgroup
+
+  ValueType m_type = UnknownValueType;
   ChannelFlag m_flag = UnknownFlag;
   bool m_isDirectChannelEdited = false;
-
-//private:
 
   Q_PROPERTY(quint8 level
              READ getLevel

@@ -22,7 +22,7 @@
 #include <QTreeWidget>
 #include <QTreeView>
 #include <QAbstractItemModel>
-#include "../core/dmxsequence.h"
+#include "../core/dmxscene.h"
 
 
 class SequencerTreeView;
@@ -37,8 +37,7 @@ class SequencerWidget
 
 public:
 
-  explicit SequencerWidget(/*DmxSequence *t_dmxSequence,*/
-                           QWidget *parent = nullptr);
+  explicit SequencerWidget(QWidget *parent = nullptr);
 
   virtual ~SequencerWidget();
 
@@ -48,7 +47,6 @@ protected :
 
   SequencerTreeView *m_treeView;
   SequencerTreeModel *m_model;
-  DmxSequence *m_dmxSequence;
 
 };
 
@@ -96,7 +94,6 @@ public:
 
   virtual ~SequencerTreeModel();
 
-//  DmxSequence *getSequence() const{ return m_sequence; }
   DmxScene *getScene(const QModelIndex &index) const;
 
 
@@ -115,14 +112,7 @@ public:
 //  virtual bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) override;
   virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-
-public slots:
-
-//  void setSequence(DmxSequence *t_sequence){ m_sequence = t_sequence; }
-
 protected :
-
-//  DmxSequence *m_sequence;
 
   DmxScene *m_rootItem;
 

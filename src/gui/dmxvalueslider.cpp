@@ -101,7 +101,7 @@ SubmasterSlider::SubmasterSlider(QWidget *parent)
   : DmxValueSlider(parent)
 {}
 
-SubmasterSlider::SubmasterSlider(DmxChannelGroup *t_dmxChannelGroup,
+SubmasterSlider::SubmasterSlider(DmxValue *t_dmxChannelGroup,
                                  QWidget *parent)
   : DmxValueSlider(parent),
     m_channelGroup(t_dmxChannelGroup)

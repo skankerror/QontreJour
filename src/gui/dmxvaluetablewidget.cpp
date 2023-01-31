@@ -211,7 +211,7 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return QVariant();
 
     auto dmxValue = m_L_dmxValue.at(valueID);
-    DmxValue::ChannelFlag flag = dmxValue->getFlag();
+    DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
 
 
     switch(role)

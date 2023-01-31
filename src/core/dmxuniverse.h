@@ -75,6 +75,9 @@ private:
   QDmxDevice *m_dmxDevice;
   bool m_isConnected;
 
+  // root value, parent of all values created for this universe
+  DmxValue *m_rootValue;
+
 };
 
 #endif // DMXUNIVERSE_H

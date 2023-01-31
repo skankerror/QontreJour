@@ -33,8 +33,8 @@
 #include "directchannelwidget.h"
 #include "dmxchanneloutputwidget.h"
 
-#include "../core/dmxchannelgroup.h"
-#include "../core/dmxsequence.h"
+#include "../core/dmxscene.h"
+//#include "../core/dmxsequence.h"
 
 
 class MainWindow
@@ -49,13 +49,9 @@ public:
 
 private:
 
-  void CreateActions();
-  void CreateMenubar();
-  void CreateToolBars();
-  void CreateDockWidgets();
+  void createDockWidgets();
   void createDmxManagerContainerWidget();
-  void CreateCentralWidget();
-  void CreateStatusBar();
+  void createCentralWidget();
 
   void createConnections();
 
@@ -72,15 +68,6 @@ private slots:
 
 private:
 
-  QMenu *m_fileMenu;
-  QMenu *m_helpMenu;
-  QAction *m_newAct;
-  QAction *m_openAct;
-  QAction *m_saveAct;
-  QAction *m_exitAct;
-  QAction *m_aboutAct;
-  QAction *m_aboutQtAct;
-
   QTabWidget *m_tabWidget;
   SubmasterWidget *m_submasterWidget;
   DirectChannelWidget *m_directChannelWidget;
@@ -96,10 +83,6 @@ private:
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
 
   QDmxManager *m_dmxManager;
-
-  QList<DmxChannelGroup *> m_L_dmxChannelGroup;
-  QList<DmxScene *> m_L_scene;
-  QList<DmxSequence *> m_L_sequence;
 
   int m_universeCount; //s
 };

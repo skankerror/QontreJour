@@ -18,11 +18,12 @@
 #ifndef DMXSCENE_H
 #define DMXSCENE_H
 
-#include "dmxchannelgroup.h"
+#include "dmxvalue.h"
 
 
 class DmxScene :
-    public DmxChannelGroup
+//    public DmxChannelGroup
+    public DmxValue
 {
 
   Q_OBJECT
@@ -38,15 +39,10 @@ public:
   };
   Q_ENUM(SceneType)
 
-  explicit DmxScene(int t_ID,
-                    QString &t_name,
-                    QObject *parent = nullptr,
-                    DmxValue::ValueType t_type = Scene);
+  explicit DmxScene(DmxValue::ValueType t_type = Scene,
+                    DmxScene *t_parent = nullptr);
 
-  ~DmxScene();
-
-  // transform in DmxChannelGroup
-  DmxChannelGroup *fromSceneToChannelGroup();
+  virtual ~DmxScene();
 
   // getters
   QString getNotes() const{ return m_notes; }
@@ -54,7 +50,6 @@ public:
   double getTimeOut() const{ return m_timeOut; }
   double getDelayIn() const{ return m_delayIn; }
   double getDelayOut() const{ return m_delayOut; }
-  QList<std::pair<DmxChannelGroup *, quint8>> getL_P_dmxChannelGroup() const{ return m_L_P_dmxChannelGroup; }
   SceneType getType() const{ return m_type; }
   QList<DmxScene *> getL_subScene() const{ return m_L_subScene; }
   DmxScene *getParentSCene() const{ return m_parentSCene; }
@@ -69,11 +64,6 @@ public:
   void setDelayIn(double t_delayIn){ m_delayIn = t_delayIn; }
   void setDelayOut(double t_delayOut){ m_delayOut = t_delayOut; }
 
-  //
-  void addDmxChannelGroup(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
-  void removeDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup);
-  void setDmxChannelGroupLevel(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
-
   bool insertNewScene(int t_position);
   bool insertScene(int t_position,
                    DmxScene *t_scene);
@@ -83,9 +73,6 @@ public:
 
 
 public slots :
-
-  void setL_P_dmxChannelGroup(const QList<std::pair<DmxChannelGroup *, quint8>> &t_L_P_dmxChannelGroup)
-  { m_L_P_dmxChannelGroup = t_L_P_dmxChannelGroup; }
 
   void setType(DmxScene::SceneType t_type){ m_type = t_type; }
 
@@ -102,7 +89,7 @@ signals:
 
 protected :
 
-  QList<std::pair<DmxChannelGroup *, quint8>> m_L_P_dmxChannelGroup;
+//  QList<std::pair<DmxChannelGroup *, quint8>> m_L_P_dmxChannelGroup;
   QString m_notes;
   double m_timeIn;
   double m_timeOut;
@@ -111,8 +98,14 @@ protected :
   int m_stepNumber;
 
   SceneType m_type;
+
+  // for root scene which will contain all a sequence scene
   QList<DmxScene *> m_L_subScene;
 
+  // scene parent :
+  // nullptr for rootscene
+  // rootscene for mainscene
+  // mainscene for subscene
   DmxScene *m_parentSCene;
 
 };
