@@ -34,6 +34,12 @@ DirectChannelWidget::DirectChannelWidget(QWidget *parent)
 
 void DirectChannelWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders)
 {
+  for (const auto &item : std::as_const(m_L_sliders))
+  {
+    item->deleteLater();
+  }
+  m_L_sliders.squeeze();
+
   m_L_sliders = t_L_sliders;
 
 }

@@ -129,13 +129,10 @@ void DmxValueTableView::mousePressEvent(QMouseEvent *event)
   if (event->button() == Qt::LeftButton)
   {
     auto index = indexAt(event->pos());
-    qDebug() << "position : " << index;
     if (index.flags().testFlag(Qt::ItemIsEditable))
     {
       m_isEditing = true;
-//      qDebug() << "isEditing : " << m_isEditing;
       m_originEditingPoint = event->pos();
-//      qDebug() << "position" << m_originEditingPoint;
       m_editedIndex = index;
       return;
     }
@@ -163,7 +160,6 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
   {
     auto value = m_editedIndex.data().toInt();
     auto yValue = event->pos().y() - m_originEditingPoint.y();
-//    qDebug() << "y value in DmxValueTableView::mouseMoveEvent " << yValue;
     value -= yValue;
     if (value > 255) value = 255;
     if (value < 0) value = 0;
@@ -173,11 +169,6 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
   }
   QTableView::mouseMoveEvent(event);
 }
-
-//void DmxValueTableView::wheelEvent(QWheelEvent *event)
-//{
-//  QTableView::wheelEvent(event);
-//}
 
 /************************************************************************/
 
@@ -224,8 +215,6 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return Qt::AlignCenter;
       break;
     case Qt::BackgroundRole:
-//      return QBrush(QColor(ORANGE_COLOR));
-//      return QBrush(QColor(LIGHT_BROWN_COLOR));
       return QBrush(QColor(BLACK_COLOR));
       break;
     case Qt::ForegroundRole :
@@ -291,7 +280,6 @@ bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value
 
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-  //  qDebug() << "channelID i, model : " << channelID;
   auto dmxValue = m_L_dmxValue.at(valueID);
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());

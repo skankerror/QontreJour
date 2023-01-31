@@ -89,7 +89,6 @@ signals:
 
 protected :
 
-//  QList<std::pair<DmxChannelGroup *, quint8>> m_L_P_dmxChannelGroup;
   QString m_notes;
   double m_timeIn;
   double m_timeOut;
@@ -99,7 +98,7 @@ protected :
 
   SceneType m_type;
 
-  // for root scene which will contain all a sequence scene
+  // for root scene which will contain all a scenes sequence
   QList<DmxScene *> m_L_subScene;
 
   // scene parent :

@@ -25,7 +25,6 @@
 
 // sliders are created in mainwindow and pass to widget
 
-
 class DirectChannelWidget
     : public QWidget
 {

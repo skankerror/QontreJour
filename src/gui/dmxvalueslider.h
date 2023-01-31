@@ -20,7 +20,6 @@
 
 #include <QSlider>
 #include "../core/dmxvalue.h"
-#include "../core/dmxchannelgroup.h"
 
 class DmxValueSlider
     : public QSlider

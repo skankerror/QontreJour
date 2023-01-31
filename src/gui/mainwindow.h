@@ -19,9 +19,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMenu>
-#include <QActionGroup>
-#include <QAction>
 #include <QList>
 #include <QPushButton>
 #include <ossia-cpp/ossia-cpp98.hpp>
@@ -32,14 +29,13 @@
 #include "submasterwidget.h"
 #include "directchannelwidget.h"
 #include "dmxchanneloutputwidget.h"
-
 #include "../core/dmxscene.h"
-//#include "../core/dmxsequence.h"
 
 
 class MainWindow
     : public QMainWindow
 {
+
   Q_OBJECT
 
 public:
@@ -49,9 +45,10 @@ public:
 
 private:
 
-  void createDockWidgets();
-  void createDmxManagerContainerWidget();
   void createCentralWidget();
+  QWidget * createDmxManagerContainerWidget();
+  SubmasterWidget * createSubmasterWidget();
+  void createDockWidgets();
 
   void createConnections();
 
@@ -64,22 +61,13 @@ private slots:
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
   void setDirectChannelWidget(int t_universeID);
-  void setSubmasterWidget();
 
 private:
 
-  QTabWidget *m_tabWidget;
-  SubmasterWidget *m_submasterWidget;
   DirectChannelWidget *m_directChannelWidget;
-  QWidget *m_dmxManagerContainerWidget;
-  QPushButton *m_addDmxManagerWidgetButton;
-  QPushButton *m_removeDmxManagerWidgetButton;
   QVBoxLayout *m_dmxManagerContainerLayout;
   QList<DmxManagerWidget *> m_L_dmxManagerWidget;
 
-  GrandMasterWidget *m_grandMasterWidget;
-  PlaybackWidget *m_playbackWidget;
-  SequencerWidget *m_sequencerWidget;
   DmxChannelOutputWidget *m_dmxChannelOutputWidget;
 
   QDmxManager *m_dmxManager;

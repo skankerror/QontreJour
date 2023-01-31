@@ -142,17 +142,9 @@ int SequencerTreeModel::rowCount(const QModelIndex &parent) const
 {
   auto parentScene = getScene(parent);
   if (parentScene == m_rootItem)
-  {
-    qDebug() << "rowCount for rootItem : "
-             << m_rootItem->getSize();
     return m_rootItem->getSize();
-  }
-  int ret = parentScene ? parentScene->getSize() : 0;
-  qDebug() << "rowCount for : "
-           << parentScene
-           << " : "
-           << ret;
 
+  int ret = parentScene ? parentScene->getSize() : 0;
   return ret;
 }
 
