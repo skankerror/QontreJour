@@ -37,9 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_addDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
     m_removeDmxManagerWidgetButton(new QPushButton(m_dmxManagerContainerWidget)),
     m_universeCount(0)
-//    m_dmxOutputWindow(new QWindow())
 {
-//  m_dmxOutputWindow->show();
 //  CreateActions();
 //  CreateMenubar();
 //  CreateToolBars();
@@ -216,17 +214,17 @@ void MainWindow::CreateDockWidgets()
   auto topDock = new QDockWidget(this);
   topDock->setAllowedAreas(Qt::TopDockWidgetArea);
   // NOTE : to test
-  auto name = QString("accueil public");
-  auto scene = new DmxScene(10, name, this);
-  scene->setTimeIn(5.0);
-  scene->setTimeOut(5.0);
-  scene->setDelayIn(0);
-  scene->setDelayOut(0);
-  scene->setType(DmxScene::MainScene);
+//  auto name = QString("accueil public");
+//  auto scene = new DmxScene(10, name, this);
+//  scene->setTimeIn(5.0);
+//  scene->setTimeOut(5.0);
+//  scene->setDelayIn(0);
+//  scene->setDelayOut(0);
+//  scene->setType(DmxScene::MainScene);
 
-  auto sequence = new DmxSequence(this);
-  sequence->addScene(scene);
-  m_sequencerWidget = new SequencerWidget(sequence,
+//  auto sequence = new DmxSequence(this);
+//  sequence->addScene(scene);
+  m_sequencerWidget = new SequencerWidget(/*sequence,*/
                                           this);
 
   topDock->setWidget(m_sequencerWidget);

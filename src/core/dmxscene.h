@@ -38,7 +38,6 @@ public:
   };
   Q_ENUM(SceneType)
 
-
   explicit DmxScene(int t_ID,
                     QString &t_name,
                     QObject *parent = nullptr,
@@ -59,9 +58,9 @@ public:
   SceneType getType() const{ return m_type; }
   QList<DmxScene *> getL_subScene() const{ return m_L_subScene; }
   DmxScene *getParentSCene() const{ return m_parentSCene; }
-  int getStepNumber() const{ return m_stepNumber; }
+  int getStepNumber() const;
   int getSize() const{ return m_L_subScene.size(); }
-
+  DmxScene *getSubscene(int t_number);
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
@@ -74,6 +73,13 @@ public:
   void addDmxChannelGroup(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
   void removeDmxChannelGroup(DmxChannelGroup *t_dmxChannelGroup);
   void setDmxChannelGroupLevel(std::pair<DmxChannelGroup *, quint8> t_P_dmxChannelGroup);
+
+  bool insertNewScene(int t_position);
+  bool insertScene(int t_position,
+                   DmxScene *t_scene);
+  bool removeScene(int t_position,
+                   int t_count = 1);
+  bool addScene(DmxScene *t_scene);
 
 
 public slots :

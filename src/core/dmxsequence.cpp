@@ -57,7 +57,8 @@ DmxScene *DmxSequence::getScene(const int t_step)
 void DmxSequence::addScene(DmxScene *t_scene)
 {
   // we check if the pointer isn't null and if the output is not in the list.
-  if(t_scene && !m_L_dmxScene.contains(t_scene))
+//  if(t_scene && !m_L_dmxScene.contains(t_scene))
+  if (true)
   {
     m_L_dmxScene.append(t_scene);
 //    emit L_dmxValueChanged();
