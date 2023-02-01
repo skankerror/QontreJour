@@ -58,8 +58,8 @@ set(PROJECT_SOURCES
         src/gui/submasterwidget.cpp
         src/gui/directchannelwidget.h
         src/gui/directchannelwidget.cpp
-        src/gui/dmxchanneloutputwidget.h
-        src/gui/dmxchanneloutputwidget.cpp
+#        src/gui/dmxchanneloutputwidget.h
+#        src/gui/dmxchanneloutputwidget.cpp
         src/gui/grandmasterwidget.h
         src/gui/grandmasterwidget.cpp
         src/gui/playbackwidget.h

@@ -96,8 +96,8 @@ public:
 
   DmxScene *getScene(const QModelIndex &index) const;
 
+protected :
 
-  // QAbstractItemModel interface
   virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;
   virtual QModelIndex parent(const QModelIndex &child) const override;
   virtual int rowCount(const QModelIndex &parent) const override;

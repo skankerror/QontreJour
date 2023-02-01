@@ -28,25 +28,28 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
   : QWidget(parent),
     m_tableView(new DmxValueTableView(this)),
     m_model(new DmxValueTableModel(this)),
-    m_label(new QLabel(this)),
-    m_universeSpinBox(new QSpinBox(this))
+    m_universeSpinBox(new QSpinBox(this)),
+    m_clearSelectionButton(new QPushButton("C", this))
 {
   auto totalLayout = new QVBoxLayout();
   auto headerLayout = new QHBoxLayout();
+  auto bottomLayout = new QHBoxLayout();
 
-  // TODO : connect this spinbox to the world !
+  auto label = new QLabel("Channels on Universe :", this);
+
   m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
   m_universeSpinBox->setMinimum(1);// there's always one universe
 
   headerLayout->addStretch();
-  headerLayout->addWidget(m_label);
+  headerLayout->addWidget(/*m_*/label);
   headerLayout->addWidget(m_universeSpinBox);
+  bottomLayout->addWidget(m_clearSelectionButton);
 
   totalLayout->addLayout(headerLayout);
   totalLayout->addWidget(m_tableView);
+  totalLayout->addLayout(bottomLayout);
 
   setLayout(totalLayout);
-
 
   m_tableView->setSortingEnabled(false);
   m_tableView->setUpdatesEnabled(true);
@@ -60,12 +63,17 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
-  m_tableView->setMinimumSize(800, 200);
+  //  m_tableView->setMinimumSize(800, 200);
 
   connect(m_universeSpinBox,
           SIGNAL(valueChanged(int)),
           this,
           SLOT(onSpinboxSelected(int)));
+
+  connect (m_clearSelectionButton,
+           SIGNAL(clicked(bool)),
+           m_tableView,
+           SLOT(clearSelectionList()));
 
 }
 
@@ -92,9 +100,9 @@ void DmxValueTableWidget::setUniverseID(const int t_ID)
   m_model->setUniverseID(t_ID);
 
   disconnect(m_universeSpinBox,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(onSpinboxSelected(int)));
+             SIGNAL(valueChanged(int)),
+             this,
+             SLOT(onSpinboxSelected(int)));
 
   m_universeSpinBox->setValue(t_ID + 1);
 
@@ -124,6 +132,12 @@ DmxValueTableView::DmxValueTableView(QWidget *parent)
 DmxValueTableView::~DmxValueTableView()
 {}
 
+void DmxValueTableView::clearSelectionList()
+{
+  m_editedIndexes.clear();
+  clearSelection();
+}
+
 void DmxValueTableView::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton)
@@ -133,7 +147,7 @@ void DmxValueTableView::mousePressEvent(QMouseEvent *event)
     {
       m_isEditing = true;
       m_originEditingPoint = event->pos();
-      m_editedIndex = index;
+      m_editedIndexes.append(index);
       return;
     }
   }
@@ -158,12 +172,15 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
 {
   if (m_isEditing)
   {
-    auto value = m_editedIndex.data().toInt();
-    auto yValue = event->pos().y() - m_originEditingPoint.y();
-    value -= yValue;
-    if (value > 255) value = 255;
-    if (value < 0) value = 0;
-    model()->setData(m_editedIndex, value, Qt::EditRole);
+    for (const auto &item : std::as_const(m_editedIndexes))
+    {
+      auto value = /*m_editedIndex*/item.data().toInt();
+      auto yValue = event->pos().y() - m_originEditingPoint.y();
+      value -= yValue;
+      if (value > 255) value = 255;
+      if (value < 0) value = 0;
+      model()->setData(/*m_editedIndex*/item, value, Qt::EditRole);
+    }
     m_originEditingPoint = event->pos();
     return;
   }
@@ -315,5 +332,3 @@ Qt::ItemFlags DmxValueTableModel::flags(const QModelIndex &index) const
   return QAbstractTableModel::flags(index);
 
 }
-
-

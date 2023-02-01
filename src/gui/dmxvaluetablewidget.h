@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QSpinBox>
+#include <QPushButton>
 #include <QTableView>
 #include <QAbstractTableModel>
 #include <QEvent>
@@ -60,8 +61,8 @@ protected :
 
   DmxValueTableView *m_tableView;
   DmxValueTableModel *m_model;
-  QLabel *m_label;
   QSpinBox *m_universeSpinBox;
+  QPushButton *m_clearSelectionButton;
   int m_universeCount;
 
 };
@@ -80,7 +81,6 @@ public :
 
   virtual ~DmxValueTableView();
 
-  // QWidget interface
 protected:
 
   void mousePressEvent(QMouseEvent *event) override;
@@ -93,11 +93,16 @@ signals :
   void beginMouseEditing(QModelIndex, QPoint);
   void endMouseEditing();
 
+public slots :
+
+  void clearSelectionList();
+
 protected :
 
   bool m_isEditing = false;
   QPoint m_originEditingPoint;
-  QModelIndex m_editedIndex;
+//  QModelIndex m_editedIndex;
+  QModelIndexList m_editedIndexes;
 };
 
 

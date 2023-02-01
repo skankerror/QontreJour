@@ -28,7 +28,7 @@
 #include "sequencerwidget.h"
 #include "submasterwidget.h"
 #include "directchannelwidget.h"
-#include "dmxchanneloutputwidget.h"
+#include "dmxvaluetablewidget.h"
 #include "../core/dmxscene.h"
 
 
@@ -68,10 +68,11 @@ private:
   QVBoxLayout *m_dmxManagerContainerLayout;
   QList<DmxManagerWidget *> m_L_dmxManagerWidget;
 
-  DmxChannelOutputWidget *m_dmxChannelOutputWidget;
+  DmxValueTableWidget *m_dmxChannelTableWidget;
 
   QDmxManager *m_dmxManager;
 
-  int m_universeCount; //s
+  int m_universeCount;
+
 };
 #endif // MAINWINDOW_H

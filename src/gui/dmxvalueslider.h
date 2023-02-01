@@ -66,16 +66,16 @@ public :
 
   explicit SubmasterSlider(QWidget *parent = nullptr);
 
-  explicit SubmasterSlider(/*DmxChannelGroup*/DmxValue *t_dmxChannelGroup,
+  explicit SubmasterSlider(DmxValue *t_dmxChannelGroup,
                            QWidget *parent = nullptr);
 
   ~SubmasterSlider();
 
-  /*DmxChannelGroup*/DmxValue *getchannelGroup() const{ return m_channelGroup; }
+  DmxValue *getchannelGroup() const{ return m_channelGroup; }
 
 public slots:
 
-  void setChannelGroup(/*DmxChannelGroup*/DmxValue *t_channelGroup){ m_channelGroup = t_channelGroup; }
+  void setChannelGroup(DmxValue *t_channelGroup){ m_channelGroup = t_channelGroup; }
 
 protected slots:
 
@@ -83,7 +83,7 @@ protected slots:
 
 private :
 
-  /*DmxChannelGroup*/DmxValue *m_channelGroup;
+  DmxValue *m_channelGroup;
 
 };
 

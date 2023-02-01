@@ -25,7 +25,7 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
     m_dmxManager(QDmxManager::instance()),
-    m_dmxChannelOutputWidget(new DmxChannelOutputWidget(this)),
+    m_dmxChannelTableWidget(new DmxValueTableWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
     m_dmxManagerContainerLayout(new QVBoxLayout()),
     m_universeCount(0)
@@ -84,15 +84,18 @@ QWidget *MainWindow::createDmxManagerContainerWidget()
   return dmxManagerContainerWidget;
 }
 
+// NOTE : for the moment this method is here for testing,
+// otherwise we can create it elsewhere
 SubmasterWidget *MainWindow::createSubmasterWidget()
 {
+  auto submasterWidget = new SubmasterWidget(this);
+
 // NOTE : for testing purposes we create some channel group
   auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
       ->getDmxUniverse()
       ->getL_dmxChannel();
   auto L_submasterSlider = QList<SubmasterSlider *>();
 
-  auto submasterWidget = new SubmasterWidget(this);
 
   for (int i = 0; i < 60; i++)
   {
@@ -168,7 +171,7 @@ void MainWindow::createDockWidgets()
 
   auto bottomDock = new QDockWidget();
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-  bottomDock->setWidget(m_dmxChannelOutputWidget);
+  bottomDock->setWidget(m_dmxChannelTableWidget);
   bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
@@ -194,20 +197,19 @@ void MainWindow::addDmxManagerWidget()
   QList<DmxValue *> L_dmxValue;
 
   // we connect to update views
-//  for (const auto &item : std::as_const(L_dmxChannel))
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     connect(item,
             SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
-            m_dmxChannelOutputWidget,
+            m_dmxChannelTableWidget,
             SLOT(repaintTableView()));
 
     DmxValue *value = item;
     L_dmxValue.append(value);
   }
 
-  m_dmxChannelOutputWidget->setL_dmxValue(L_dmxValue);
-  m_dmxChannelOutputWidget->setUniverseID(m_universeCount); // count has not been ++ yet
+  m_dmxChannelTableWidget->setL_dmxValue(L_dmxValue);
+  m_dmxChannelTableWidget->setUniverseID(m_universeCount); // count has not been ++ yet
 
   m_universeCount++;
 
@@ -235,13 +237,13 @@ void MainWindow::removeDmxManagerWidget()
     {
       connect(item,
               SIGNAL(levelChanged(int,quint8)),
-              m_dmxChannelOutputWidget,
+              m_dmxChannelTableWidget,
               SLOT(repaintTableView()));
       DmxValue *value = item;
       L_dmxValue.append(value);
     }
-    m_dmxChannelOutputWidget->setL_dmxValue(L_dmxValue);
-    m_dmxChannelOutputWidget->setUniverseID(m_universeCount - 1);
+    m_dmxChannelTableWidget->setL_dmxValue(L_dmxValue);
+    m_dmxChannelTableWidget->setUniverseID(m_universeCount - 1);
   }
 }
 
@@ -250,10 +252,10 @@ void MainWindow::createConnections()
 {
   connect(this,
           SIGNAL(universeCountChanged(int)),
-          m_dmxChannelOutputWidget,
+          m_dmxChannelTableWidget,
           SLOT(onUniverseCountChanged(int)));
 
-  connect(m_dmxChannelOutputWidget,
+  connect(m_dmxChannelTableWidget,
           SIGNAL(askForUniverseChanged(int)),
           this,
           SLOT(setDirectChannelWidget(int)));

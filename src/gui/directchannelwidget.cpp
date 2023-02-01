@@ -48,7 +48,6 @@ void DirectChannelWidget::populateWidget()
 {
   // on crée le 1er widget pour contenir 32 sliders
   int page_count = m_L_sliders.size() / SLIDERS_PER_PAGE;
-//  qDebug() << "page count : " << page_count;
   if (m_L_sliders.size() > page_count * SLIDERS_PER_PAGE)
     page_count++;
 
