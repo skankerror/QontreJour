@@ -27,6 +27,7 @@
 #include <QEvent>
 #include "../core/dmxvalue.h"
 
+
 class DmxValueTableView;
 class DmxValueTableModel;
 
@@ -49,7 +50,7 @@ signals :
 public slots:
 
   void onUniverseCountChanged(int t_universeCount);
-  void setL_dmxValue(const QList<DmxValue *> t_L_dmxValue);
+  void setL_controledValue(const QList<DmxValue *> t_m_L_controledValue);
   void setUniverseID(const int t_ID);
 
 protected slots :
@@ -57,11 +58,18 @@ protected slots :
   void onSpinboxSelected(int t_universeID);
   void repaintTableView();
 
+  void selectAll();
+  void recGroup();
+  void recScene();
+
 protected :
 
   DmxValueTableView *m_tableView;
   DmxValueTableModel *m_model;
   QSpinBox *m_universeSpinBox;
+  QPushButton *m_selectAll;
+  QPushButton *m_recGroup;
+  QPushButton *m_recScene;
   QPushButton *m_clearSelectionButton;
   int m_universeCount;
 
@@ -83,10 +91,10 @@ public :
 
 protected:
 
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
-  void mouseMoveEvent(QMouseEvent *event) override;
+  virtual void mousePressEvent(QMouseEvent *event) override;
+  virtual void mouseReleaseEvent(QMouseEvent *event) override;
+  virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+  virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 signals :
 
@@ -101,8 +109,8 @@ protected :
 
   bool m_isEditing = false;
   QPoint m_originEditingPoint;
-//  QModelIndex m_editedIndex;
   QModelIndexList m_editedIndexes;
+
 };
 
 
@@ -120,12 +128,15 @@ public:
 
   virtual ~DmxValueTableModel();
 
-  QList<DmxValue *> getL_dmxValue() const { return m_L_dmxValue; }
-  void setL_dmxValue(const QList<DmxValue *> &t_L_dmxValue){ m_L_dmxValue = t_L_dmxValue; }
+  QList<DmxValue *> getL_controledValue() const { return m_L_controledValue; }
+  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue){ m_L_controledValue = t_m_L_controledValue; }
   int getUniverseID() const { return m_universeID; }
   void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
 
-  // overrides
+
+
+protected :
+
   int rowCount(const QModelIndex &parent) const override;
   int columnCount(const QModelIndex &parent) const override;
   QVariant data(const QModelIndex &index, int role) const override;
@@ -136,7 +147,7 @@ public:
 
 protected :
 
-  QList<DmxValue *> m_L_dmxValue;
+  QList<DmxValue *> m_L_controledValue;
   int m_universeID;
 
 };

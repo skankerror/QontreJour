@@ -3,8 +3,7 @@
 
 #include "qdmxusbinterface.h"
 
-//#include <QMutex>
-#include <QRecursiveMutex>
+#include <QMutex>
 
 class QEnttecPro;
 class QEnttecProInput : public QDmxUsbThread

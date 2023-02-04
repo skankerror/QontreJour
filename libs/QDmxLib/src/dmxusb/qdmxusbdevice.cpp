@@ -54,7 +54,6 @@ void QDmxUsbDevicePrivate::init()
             _type = QDmxUsbDevice::ProRXTX;
             _outputCount = 1;
 //            _inputCount = 1;
-            _inputCount = 0;
             _name = devName;
             _iface = new QEnttecPro(q);
         }
@@ -114,9 +113,10 @@ QDmxUsbDevice::QDmxUsbDevice(const QString& name,
                              const QString& vendor,
                              quint16 vid,
                              quint16 pid,
+                             quint32 id,
                              QDmxUsbDevice::Backend backend,
                              QDmxUsbDriver* parent) :
-    QDmxDevice(*new QDmxUsbDevicePrivate(name, serial, vendor, vid, pid, backend, parent), parent)
+    QDmxDevice(*new QDmxUsbDevicePrivate(name, serial, vendor, vid, pid, id, backend, parent), parent)
 {
     d_func()->init();
 }
@@ -173,7 +173,7 @@ quint16 QDmxUsbDevice::productId() const
 
 QDmxUsbBackend* QDmxUsbDevice::privateBackend() const
 {
-    return d_func()->_backend;
+    return d_func()->_backend.get();
 }
 
 void QDmxUsbDevice::setData(quint8 port, quint16 channel, quint8 data)

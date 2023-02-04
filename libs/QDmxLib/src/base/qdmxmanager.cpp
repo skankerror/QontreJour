@@ -31,6 +31,8 @@ public:
 
     QDmxManager* q_ptr = nullptr;
 
+    bool    _initialised = false;
+    bool    _configEnabled = false;
     QString _configLocation;
     QList<QDmxDriver*> _allDrivers;
 
@@ -158,18 +160,22 @@ QDmxManager* QDmxManager::instance()
     return &inst;
 }
 
-bool QDmxManager::init(const QString& configLocation)
+bool QDmxManager::init()
 {
     Q_D(QDmxManager);
-    d->_configLocation = configLocation;
-
-    qDebug() << "[qdmxlib] init with config location:" << configLocation;
 
     bool success = true;
     for(auto d : qAsConst(d->_allDrivers))
         success &= d->load();
 
+    d->_initialised = success;
+
     return success;
+}
+
+bool QDmxManager::isInitialised() const
+{
+    return d_func()->_initialised;
 }
 
 bool QDmxManager::teardown()
@@ -194,10 +200,57 @@ bool QDmxManager::teardown()
             success &= d->unload();
     }
 
+    d->_initialised = false;
+
     return success;
 }
 
-QString QDmxManager::configLocation()
+void QDmxManager::setConfigEnabled(bool en)
+{
+    Q_D(QDmxManager);
+
+    if(d->_initialised)
+    {
+        qWarning() << "[qdmxlib] Manager is already initialised. No effect.";
+        return;
+    }
+
+    if(en != d->_configEnabled)
+    {
+        d->_configEnabled = en;
+
+        if(en)
+        {
+            if(d->_configLocation.isEmpty())
+            {
+                qWarning() << "[qdmxlib] No config location set, using the default \"./\"";
+                d->_configLocation = "./";
+            }
+            else
+                qDebug() << "[qdmxlib] Config files enabled using location:" << d->_configLocation;
+        }
+    }
+}
+
+bool QDmxManager::configEnabled() const
+{
+    return d_func()->_configEnabled;
+}
+
+void QDmxManager::setConfigLocation(const QString& configLocation)
+{
+    Q_D(QDmxManager);
+    if(d->_initialised)
+    {
+        qWarning() << "[qdmxlib] Manager is already initialised. No effect.";
+        return;
+    }
+
+    d->_configLocation = configLocation;
+    qDebug() << "[qdmxlib] Config file location changed to:" << configLocation;
+}
+
+QString QDmxManager::configLocation() const
 {
     return d_func()->_configLocation;
 }
@@ -272,7 +325,7 @@ bool QDmxManager::patch(PortType portType, QDmxDevice* device, quint8 port, quin
         return false;
     }
 
-    qDebug() << "[qdmxlib] Patching" << device->name() << "port" << port << "to universe" << universe;
+    qDebug() << "[qdmxlib] Patching" << device->name() << (portType == Input ? "input" : "output") << "port" << port << "to universe" << universe;
 
     auto& patch = portType == Input ? d->_inputPatch : d->_outputPatch;
     auto& data = portType == Input ? d->_inputData : d->_outputData;

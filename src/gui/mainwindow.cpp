@@ -104,11 +104,11 @@ SubmasterWidget *MainWindow::createSubmasterWidget()
 
     auto dmxChannel1 = L_dmxChannel.at(i + 10);
     quint8 value1 = i +100;
-    channelGroup->addChild(dmxChannel1);
+    channelGroup->addControledChild(dmxChannel1);
     channelGroup->setStoredLevel(0, value1);
     auto dmxChannel2 = L_dmxChannel.at(i + 100);
     quint8 value2 = i + 150;
-    channelGroup->addChild(dmxChannel2);
+    channelGroup->addControledChild(dmxChannel2);
     channelGroup->setStoredLevel(1 , value2);
 
 
@@ -194,7 +194,7 @@ void MainWindow::addDmxManagerWidget()
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
   auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
-  QList<DmxValue *> L_dmxValue;
+  QList<DmxValue *> m_L_controledValue;
 
   // we connect to update views
   for (const auto &item : std::as_const(L_dmxChannel))
@@ -205,10 +205,10 @@ void MainWindow::addDmxManagerWidget()
             SLOT(repaintTableView()));
 
     DmxValue *value = item;
-    L_dmxValue.append(value);
+    m_L_controledValue.append(value);
   }
 
-  m_dmxChannelTableWidget->setL_dmxValue(L_dmxValue);
+  m_dmxChannelTableWidget->setL_controledValue(m_L_controledValue);
   m_dmxChannelTableWidget->setUniverseID(m_universeCount); // count has not been ++ yet
 
   m_universeCount++;
@@ -231,7 +231,7 @@ void MainWindow::removeDmxManagerWidget()
     dmxManagerWidget = m_L_dmxManagerWidget.first(); // we get first universe
     auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
     auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
-    QList<DmxValue *> L_dmxValue;
+    QList<DmxValue *> m_L_controledValue;
 
     for (const auto &item : std::as_const(L_dmxChannel))
     {
@@ -240,9 +240,9 @@ void MainWindow::removeDmxManagerWidget()
               m_dmxChannelTableWidget,
               SLOT(repaintTableView()));
       DmxValue *value = item;
-      L_dmxValue.append(value);
+      m_L_controledValue.append(value);
     }
-    m_dmxChannelTableWidget->setL_dmxValue(L_dmxValue);
+    m_dmxChannelTableWidget->setL_controledValue(m_L_controledValue);
     m_dmxChannelTableWidget->setUniverseID(m_universeCount - 1);
   }
 }

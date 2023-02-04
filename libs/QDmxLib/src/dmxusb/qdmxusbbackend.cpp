@@ -39,6 +39,7 @@ bool QDmxUsbBackend::dealWith(QList<QDmxUsbDevice*>& devices,
                               const QString& vendor,
                               quint16 vid,
                               quint16 pid,
+                              quint32 id,
                               QDmxUsbDevice::Backend backend,
                               QDmxUsbDriver* parent)
 {
@@ -61,7 +62,7 @@ bool QDmxUsbBackend::dealWith(QList<QDmxUsbDevice*>& devices,
     else
     {
         // Not found in the existing devices
-        auto dev = new QDmxUsbDevice(name, serial, vendor, vid, pid, backend, parent);
+        auto dev = new QDmxUsbDevice(name, serial, vendor, vid, pid, id, backend, parent);
         qDebug() << "[dmxusb] New device detected:"
                  << dev->name()
                  << dev->serialNumber()

@@ -96,6 +96,12 @@ public:
 
   DmxScene *getScene(const QModelIndex &index) const;
 
+  DmxScene *getRootItem() const{ return m_rootItem; }
+
+public slots :
+
+  void setRootItem(DmxScene *t_rootItem){ m_rootItem = t_rootItem; }
+
 protected :
 
   virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;

@@ -37,7 +37,7 @@ public:
                          const QString& serial,
                          const QString& vendor,
                          quint16 vid,
-                         quint16 pid,
+                         quint16 pid, quint32 id,
                          QDmxUsbDevice::Backend backend,
                          QDmxUsbDriver* parent);
     static bool clear(QDmxUsbDevice::Backend backend,

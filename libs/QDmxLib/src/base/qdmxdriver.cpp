@@ -153,7 +153,7 @@ bool QDmxDriver::load()
         return true;
     }
 
-    if(!d->loadConfig())
+    if(d->_manager->configEnabled() && !d->loadConfig())
     {
         qWarning() << QStringLiteral("[%1]").arg(name()) << "driver failed to load from config.";
         return false;
@@ -184,7 +184,7 @@ bool QDmxDriver::unload()
         return true;
     }
 
-    if(!d->saveConfig())
+    if(d->_manager->configEnabled() && !d->saveConfig())
         qWarning() << QStringLiteral("[%1]").arg(name()) << "driver failed to save to config.";
 
     if(d->_enabled)

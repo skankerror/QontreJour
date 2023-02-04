@@ -8,6 +8,10 @@
 #include <qdmxlib/private/qdmxftdibackend_p.h>
 #endif
 
+#ifdef QDMXLIB_HAS_FTD2XX
+#include <qdmxlib/private/qdmxftd2xxbackend_p.h>
+#endif
+
 #ifdef QDMXLIB_HAS_QTSERIAL
 #include <qdmxlib/private/qdmxserialbackend_p.h>
 #endif
@@ -23,6 +27,7 @@ public:
                          const QString& vendor,
                          quint16 vid,
                          quint16 pid,
+                         quint32 id,
                          QDmxUsbDevice::Backend backend,
                          QDmxDriver* parent) :
         QDmxDevicePrivate(parent),
@@ -31,21 +36,24 @@ public:
         _serial(serial),
         _vendor(vendor),
         _vendorId(vid),
-        _productId(pid)
+        _productId(pid),
+        _id(id)
     {
         switch (backend) {
         case QDmxUsbDevice::LibFTDI:
 #ifdef QDMXLIB_HAS_FTDI
-            _backend = new QDmxFTDIBackend(this);
+            _backend.reset(new QDmxFTDIBackend(this));
 #endif
             break;
         case QDmxUsbDevice::FTD2XX:
-#ifdef QDMXLIB_HAS_QTSERIAL
-            _backend = new QDmxSerialBackend(this);
+#ifdef QDMXLIB_HAS_FTD2XX
+            _backend.reset(new QDmxFTD2XXBackend(this));
 #endif
             break;
         case QDmxUsbDevice::Serial:
-
+#ifdef QDMXLIB_HAS_QTSERIAL
+            _backend.reset(new QDmxSerialBackend(this));
+#endif
             break;
         default:
             break;
@@ -61,7 +69,8 @@ public:
     QString _vendor;
     quint16 _vendorId;
     quint16 _productId;
-    QDmxUsbBackend* _backend;
+    quint32 _id;
+    std::unique_ptr<QDmxUsbBackend> _backend;
 
     QDmxUsbInterface* _iface = nullptr;
 };

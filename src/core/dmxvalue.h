@@ -21,10 +21,11 @@
 #include <QObject>
 #include <QString>
 
-// NOTE : class for : dmxoutput, dmxchannel
-//
-// mother of :
-// dmxchannelgroup, mother of :
+// NOTE : class for :
+// dmxoutput,
+// dmxchannel,
+// dmxchannelgroup
+// ** mother of :
 // ** dmxscene
 
 class DmxValue
@@ -37,16 +38,19 @@ public:
 
   enum ValueType
   {
-    RootValue,
+    RootOutput,
     Output,
+    RootChannel,
     Channel,
     ChannelGroup,
+    RootScene,
     Scene,
+    SubScene,
     UnknownValueType
   };
   Q_ENUM(ValueType)
 
-  // enum for dmx channels
+  // enum for signals
   enum SignalSenderType
   {
     SubmasterSliderSender,
@@ -72,46 +76,57 @@ public:
   };
   Q_ENUM(ChannelFlag)
 
+  // cstr
   explicit DmxValue(ValueType t_type = UnknownValueType,
                     DmxValue *t_parent = nullptr);
 
+  // dstr
   virtual ~DmxValue();
 
-// getters
+  // getters
   quint8 getLevel() const{  return m_level; }
   quint8 getMaxLevel() const { return m_maxLevel; }
   int getUniverseID() const { return m_universeID; }
-  int getID() const { return m_ID; }
+  int getID() const{ return m_ID; }
   QString getName() const{ return m_name; }
-  QList<DmxValue *> getL_dmxValue() const{ return m_L_dmxValue; }
-  DmxValue* getChild(int t_index);
+  QList<DmxValue *> getL_controledValue() const{ return m_L_controledValue; }
+  DmxValue * getControledChild(int t_index);
   ValueType getType() const{ return m_type; }
   quint8 getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   quint8 getchannelGroupLevel() const{ return m_channelGroupLevel; }
   quint8 getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   quint8 getnextSceneLevel() const{ return m_nextSceneLevel; }
   ChannelFlag getChannelFlag() const{ return m_flag; }
-  int getValuesCount() const { return m_L_dmxValue.size(); }
-  quint8 getChildLevel(int t_index);
+  int getControledValueSize() const{ return m_L_controledValue.size(); }
+  int getChildValueSize() const{ return m_L_childValue.size(); }
+  quint8 getControledChildLevel(int t_index);
+  DmxValue *getParentValue() const{ return m_parentValue;}
+  QList<DmxValue *> getL_childValue() const{ return m_L_childValue;}
+  QList<quint8> getL_storedLevels() const{ return m_L_storedLevels; }
+  ChannelFlag getFlag() const{ return m_flag; }
+  bool getIsDirectChannelEdited() const{ return m_isDirectChannelEdited; }
 
   // setters
   void setMaxLevel(quint8 t_maxLevel);
   void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
   void setID(int t_ID);
-  void setPropertyLevel(int t_level); // setter different from the slot, needed by property
+  // setter different from the slot, needed by property
+  void setPropertyLevel(int t_level);
   void setName(const QString &t_name) { m_name = t_name; }
-  void setL_dmxValue(const QList<DmxValue *> &t_L_dmxValue){ m_L_dmxValue = t_L_dmxValue; }
+  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue)
+  { m_L_controledValue = t_m_L_controledValue; }
   void setType(ValueType t_type){ m_type = t_type; }
 
-  // methods to handle children
-  void addChild(DmxValue *t_dmxValue);
-  void addChildren(const QList<DmxValue *> t_L_dmxValue);
-  bool removeChild(const DmxValue *t_dmxValue);
-  bool removeChildren(const QList<DmxValue *> t_L_dmxValue);
+  // meths for controled children
+  void addControledChild(DmxValue *t_dmxValue);
+  void addControledChildren(const QList<DmxValue *> t_m_L_controledValue);
+  bool removeControledChild(const DmxValue *t_dmxValue);
+  bool removeControledChildren(const QList<DmxValue *> t_m_L_controledValue);
   void clearList();
 
+  void addChildValue(DmxValue *t_dmxValue);
 
-private :
+protected :
 
   void setChannelLevel(SignalSenderType t_senderType,
                        quint8 t_level);
@@ -123,10 +138,10 @@ private :
 signals:
 
   void levelChanged(DmxValue::SignalSenderType,
-                    quint8);  //m_level
-  void requestDmxUpdate(int, // m_outputID
-                        quint8); // level
-  void L_dmxValueChanged();
+                    quint8 t_level);
+  void requestDmxUpdate(int m_outputID,
+                        quint8 t_level);
+  void m_L_controledValueChanged();
 
   void directChannelEditLevelChanged(quint8 directChannelEditLevel);
   void channelGroupLevelChanged(quint8 channelGroupLevel);
@@ -144,31 +159,91 @@ public slots:
   void setChannelGroupLevel(quint8 t_channelGroupLevel);
   void setSelectedSceneLevel(quint8 t_selectedSceneLevel);
   void setNextSceneLevel(quint8 t_nextSceneLevel);
-  void setChildLevel(DmxValue::SignalSenderType t_senderType,
-                     int t_index,
-                     quint8 t_level);
+  void setControledChildLevel(DmxValue::SignalSenderType t_senderType,
+                              int t_index,
+                              quint8 t_level);
   void setStoredLevel(int t_childIndex,
                       quint8 t_level);
 
   void setFlag(DmxValue::ChannelFlag t_flag){ m_flag = t_flag; }
 
+  void setParentValue(DmxValue *t_parentValue){ m_parentValue = t_parentValue; }
+
+  void setL_childValue(const QList<DmxValue *> &t_L_childValue)
+  { m_L_childValue = t_L_childValue;}
+  void setL_storedLevels(const QList<quint8> &t_L_storedLevels)
+  {  m_L_storedLevels = t_L_storedLevels; }
+  void setIsDirectChannelEdited(bool t_isDirectChannelEdited)
+  { m_isDirectChannelEdited = t_isDirectChannelEdited; }
+
 protected :
 
-  quint8 m_level;
+  // commons for all types :
+  int m_ID;
+  int m_universeID;
+  QString m_name;
+  ValueType m_type = UnknownValueType;
+
+  // for all except root ones
+  quint8 m_level = 0;
+
+  // for output
   quint8 m_maxLevel = 255;
+
+  // for channel
   quint8 m_directChannelEditLevel;
   quint8 m_channelGroupLevel;
   quint8 m_selectedSceneLevel;
   quint8 m_nextSceneLevel;
-  int m_ID;
-  int m_universeID;
-  QString m_name;
-  QList<DmxValue *> m_L_dmxValue;
-  QList<quint8> m_L_storedLevels; // for settings in scene or channelgroup
-
-  ValueType m_type = UnknownValueType;
   ChannelFlag m_flag = UnknownFlag;
   bool m_isDirectChannelEdited = false;
+
+  // faire aussi une autre value pour channel group ?
+  // si ça reçoit de plusieurs sources ?
+
+  // for all except subscene output channel group
+  // children of instance
+  // this will be output for root output
+  // channels for root channel
+  // channel(s) for channel group
+  // channel group(s) and channel(s) for scene and subscene
+  // scene for sub scene
+  QList<DmxValue *> m_L_childValue;
+
+  // for all except root Values, and output
+  // value controled by instance
+  // it's set by setLevel() slot that is emited and recieved
+  // from value to value.
+  // scene
+  // subscene
+  // setLevel for
+  //   -channel group
+  //  | and channel
+  //  set level for
+  //        channel
+  // and then channel to output
+  // all htp decisions are taken by channel
+  // knowing if it's a direct edit
+  // a channel group value
+  // a channel group via scene
+  // a scene, subscene, a nextscene
+  // to determine wich value set to output and how present it
+  // to mvc.
+  // this is done with enum flags
+  QList<DmxValue *> m_L_controledValue;
+
+  // for controled channel or channel group levels
+  // in scene, subscene or channelgroup
+  QList<quint8> m_L_storedLevels;
+
+  // parent value
+  // for output and channels it will be qobj child of universe which will destroy
+  // it on his destruction.
+  // for scene this will be root scene
+  // for subscene this will be a scene.
+  // this is easy way to implement fu****g tree model in Qt.
+  // so in a way a root scene is a sequence.
+  DmxValue *m_parentValue;
 
   Q_PROPERTY(quint8 level
              READ getLevel

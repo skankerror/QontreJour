@@ -46,10 +46,15 @@ public:
 
     static QDmxManager* instance();
 
-    bool init(const QString& configLocation = "./");
+    bool init();
+    bool isInitialised() const;
     bool teardown();
 
-    QString configLocation();
+    void setConfigEnabled(bool en);
+    bool configEnabled() const;
+
+    void setConfigLocation(const QString& configLocation);
+    QString configLocation() const;
 
     QList<QDmxDriver*> availableDrivers() const;
     QList<QDmxDevice*> availableDevices() const;

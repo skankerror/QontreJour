@@ -1,19 +1,20 @@
-#ifndef QDMXFTDIBACKEND_H
-#define QDMXFTDIBACKEND_H
+#ifndef QDMXFTD2XXBACKEND_H
+#define QDMXFTD2XXBACKEND_H
 
 #include "qdmxusbbackend_p.h"
 
 class QDmxUsbDriver;
 class QDmxUsbDevice;
-struct ftdi_context;
 
-class QDmxFTDIBackend : public QDmxUsbBackend
+class QDmxFTD2XXBackend : public QDmxUsbBackend
 {
-public:
-    QDmxFTDIBackend(QDmxUsbDevicePrivate* device);
-    ~QDmxFTDIBackend() override;
+    using ft_handle = void*;
 
-    inline QDmxUsbDevice::Backend backend() const override { return QDmxUsbDevice::LibFTDI; }
+public:
+    QDmxFTD2XXBackend(QDmxUsbDevicePrivate* device);
+    ~QDmxFTD2XXBackend() override;
+
+    inline QDmxUsbDevice::Backend backend() const override { return QDmxUsbDevice::FTD2XX; }
 
     static bool pollDevices(QList<QDmxUsbDevice*>& devices, QDmxUsbDriver* parent);
 
@@ -36,8 +37,12 @@ public:
     quint8 readByte(bool* ok = nullptr) override;
 
 protected:
-    ftdi_context* _context = nullptr;
+    static quint32 getInterfaceInfo(quint32 devId, QString& vendor, QString& descr,
+                                    QString& serial, quint16& vid, quint16& pid);
+
+protected:
+    ft_handle _handle = nullptr;
     quint8 _latency = 16;
 };
 
-#endif // QDMXFTDIBACKEND_H
+#endif // QDMXFTD2XXBACKEND_H

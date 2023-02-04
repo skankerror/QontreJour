@@ -49,8 +49,6 @@ public:
 
   // setters
   void setID(int t_ID) { m_ID = t_ID; }
-//  bool setOutputLevel(int t_outputID,
-//                      int t_level);
   void setDmxDevice(QDmxDevice *t_dmxDevice) { m_dmxDevice = t_dmxDevice; }
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 
@@ -76,7 +74,8 @@ private:
   bool m_isConnected;
 
   // root value, parent of all values created for this universe
-  DmxValue *m_rootValue;
+  DmxValue *m_rootChannel;
+  DmxValue *m_rootOutput;
 
 };
 

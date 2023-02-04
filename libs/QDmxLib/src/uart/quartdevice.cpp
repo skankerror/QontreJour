@@ -37,7 +37,10 @@ public:
     QUartDevicePrivate(const QSerialPortInfo& info, QUartDriver* driver) :
         QDmxDevicePrivate(driver),
         _info(info)
-    {}
+    {
+        _outputCount = 1;
+        _inputCount = 0;
+    }
 
     QUartThread* _thread = nullptr;
     QSerialPortInfo _info;
@@ -134,9 +137,6 @@ void QUartThread::run()
 QUartDevice::QUartDevice(const QSerialPortInfo& info, QUartDriver* parent) :
     QDmxDevice(*new QUartDevicePrivate(info, parent), parent)
 {
-    Q_D(QUartDevice);
-    d->_outputCount = 1;
-    d->_inputCount = 0;
 }
 
 QString QUartDevice::name() const

@@ -49,6 +49,7 @@ public:
                   const QString& vendor,
                   quint16 vid,
                   quint16 pid,
+                  quint32 id,
                   Backend backend,
                   QDmxUsbDriver* parent = nullptr);
     ~QDmxUsbDevice() override;
@@ -62,6 +63,7 @@ public:
     QString vendor() const;
     quint16 vendorId() const;
     quint16 productId() const;
+    quint32 id() const;
 
 protected:
     QDmxUsbBackend* privateBackend() const;

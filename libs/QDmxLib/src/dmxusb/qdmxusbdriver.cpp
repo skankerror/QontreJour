@@ -9,6 +9,11 @@
 #include <qdmxlib/private/qdmxftdibackend_p.h>
 #endif
 
+#ifdef QDMXLIB_HAS_FTD2XX
+#include <qdmxlib/private/qdmxftd2xxbackend_p.h>
+#endif
+
+
 #ifdef QDMXLIB_HAS_QTSERIAL
 #include <qdmxlib/private/qdmxserialbackend_p.h>
 #endif
@@ -49,6 +54,10 @@ void QDmxUsbDriver::pollDevices(bool preventEmit)
 
 #ifdef QDMXLIB_HAS_FTDI
     shouldEmit |= QDmxFTDIBackend::pollDevices(d->_devices, this);
+#endif
+
+#ifdef QDMXLIB_HAS_FTD2XX
+    shouldEmit |= QDmxFTD2XXBackend::pollDevices(d->_devices, this);
 #endif
 
 #ifdef QDMXLIB_HAS_QTSERIAL

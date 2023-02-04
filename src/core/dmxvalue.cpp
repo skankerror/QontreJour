@@ -56,10 +56,12 @@ DmxValue::~DmxValue()
   DmxValue::clearList();
 }
 
-quint8 DmxValue::getChildLevel(int t_index)
+quint8 DmxValue::getControledChildLevel(int t_index)
 {
-  auto value = getChild(t_index);
+  auto value = getControledChild(t_index);
   if (value) return value->getLevel();
+
+  qWarning() << "problem in DmxValue::getControledChildLevel";
   return -1;
 }
 
@@ -205,11 +207,11 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
     m_level = t_level;
 
     for (int i = 0;
-         (i < m_L_dmxValue.size())
+         (i < m_L_controledValue.size())
          || (i < m_L_storedLevels.size());
          i++)
     {
-      auto dmxChannel = m_L_dmxValue.at(i);
+      auto dmxChannel = m_L_controledValue.at(i);
       auto level = m_L_storedLevels.at(i);
       double coef = double(m_level)/255.0f;
       if (t_senderType != NextSceneSender)
@@ -220,10 +222,10 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
 
 }
 
-DmxValue *DmxValue::getChild(int t_index)
+DmxValue *DmxValue::getControledChild(int t_index)
 {
-  if (t_index && (t_index < m_L_dmxValue.size()))
-    return m_L_dmxValue.at(t_index);
+  if (t_index && (t_index < m_L_controledValue.size()))
+    return m_L_controledValue.at(t_index);
   else
     return nullptr;
 }
@@ -269,12 +271,12 @@ void DmxValue::setNextSceneLevel(quint8 t_nextSceneLevel)
   emit nextSceneLevelChanged(m_nextSceneLevel);
 }
 
-void DmxValue::setChildLevel(SignalSenderType t_senderType,
+void DmxValue::setControledChildLevel(SignalSenderType t_senderType,
                              int t_index,
                              quint8 t_level)
 {
-  if (t_index && (t_index < m_L_dmxValue.size()))
-  m_L_dmxValue.at(t_index)->setLevel(t_senderType,
+  if (t_index && (t_index < m_L_controledValue.size()))
+  m_L_controledValue.at(t_index)->setLevel(t_senderType,
                                      t_level);
 }
 
@@ -311,42 +313,42 @@ void DmxValue::setPropertyLevel(int t_level)
 
 }
 
-void DmxValue::addChild(DmxValue *t_dmxValue)
+void DmxValue::addControledChild(DmxValue *t_dmxValue)
 {
-  // we check if the pointer isn't null and if the output is not in the list.
-  if(t_dmxValue && !m_L_dmxValue.contains(t_dmxValue))
+  // we check if the pointer isn't null and if the value is not in the list.
+  if(t_dmxValue && !m_L_controledValue.contains(t_dmxValue))
   {
-    m_L_dmxValue.append(t_dmxValue);
+    m_L_controledValue.append(t_dmxValue);
     quint8 storedLevel = 0;
     m_L_storedLevels.append(storedLevel);
-    emit L_dmxValueChanged();
+    emit m_L_controledValueChanged();
   }
   else
-    qWarning() << "cant add value";
+    qWarning() << "can't add value";
 
 }
 
-void DmxValue::addChildren(const QList<DmxValue *> t_L_dmxValue)
+void DmxValue::addControledChildren(const QList<DmxValue *> t_m_L_controledValue)
 {
-  for (const auto &item : std::as_const(t_L_dmxValue))
+  for (const auto &item : std::as_const(t_m_L_controledValue))
   {
-    addChild(item);
+    addControledChild(item);
   }
 }
 
-bool DmxValue::removeChild(const DmxValue *t_dmxValue)
+bool DmxValue::removeControledChild(const DmxValue *t_dmxValue)
 {
   // we check if the pointer isn't null ...
   if(t_dmxValue)
   {
-    int index = m_L_dmxValue.indexOf(t_dmxValue);
+    int index = m_L_controledValue.indexOf(t_dmxValue);
 //    and if the output is in the list.
     if(index)
     {
-      m_L_dmxValue.removeAt(index);
+      m_L_controledValue.removeAt(index);
       m_L_storedLevels.removeAt(index);
-      emit L_dmxValueChanged();
-      //  m_L_dmxValue.squeeze(); // this freeis unused memory
+      emit m_L_controledValueChanged();
+      //  m_L_controledValue.squeeze(); // this freeis unused memory
       return true;
     }
   }
@@ -355,13 +357,13 @@ bool DmxValue::removeChild(const DmxValue *t_dmxValue)
   return false;
 }
 
-bool DmxValue::removeChildren(const QList<DmxValue *> t_L_dmxValue)
+bool DmxValue::removeControledChildren(const QList<DmxValue *> t_m_L_controledValue)
 {
   bool test;
   bool ret = true;
-  for (const auto &item : std::as_const(t_L_dmxValue))
+  for (const auto &item : std::as_const(t_m_L_controledValue))
   {
-    test = removeChild(item);
+    test = removeControledChild(item);
     if (!test)
     {
       ret = false;
@@ -372,12 +374,28 @@ bool DmxValue::removeChildren(const QList<DmxValue *> t_L_dmxValue)
 
 void DmxValue::clearList()
 {
-  m_L_dmxValue.clear();
+  m_L_controledValue.clear();
   m_L_storedLevels.clear();
   // emit signal ?
-  m_L_dmxValue.squeeze();
+  m_L_controledValue.squeeze();
   m_L_storedLevels.squeeze();
   // NOTE : do not destroy value args
   // universe or ? have to do it.
+}
+
+void DmxValue::addChildValue(DmxValue * t_dmxValue)
+{
+  // we check if the pointer isn't null and if the value is not in the list.
+  if(t_dmxValue && !m_L_childValue.contains(t_dmxValue))
+  {
+    m_L_childValue.append(t_dmxValue);
+    quint8 storedLevel = 0;
+//    m_L_storedLevels.append(storedLevel);
+//    emit m_L_childValueChanged();
+  }
+  else
+    qWarning() << "cant add child value";
+
+
 }
 

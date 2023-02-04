@@ -1,0 +1,12 @@
+- établir des noms par défaut aux values :
+OUT %.% [universe ID]
+CH %.% [universe ID]
+GROUP %
+Root Scene
+Sc %
+SubSc %
+
+- mettre un système pour l'id des scenes.
+ce doit être un double.
+caler par défaut 10 après le dernier chiffre des dizaines sauf en cas de *9.99
+

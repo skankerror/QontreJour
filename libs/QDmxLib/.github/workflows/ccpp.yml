@@ -1,0 +1,47 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        qt: ['5.15.2', '6.5.0']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt }}
+        if: ${{ matrix.qt == '5.15.2' }}
+
+      - uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt }}
+          modules: qtserialport
+        if: ${{ matrix.qt == '6.5.0' }}
+
+      - run: |
+          sudo apt update && sudo apt upgrade -y && sudo apt install -y libftdi1-dev
+        if: ${{ runner.os == 'Linux' }}
+
+      - run: brew install libftdi
+        if: ${{ runner.os == 'maxOS' }}
+
+      - run: cmake -DCMAKE_INSTALL_PREFIX=dist -DQDMXLIB_INSTALL=OFF -DQDMXLIB_BUILD_TESTS=ON -S . -B build
+
+      - run: cmake --build build --config Release
+
+      - run: ctest
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: release-${{ runner.os }}
+          path: dist

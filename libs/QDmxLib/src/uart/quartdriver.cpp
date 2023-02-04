@@ -29,7 +29,7 @@ bool QUartDriver::loadHook()
     Q_D(QUartDriver);
     for(const auto& info : QSerialPortInfo::availablePorts())
     {
-        // Skip ports with vip and pid because they'll be handled by
+        // Skip ports with vid and pid because they'll be handled by
         // USB Dmx driver
         if(info.hasVendorIdentifier() || info.hasProductIdentifier())
             continue;

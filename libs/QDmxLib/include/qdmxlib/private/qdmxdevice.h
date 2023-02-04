@@ -19,7 +19,7 @@ public:
     QDmxDevice(QDmxDriver* parent = nullptr);
     ~QDmxDevice() override;
 
-    virtual QString name() const { return "dummy"; }
+    virtual QString name() const = 0;
 
     QDmxDriver* driver() const;
     QDmxManager* manager() const;
@@ -62,6 +62,12 @@ class QDmxDummyDevice : public QDmxDevice
 
 public:
     QDmxDummyDevice(QDmxDriver* parent = nullptr);
+
+    QString name() const override { return "dummy"; }
+
+    void setData(quint8 port, quint16 channel, quint8 data) override;
+    void setData(quint8 port, quint16 channel, const QByteArray& data) override;
+    void setData(quint8 port, const QByteArray& data) override;
 };
 
 #endif // QDMXDEVICE_H

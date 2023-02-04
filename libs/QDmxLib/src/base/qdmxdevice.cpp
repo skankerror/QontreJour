@@ -174,3 +174,30 @@ QDmxDummyDevice::QDmxDummyDevice(QDmxDriver* parent) :
     QDmxDevice(*new QDmxDummyDevicePrivate(parent), parent)
 {
 }
+
+void QDmxDummyDevice::setData(quint8 port, quint16 channel, quint8 data)
+{
+    Q_D(QDmxDummyDevice);
+
+    QDmxDevice::setData(port, channel, data);
+    d->_inputData = d->_outputData;
+    emit inputDataChanged(port, readInputData(port));
+}
+
+void QDmxDummyDevice::setData(quint8 port, quint16 channel, const QByteArray& data)
+{
+    Q_D(QDmxDummyDevice);
+
+    QDmxDevice::setData(port, channel, data);
+    d->_inputData = d->_outputData;
+    emit inputDataChanged(port, readInputData(port));
+}
+
+void QDmxDummyDevice::setData(quint8 port, const QByteArray& data)
+{
+    Q_D(QDmxDummyDevice);
+
+    QDmxDevice::setData(port, data);
+    d->_inputData = d->_outputData;
+    emit inputDataChanged(port, readInputData(port));
+}

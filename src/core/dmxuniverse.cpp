@@ -26,7 +26,9 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_outputCount(t_outputCount),
     m_isConnected(false),
     m_dmxDevice(nullptr),
-    m_rootValue(new DmxValue(DmxValue::RootValue))
+    m_rootChannel(new DmxValue(DmxValue::RootChannel)),
+    m_rootOutput(new DmxValue(DmxValue::RootOutput))
+//    m_rootValue(new DmxValue(DmxValue::RootValue))
 {
   for (int i = 0; i < m_outputCount; i++)
   {
@@ -36,7 +38,7 @@ DmxUniverse::DmxUniverse(int t_universeID,
 //                                  this,
 //                                  DmxValue::Output);
     auto dmxOutput = new DmxValue(DmxValue::Output,
-                                  m_rootValue);
+                                  m_rootOutput);
     dmxOutput->setUniverseID(m_ID);
     dmxOutput->setID(i);
 
@@ -45,13 +47,13 @@ DmxUniverse::DmxUniverse(int t_universeID,
 //                                   this,
 //                                   DmxValue::Channel);
     auto dmxChannel = new DmxValue(DmxValue::Channel,
-                                  m_rootValue);
+                                   m_rootChannel);
     dmxChannel->setUniverseID(m_ID);
     dmxChannel->setID(i);
 
 //    dmxChannel->setType(DmxValue::Channel);
     // we start with straight patch
-    dmxChannel->addChild(dmxOutput);
+    dmxChannel->addControledChild(dmxOutput);
     m_L_dmxChannel.append(dmxChannel);
     m_L_dmxOutput.append(dmxOutput);
 

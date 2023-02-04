@@ -22,8 +22,7 @@
 SequencerWidget::SequencerWidget(QWidget *parent)
   : QWidget(parent),
     m_treeView(new SequencerTreeView(this)),
-    m_model(new SequencerTreeModel())/*,
-    m_dmxSequence(t_dmxSequence)*/
+    m_model(new SequencerTreeModel())
 {
   auto layout = new QVBoxLayout();
 
@@ -51,10 +50,10 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   : QAbstractItemModel(parent)
 {
   QString name = "Root Item";
-  m_rootItem = new DmxScene(/*0, name*/);
+  m_rootItem = new DmxScene(DmxValue::RootScene);
   m_rootItem->setID(0);
   m_rootItem->setName(name);
-  m_rootItem->setType(DmxScene::RootScene);
+//  m_rootItem->setType(DmxScene::RootScene);
 
   // test
   name = QString("accueil public");
@@ -66,14 +65,16 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   scene->setTimeOut(5.0);
   scene->setDelayIn(0);
   scene->setDelayOut(0);
-  scene->setType(DmxScene::MainScene);
-  scene->setParentSCene(m_rootItem);
+//  scene->setType(DmxScene::MainScene);
+//  scene->setParentSCene(m_rootItem);
+  scene->setParentValue(m_rootItem);
   scene->setStepNumber(0);
-  m_rootItem->addScene(scene);
+//  m_rootItem->addScene(scene);
+  m_rootItem->addChildValue(scene);
 
   name = "subScene 10";
   auto subScene = new DmxScene(/*10, name, this*/
-                               DmxValue::Scene,
+                               DmxValue::SubScene,
                                scene);
   subScene->setID(10);
   subScene->setName(name);
@@ -82,9 +83,10 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   subScene->setDelayIn(1);
   subScene->setDelayOut(3);
   subScene->setType(DmxScene::SubScene);
-  subScene->setParentSCene(scene);
+//  subScene->setParentSCene(scene);
+  subScene->setParentValue(scene);
   subScene->setStepNumber(0);
-  scene->addScene(subScene);
+  scene->/*addScene*/addChildValue(subScene);
 
 }
 
@@ -110,7 +112,7 @@ QModelIndex SequencerTreeModel::index(int row, int column, const QModelIndex &pa
 
   auto parentScene = getScene(parent);
   if (!parentScene) return QModelIndex();
-  auto childScene = parentScene->getSubscene(row);
+  auto childScene = parentScene->getL_childValue().at(row);
   if (childScene)
     return createIndex(row,
                        column,
@@ -125,16 +127,18 @@ QModelIndex SequencerTreeModel::parent(const QModelIndex &child) const
 
   auto childScene = getScene(child);
   auto parentScene = childScene
-      ? childScene->getParentSCene()
+      ? childScene->/*getParentSCene*/getParentValue()
       : nullptr;
 
   if (parentScene == m_rootItem
       || !parentScene)
     return QModelIndex();
 
-  return createIndex(parentScene->getStepNumber(),
+  auto parentCast = static_cast<DmxScene *>(parentScene);
+
+  return createIndex(/*parentScene*/parentCast->getStepNumber(),
                      0,
-                     parentScene);
+                     /*parentScene*/parentCast);
 
 }
 
@@ -142,9 +146,9 @@ int SequencerTreeModel::rowCount(const QModelIndex &parent) const
 {
   auto parentScene = getScene(parent);
   if (parentScene == m_rootItem)
-    return m_rootItem->getSize();
+    return m_rootItem->/*getSize()*/getChildValueSize();
 
-  int ret = parentScene ? parentScene->getSize() : 0;
+  int ret = parentScene ? parentScene->/*getSize()*/getChildValueSize() : 0;
   return ret;
 }
 

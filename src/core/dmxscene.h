@@ -22,7 +22,6 @@
 
 
 class DmxScene :
-//    public DmxChannelGroup
     public DmxValue
 {
 
@@ -30,16 +29,7 @@ class DmxScene :
 
 public:
 
-  enum SceneType
-  {
-    RootScene,
-    MainScene,
-    SubScene,
-    Unknow_type
-  };
-  Q_ENUM(SceneType)
-
-  explicit DmxScene(DmxValue::ValueType t_type = Scene,
+  explicit DmxScene(DmxValue::ValueType t_type /*= Scene*/,
                     DmxScene *t_parent = nullptr);
 
   virtual ~DmxScene();
@@ -50,12 +40,7 @@ public:
   double getTimeOut() const{ return m_timeOut; }
   double getDelayIn() const{ return m_delayIn; }
   double getDelayOut() const{ return m_delayOut; }
-  SceneType getType() const{ return m_type; }
-  QList<DmxScene *> getL_subScene() const{ return m_L_subScene; }
-  DmxScene *getParentSCene() const{ return m_parentSCene; }
   int getStepNumber() const;
-  int getSize() const{ return m_L_subScene.size(); }
-  DmxScene *getSubscene(int t_number);
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
@@ -64,26 +49,9 @@ public:
   void setDelayIn(double t_delayIn){ m_delayIn = t_delayIn; }
   void setDelayOut(double t_delayOut){ m_delayOut = t_delayOut; }
 
-  bool insertNewScene(int t_position);
-  bool insertScene(int t_position,
-                   DmxScene *t_scene);
-  bool removeScene(int t_position,
-                   int t_count = 1);
-  bool addScene(DmxScene *t_scene);
-
-
 public slots :
 
-  void setType(DmxScene::SceneType t_type){ m_type = t_type; }
-
-  void setL_subScene(const QList<DmxScene *> &t_L_subScene)
-  { m_L_subScene = t_L_subScene; }
-
-  void setParentSCene(DmxScene *t_parentSCene)
-  { m_parentSCene = t_parentSCene; }
-
-  void setStepNumber(int t_stepNumber)
-  { m_stepNumber = t_stepNumber; }
+  void setStepNumber(int t_stepNumber){ m_stepNumber = t_stepNumber; }
 
 signals:
 
@@ -95,17 +63,6 @@ protected :
   double m_delayIn;
   double m_delayOut;
   int m_stepNumber;
-
-  SceneType m_type;
-
-  // for root scene which will contain all a scenes sequence
-  QList<DmxScene *> m_L_subScene;
-
-  // scene parent :
-  // nullptr for rootscene
-  // rootscene for mainscene
-  // mainscene for subscene
-  DmxScene *m_parentSCene;
 
 };
 

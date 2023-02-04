@@ -29,6 +29,9 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
     m_tableView(new DmxValueTableView(this)),
     m_model(new DmxValueTableModel(this)),
     m_universeSpinBox(new QSpinBox(this)),
+    m_selectAll(new QPushButton("All", this)),
+    m_recGroup(new QPushButton("Rec Group", this)),
+    m_recScene(new QPushButton("Rec Scene", this)),
     m_clearSelectionButton(new QPushButton("C", this))
 {
   auto totalLayout = new QVBoxLayout();
@@ -38,11 +41,15 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
   auto label = new QLabel("Channels on Universe :", this);
 
   m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
-  m_universeSpinBox->setMinimum(1);// there's always one universe
+  m_universeSpinBox->setMinimum(1);// there's always at least one universe
 
   headerLayout->addStretch();
-  headerLayout->addWidget(/*m_*/label);
+  headerLayout->addWidget(label);
   headerLayout->addWidget(m_universeSpinBox);
+  bottomLayout->addStretch();
+  bottomLayout->addWidget(m_selectAll);
+  bottomLayout->addWidget(m_recGroup);
+  bottomLayout->addWidget(m_recScene);
   bottomLayout->addWidget(m_clearSelectionButton);
 
   totalLayout->addLayout(headerLayout);
@@ -89,9 +96,9 @@ void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
 
 }
 
-void DmxValueTableWidget::setL_dmxValue(const QList<DmxValue *> t_L_dmxValue)
+void DmxValueTableWidget::setL_controledValue(const QList<DmxValue *> t_m_L_controledValue)
 {
-  m_model->setL_dmxValue(t_L_dmxValue);
+  m_model->setL_controledValue(t_m_L_controledValue);
 
 }
 
@@ -121,6 +128,21 @@ void DmxValueTableWidget::onSpinboxSelected(int t_universeID)
 void DmxValueTableWidget::repaintTableView()
 {
   emit m_model->layoutChanged();
+}
+
+void DmxValueTableWidget::selectAll()
+{
+
+}
+
+void DmxValueTableWidget::recGroup()
+{
+
+}
+
+void DmxValueTableWidget::recScene()
+{
+
 }
 
 /*************************************************************************/
@@ -174,12 +196,12 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
   {
     for (const auto &item : std::as_const(m_editedIndexes))
     {
-      auto value = /*m_editedIndex*/item.data().toInt();
+      auto value = item.data().toInt();
       auto yValue = event->pos().y() - m_originEditingPoint.y();
       value -= yValue;
       if (value > 255) value = 255;
       if (value < 0) value = 0;
-      model()->setData(/*m_editedIndex*/item, value, Qt::EditRole);
+      model()->setData(item, value, Qt::EditRole);
     }
     m_originEditingPoint = event->pos();
     return;
@@ -215,10 +237,10 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
   {
     int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column();
-    if (valueID < 0 || valueID >= m_L_dmxValue.size())
+    if (valueID < 0 || valueID >= m_L_controledValue.size())
       return QVariant();
 
-    auto dmxValue = m_L_dmxValue.at(valueID);
+    auto dmxValue = m_L_controledValue.at(valueID);
     DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
 
 
@@ -297,7 +319,7 @@ bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value
 
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-  auto dmxValue = m_L_dmxValue.at(valueID);
+  auto dmxValue = m_L_controledValue.at(valueID);
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());
 

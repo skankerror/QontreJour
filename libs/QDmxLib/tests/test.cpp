@@ -5,47 +5,54 @@
 #include <qdmxlib/QDmxDriver>
 #include <qdmxlib/QDmxDevice>
 
-class TestManager : public QObject
+class TestDmx : public QObject
 {
     Q_OBJECT
 
 public:
-    TestManager() = default;
+    TestDmx() = default;
 
 private slots:
     void initTestCase();
     void cleanupTestCase();
+
     void listingDrivers();
     void listingDevices();
+
     void driverByName();
     void deviceByName();
+
     void patch();
     void dmx();
 };
 
-void TestManager::initTestCase()
+void TestDmx::initTestCase()
 {
-    QFileInfo fi(QFINDTESTDATA("configs/dummy.json"));
-    QVERIFY(QDmxManager::instance()->init(fi.absolutePath()));
+    QVERIFY(QDmxManager::instance()->init());
+    QVERIFY(QDmxManager::instance()->isInitialised());
+    QVERIFY(!QDmxManager::instance()->configEnabled());
 }
 
-void TestManager::cleanupTestCase()
+void TestDmx::cleanupTestCase()
 {
     QVERIFY(QDmxManager::instance()->teardown());
 }
 
-void TestManager::listingDrivers()
+void TestDmx::listingDrivers()
 {
     for(auto d : QDmxManager::instance()->availableDrivers())
     {
-        QVERIFY(d->isEnabled());
         QVERIFY(d->isLoaded());
+        QVERIFY(!d->isEnabled());
 
         qDebug() <<  d->name();
+
+        d->setEnabled(true);
+        QVERIFY(d->isEnabled());
     }
 }
 
-void TestManager::listingDevices()
+void TestDmx::listingDevices()
 {
     for(auto d : QDmxManager::instance()->availableDevices())
     {
@@ -54,20 +61,20 @@ void TestManager::listingDevices()
     }
 }
 
-void TestManager::driverByName()
+void TestDmx::driverByName()
 {
     QVERIFY(QDmxManager::instance()->driver("dummy"));
     QVERIFY(QDmxManager::instance()->driver("artnet"));
     QVERIFY(!QDmxManager::instance()->driver("__fake__"));
 }
 
-void TestManager::deviceByName()
+void TestDmx::deviceByName()
 {
     QVERIFY(QDmxManager::instance()->device("dummy", "dummy"));
     QVERIFY(!QDmxManager::instance()->device("dummy", "__fake__"));
 }
 
-void TestManager::patch()
+void TestDmx::patch()
 {
     auto* m = QDmxManager::instance();
     QVERIFY(m->patch("dummy", "dummy", 0, 0));
@@ -88,8 +95,11 @@ void TestManager::patch()
     QVERIFY(!m->isPatched("dummy"));
 }
 
-void TestManager::dmx()
+void TestDmx::dmx()
 {
+    // dummy is a loopback device, it will parot whatever you write back to its
+    // input.
+
     auto* m = QDmxManager::instance();
     QVERIFY(m->patch("dummy", "dummy", 0, 0));
 
@@ -99,11 +109,30 @@ void TestManager::dmx()
     auto output = m->readOutputData(0);
     QCOMPARE(output, QByteArray(512, 0x00));
 
+    QSignalSpy spyIn(m, SIGNAL(inputDataChanged(quint8,QByteArray)));
+    QSignalSpy spyOut(m, SIGNAL(outputDataChanged(quint8,QByteArray)));
+
     QVERIFY(m->writeData(0, 0, 100));
     output = m->readOutputData(0);
     auto test = QByteArray(512, 0x00);
     test[0] = 100;
     QCOMPARE(output, test);
+
+    if(spyIn.isEmpty())
+        spyIn.wait();
+
+    if(spyOut.isEmpty())
+        spyOut.wait();
+
+    QCOMPARE(spyIn.count(), 1);
+    QCOMPARE(spyOut.count(), 1);
+
+    QCOMPARE(m->readOutputData(0), m->readInputData(0));
+
+    auto listIn = spyIn.takeFirst();
+    auto listOut = spyOut.takeFirst();
+
+    QCOMPARE(listIn, listOut);
 
     QVERIFY(m->writeData(0, 0, QByteArray(3, 200u)));
     output = m->readOutputData(0);
@@ -112,9 +141,25 @@ void TestManager::dmx()
     test[2] = 200u;
     QCOMPARE(output, test);
 
+    if(spyIn.isEmpty())
+        spyIn.wait();
+
+    if(spyOut.isEmpty())
+        spyOut.wait();
+
+    QCOMPARE(spyIn.count(), 1);
+    QCOMPARE(spyOut.count(), 1);
+
+    QCOMPARE(m->readOutputData(0), m->readInputData(0));
+
+    listIn = spyIn.takeFirst();
+    listOut = spyOut.takeFirst();
+
+    QCOMPARE(listIn, listOut);
+
     QVERIFY(m->unpatch((quint8)0));
 }
 
-QTEST_MAIN(TestManager)
+QTEST_MAIN(TestDmx)
 
-#include "tst_manager.moc"
+#include "test.moc"
