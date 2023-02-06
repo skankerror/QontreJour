@@ -193,9 +193,9 @@ bool QE131DevicePrivate::extractDmxData(const QByteArray& data, quint8& port)
 
     int length = (data[123] << 8) + data[124];
 
-    auto quint8 = data.mid(126, length);
+    auto dmx = data.mid(126, length);
 
-    updateBuffer(_inputData, port, quint8);
+    updateBuffer(_inputData, port, dmx);
 
     return true;
 }
@@ -212,18 +212,18 @@ void QE131Device::setData(quint8 port, quint16 channel, quint8 data)
 {
     Q_D(QE131Device);
     QDmxGenericNetworkDevice::setData(port, channel, data);
-    auto quint8 = d->e131Dmx(port, channel+1);
+    auto dmx = d->e131Dmx(port, channel+1);
     QHostAddress addr(0xECFF0000 + (port + 1));
-    d->_socket->writeDatagram(quint8, addr, e131_port);
+    d->_socket->writeDatagram(dmx, addr, e131_port);
 }
 
 void QE131Device::setData(quint8 port, quint16 channel, const QByteArray& data)
 {
     Q_D(QE131Device);
     QDmxGenericNetworkDevice::setData(port, channel, data);
-    auto quint8 = d->e131Dmx(port, channel+data.size());
+    auto dmx = d->e131Dmx(port, channel+data.size());
     QHostAddress addr(0xECFF0000 + (port + 1));
-    d->_socket->writeDatagram(quint8, addr, e131_port);
+    d->_socket->writeDatagram(dmx, addr, e131_port);
 }
 
 void QE131Device::setData(quint8 port, const QByteArray& data)
