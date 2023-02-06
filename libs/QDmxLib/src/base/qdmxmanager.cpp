@@ -481,7 +481,7 @@ bool QDmxManager::isPatched(PortType portType, QDmxDriver* driver)
     return std::any_of(devs.begin(), devs.end(), [portType, this](auto* dev){ return isPatched(portType, dev); });
 }
 
-bool QDmxManager::patchedUniverse(PortType portType, QDmxDevice* device, quint8 port, quint8& universe)
+bool QDmxManager::patchedUniverse(PortType portType, QDmxDevice* device, quint8 port, quint8 &universe)
 {
     Q_D(QDmxManager);
     const auto& patch = portType == Input ? d->_inputPatch : d->_outputPatch;
@@ -493,7 +493,7 @@ bool QDmxManager::patchedUniverse(PortType portType, QDmxDevice* device, quint8 
     return true;
 }
 
-bool QDmxManager::patchedUniverse(PortType portType, const QString& driver, const QString& name, quint8 port, quint8& universe)
+bool QDmxManager::patchedUniverse(PortType portType, const QString& driver, const QString& name, quint8 port, quint8 &universe)
 {
     auto dev = device(driver, name);
     if(!dev)

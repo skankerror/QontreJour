@@ -103,11 +103,11 @@ SubmasterWidget *MainWindow::createSubmasterWidget()
     channelGroup->setID(i);
 
     auto dmxChannel1 = L_dmxChannel.at(i + 10);
-    quint8 value1 = i +100;
+    dmx value1 = i +100;
     channelGroup->addControledChild(dmxChannel1);
     channelGroup->setStoredLevel(0, value1);
     auto dmxChannel2 = L_dmxChannel.at(i + 100);
-    quint8 value2 = i + 150;
+    dmx value2 = i + 150;
     channelGroup->addControledChild(dmxChannel2);
     channelGroup->setStoredLevel(1 , value2);
 
@@ -133,9 +133,9 @@ void MainWindow::setDirectChannelWidget(int t_universeID)
     auto directChannelSlider = new DmxValueSlider(item,
                                                   m_directChannelWidget);
     connect(item,
-            SIGNAL(blockDirectChannelSlider(quint8)),
+            SIGNAL(blockDirectChannelSlider(dmx)),
             directChannelSlider,
-            SLOT(unMoveSlider(quint8)));
+            SLOT(unMoveSlider(dmx)));
     L_directChannelSlider.append(directChannelSlider);
   }
 
@@ -200,7 +200,7 @@ void MainWindow::addDmxManagerWidget()
   for (const auto &item : std::as_const(L_dmxChannel))
   {
     connect(item,
-            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+            SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
             m_dmxChannelTableWidget,
             SLOT(repaintTableView()));
 
@@ -236,7 +236,7 @@ void MainWindow::removeDmxManagerWidget()
     for (const auto &item : std::as_const(L_dmxChannel))
     {
       connect(item,
-              SIGNAL(levelChanged(int,quint8)),
+              SIGNAL(levelChanged(int,dmx)),
               m_dmxChannelTableWidget,
               SLOT(repaintTableView()));
       DmxValue *value = item;

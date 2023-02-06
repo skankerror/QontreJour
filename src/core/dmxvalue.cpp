@@ -56,7 +56,7 @@ DmxValue::~DmxValue()
   DmxValue::clearList();
 }
 
-quint8 DmxValue::getControledChildLevel(int t_index)
+dmx DmxValue::getControledChildLevel(int t_index)
 {
   auto value = getControledChild(t_index);
   if (value) return value->getLevel();
@@ -66,7 +66,7 @@ quint8 DmxValue::getControledChildLevel(int t_index)
 }
 
 void DmxValue::setLevel(SignalSenderType t_senderType,
-                        quint8 t_level)
+                        dmx t_level)
 {
   if ((t_level < 0)
       || (t_level > 255))
@@ -88,7 +88,7 @@ void DmxValue::setLevel(SignalSenderType t_senderType,
 }
 
 void DmxValue::setChannelLevel(SignalSenderType t_senderType,
-                               quint8 t_level)
+                               dmx t_level)
 {
   switch(t_senderType)
   {
@@ -118,7 +118,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
   }
 
   // here we determine if output level change
-  int level; // final set
+  int level; // final set. keep an int ? or dmx, overdmx ?
   if (m_isDirectChannelEdited)
   {
     if(m_directChannelEditLevel > m_channelGroupLevel)
@@ -147,6 +147,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
       m_flag = SelectedSceneFlag;
     }
   }
+  // TODO : ici gérer le offset ovredmx
   if (m_level == level
       || (level < 0)
       || (level > 255))
@@ -164,7 +165,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
 }
 
 void DmxValue::setOutputLevel(SignalSenderType t_senderType,
-                              quint8 t_level)
+                              dmx t_level)
 {
   if (m_flag == ParkedFlag)
     return;
@@ -178,7 +179,7 @@ void DmxValue::setOutputLevel(SignalSenderType t_senderType,
   else
     coef = double(m_maxLevel)/255.0f;
 
-  quint8 level = (quint8)(coef * t_level);
+  dmx level = (dmx)(coef * t_level);
 
   if (m_level == level
       || (level < 0)
@@ -193,7 +194,7 @@ void DmxValue::setOutputLevel(SignalSenderType t_senderType,
 }
 
 void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
-                                    quint8 t_level)
+                                    dmx t_level)
 {
   if ((t_senderType == SubmasterSliderSender)
       || (t_senderType == SelectedSceneSender)
@@ -207,7 +208,7 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
     m_level = t_level;
 
     for (int i = 0;
-         (i < m_L_controledValue.size())
+         (i < m_L_controledValue.size()) // not nice this ||
          || (i < m_L_storedLevels.size());
          i++)
     {
@@ -216,7 +217,7 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
       double coef = double(m_level)/255.0f;
       if (t_senderType != NextSceneSender)
         dmxChannel->setLevel(DmxValue::ChannelGroupSender,
-                             (quint8)(coef * level));
+                             (dmx)(coef * level));
     }
   }
 
@@ -230,16 +231,16 @@ DmxValue *DmxValue::getControledChild(int t_index)
     return nullptr;
 }
 
-void DmxValue::setMaxLevel(quint8 t_maxLevel)
+void DmxValue::setMaxLevel(dmx t_maxLevel)
 {
   if (m_maxLevel == t_maxLevel)
     return;
   m_maxLevel = t_maxLevel;
-//  emit maxLevelChanged(/*m_ID,*/
-//                       m_maxLevel);
+  //  emit maxLevelChanged(/*m_ID,*/
+  //                       m_maxLevel);
 }
 
-void DmxValue::setDirectChannelEditLevel(quint8 t_directChannelEditLevel)
+void DmxValue::setDirectChannelEditLevel(dmx t_directChannelEditLevel)
 {
   if (m_directChannelEditLevel == t_directChannelEditLevel)
     return;
@@ -247,7 +248,7 @@ void DmxValue::setDirectChannelEditLevel(quint8 t_directChannelEditLevel)
   emit directChannelEditLevelChanged(m_directChannelEditLevel);
 }
 
-void DmxValue::setChannelGroupLevel(quint8 t_channelGroupLevel)
+void DmxValue::setChannelGroupLevel(dmx t_channelGroupLevel)
 {
   if (m_channelGroupLevel == t_channelGroupLevel)
     return;
@@ -255,7 +256,7 @@ void DmxValue::setChannelGroupLevel(quint8 t_channelGroupLevel)
   emit channelGroupLevelChanged(m_channelGroupLevel);
 }
 
-void DmxValue::setSelectedSceneLevel(quint8 t_selectedSceneLevel)
+void DmxValue::setSelectedSceneLevel(dmx t_selectedSceneLevel)
 {
   if (m_selectedSceneLevel == t_selectedSceneLevel)
     return;
@@ -263,7 +264,7 @@ void DmxValue::setSelectedSceneLevel(quint8 t_selectedSceneLevel)
   emit selectedSceneLevelChanged(m_selectedSceneLevel);
 }
 
-void DmxValue::setNextSceneLevel(quint8 t_nextSceneLevel)
+void DmxValue::setNextSceneLevel(dmx t_nextSceneLevel)
 {
   if (m_nextSceneLevel == t_nextSceneLevel)
     return;
@@ -272,16 +273,16 @@ void DmxValue::setNextSceneLevel(quint8 t_nextSceneLevel)
 }
 
 void DmxValue::setControledChildLevel(SignalSenderType t_senderType,
-                             int t_index,
-                             quint8 t_level)
+                                      int t_index,
+                                      dmx t_level)
 {
   if (t_index && (t_index < m_L_controledValue.size()))
-  m_L_controledValue.at(t_index)->setLevel(t_senderType,
-                                     t_level);
+    m_L_controledValue.at(t_index)->setLevel(t_senderType,
+                                             t_level);
 }
 
 void DmxValue::setStoredLevel(int t_childIndex,
-                              quint8 t_level)
+                              dmx t_level)
 {
   if (t_childIndex < 0
       || t_childIndex >= m_L_storedLevels.size())
@@ -292,14 +293,14 @@ void DmxValue::setStoredLevel(int t_childIndex,
   m_L_storedLevels[t_childIndex] = t_level;
 }
 
-void DmxValue::setID(int t_ID)
+void DmxValue::setID(id t_ID)
 {
   if (m_ID == t_ID)
     return;
   m_ID = t_ID;
 }
 
-void DmxValue::setPropertyLevel(int t_level)
+void DmxValue::setPropertyLevel(dmx t_level)
 {
   if (m_level == t_level
       || (t_level < 0)
@@ -308,8 +309,8 @@ void DmxValue::setPropertyLevel(int t_level)
 
   m_level = t_level;
   // TODO : implement that
-//  emit levelChanged(/*m_ID,*/
-//                    m_level);
+  //  emit levelChanged(/*m_ID,*/
+  //                    m_level);
 
 }
 
@@ -319,7 +320,7 @@ void DmxValue::addControledChild(DmxValue *t_dmxValue)
   if(t_dmxValue && !m_L_controledValue.contains(t_dmxValue))
   {
     m_L_controledValue.append(t_dmxValue);
-    quint8 storedLevel = 0;
+    dmx storedLevel = 0;
     m_L_storedLevels.append(storedLevel);
     emit m_L_controledValueChanged();
   }
@@ -342,7 +343,7 @@ bool DmxValue::removeControledChild(const DmxValue *t_dmxValue)
   if(t_dmxValue)
   {
     int index = m_L_controledValue.indexOf(t_dmxValue);
-//    and if the output is in the list.
+    //    and if the output is in the list.
     if(index)
     {
       m_L_controledValue.removeAt(index);
@@ -353,7 +354,7 @@ bool DmxValue::removeControledChild(const DmxValue *t_dmxValue)
     }
   }
   qWarning() << "pointer is null or output is not in the list."
-           << "can't remove value";
+             << "can't remove value";
   return false;
 }
 
@@ -389,9 +390,9 @@ void DmxValue::addChildValue(DmxValue * t_dmxValue)
   if(t_dmxValue && !m_L_childValue.contains(t_dmxValue))
   {
     m_L_childValue.append(t_dmxValue);
-    quint8 storedLevel = 0;
-//    m_L_storedLevels.append(storedLevel);
-//    emit m_L_childValueChanged();
+    dmx storedLevel = 0;
+    //    m_L_storedLevels.append(storedLevel);
+    //    emit m_L_childValueChanged();
   }
   else
     qWarning() << "cant add child value";

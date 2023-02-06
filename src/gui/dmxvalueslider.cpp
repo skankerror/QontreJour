@@ -38,16 +38,16 @@ DmxValueSlider::DmxValueSlider(DmxValue *t_dmxValue,
           SLOT(updateLevel(int)));
 
   connect(m_dmxValue,
-          SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
           this,
-          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,quint8)));
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
 }
 
 DmxValueSlider::~DmxValueSlider()
 {}
 
-void DmxValueSlider::unMoveSlider(quint8 t_level)
+void DmxValueSlider::unMoveSlider(dmx t_level)
 {
   // we disconnect to avoid connecting loop
   disconnect(this,
@@ -74,7 +74,7 @@ void DmxValueSlider::updateLevel(int t_level)
 }
 
 void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
-                                         quint8 t_level)
+                                         dmx t_level)
 {
   Q_UNUSED(t_type)
 
@@ -112,9 +112,9 @@ SubmasterSlider::SubmasterSlider(DmxValue *t_dmxChannelGroup,
           SLOT(updateLevel(int)));
 
   connect(m_channelGroup,
-          SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
           this,
-          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,quint8)));
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
 }
 

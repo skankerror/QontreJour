@@ -33,7 +33,7 @@ class DmxUniverse
 public:
 
   // cstr
-  explicit DmxUniverse(int t_universeID,
+  explicit DmxUniverse(uid t_universeID,
                        int t_outputCount = UNIVERSE_OUTPUT_COUNT_DEFAULT,
                        QObject *parent = nullptr);
 
@@ -41,33 +41,33 @@ public:
   ~DmxUniverse();
 
   // getters
-  int getID() const { return m_ID; }
+  uid getID() const { return m_ID; }
   int getOutputCount() const { return m_outputCount; }
   QDmxDevice* getDmxDevice() const { return m_dmxDevice; }
   bool isConnected() const { return m_isConnected; }
   QList<DmxValue *> getL_dmxChannel() const { return m_L_dmxChannel; }
 
   // setters
-  void setID(int t_ID) { m_ID = t_ID; }
+  void setID(uid t_ID) { m_ID = t_ID; }
   void setDmxDevice(QDmxDevice *t_dmxDevice) { m_dmxDevice = t_dmxDevice; }
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 
 
 signals:
 
-  void dmxOutputUpdateRequired(int, // output id
-                               int); // level
+  void dmxOutputUpdateRequired(id, // output id
+                               dmx ); // level
 
 private slots:
 
-  void onRequestDmxUpdate(int t_ID,
-                          quint8 t_level);
+  void onRequestDmxUpdate(id t_ID,
+                          dmx t_level);
 
 private:
 
   QList<DmxValue *> m_L_dmxOutput;
   QList<DmxValue *> m_L_dmxChannel;
-  int m_ID;
+  uid m_ID;
   int m_outputCount;
 
   QDmxDevice *m_dmxDevice;

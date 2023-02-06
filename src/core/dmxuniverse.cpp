@@ -18,7 +18,7 @@
 #include "dmxuniverse.h"
 #include <QDebug>
 
-DmxUniverse::DmxUniverse(int t_universeID,
+DmxUniverse::DmxUniverse(uid t_universeID,
                          int t_outputCount/* = 512 */,
                          QObject *parent)
   : QObject(parent),
@@ -33,19 +33,11 @@ DmxUniverse::DmxUniverse(int t_universeID,
   for (int i = 0; i < m_outputCount; i++)
   {
     // create output and channel
-//    auto dmxOutput = new DmxValue(m_ID, // universeID
-//                                  i, // first output will be id 0
-//                                  this,
-//                                  DmxValue::Output);
     auto dmxOutput = new DmxValue(DmxValue::Output,
                                   m_rootOutput);
     dmxOutput->setUniverseID(m_ID);
     dmxOutput->setID(i);
 
-//    auto dmxChannel = new DmxValue(m_ID,
-//                                   i,
-//                                   this,
-//                                   DmxValue::Channel);
     auto dmxChannel = new DmxValue(DmxValue::Channel,
                                    m_rootChannel);
     dmxChannel->setUniverseID(m_ID);
@@ -58,18 +50,14 @@ DmxUniverse::DmxUniverse(int t_universeID,
     m_L_dmxOutput.append(dmxOutput);
 
     connect(dmxChannel,
-            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
+            SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
             dmxOutput,
-            SLOT(setLevel(DmxValue::SignalSenderType,quint8)));
+            SLOT(setLevel(DmxValue::SignalSenderType,dmx)));
 
-//    connect(dmxOutput,
-//            SIGNAL(levelChanged(DmxValue::SignalSenderType,quint8)),
-//            this,
-//            SLOT(onOutputLevelChanged(DmxValue::SignalSenderType,quint8)));
     connect(dmxOutput,
-            SIGNAL(requestDmxUpdate(int,quint8)),
+            SIGNAL(requestDmxUpdate(id,dmx)),
             this,
-            SLOT(onRequestDmxUpdate(int,quint8)));
+            SLOT(onRequestDmxUpdate(id,dmx)));
 
 
   }
@@ -100,8 +88,8 @@ DmxUniverse::~DmxUniverse()
 
 }
 
-void DmxUniverse::onRequestDmxUpdate(int t_ID,
-                                     quint8 t_level)
+void DmxUniverse::onRequestDmxUpdate(id t_ID,
+                                     dmx t_level)
 {
   if (!m_isConnected)
     return;

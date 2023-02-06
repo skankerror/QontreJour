@@ -41,13 +41,13 @@ public:
 
 public slots :
 
-  void unMoveSlider(quint8 t_level);
+  void unMoveSlider(dmx t_level);
 
 protected slots :
 
   virtual void updateLevel(int t_level);
   virtual void onValueLevelChanged(DmxValue::SignalSenderType t_type,
-                                   quint8 t_level);
+                                   dmx t_level);
 
 protected :
 
