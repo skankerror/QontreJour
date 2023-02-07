@@ -31,7 +31,7 @@ class ValueSlidersWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit ValueSlidersWidget(QWidget *parent = nullptr);
 
@@ -42,9 +42,7 @@ public:
   // setters
   void setL_sliders(const QList<DmxValueSlider *> &t_L_sliders);
 
-signals:
-
-public slots:
+public slots :
 
   virtual void populateWidget() = 0;
 
@@ -69,7 +67,7 @@ class DirectChannelWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DirectChannelWidget(QWidget *parent = nullptr);
 
@@ -85,7 +83,7 @@ class SubmasterWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit SubmasterWidget(QWidget *parent = nullptr);
 
@@ -103,7 +101,7 @@ class DmxValueSlider
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DmxValueSlider(QWidget *parent = nullptr);
 

@@ -34,12 +34,12 @@ class MainWindow
 
   Q_OBJECT
 
-public:
+public :
 
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-private:
+private :
 
   void createCentralWidget();
   QWidget * createDmxManagerContainerWidget();
@@ -47,17 +47,17 @@ private:
 
   void createConnections();
 
-signals:
+signals :
 
   void universeCountChanged(int);
 
-private slots:
+private slots :
 
   void addDmxManagerWidget();
   void removeDmxManagerWidget();
   void setDirectChannelWidget(int t_universeID);
 
-private:
+private :
 
   DirectChannelWidget *m_directChannelWidget;
   QVBoxLayout *m_dmxManagerContainerLayout;

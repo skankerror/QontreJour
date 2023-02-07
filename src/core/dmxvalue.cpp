@@ -61,7 +61,16 @@ DmxValue::DmxValue(ValueType t_type,
 
 DmxValue::~DmxValue()
 {
-  DmxValue::clearList();
+  // useful for root values, scenes
+  for (const auto &item
+       : std::as_const(m_L_childValue))
+  {
+    item->deleteLater();
+  }
+  m_L_childValue.clear();
+  m_L_childValue.squeeze();
+
+  DmxValue::clearControledList();
 }
 
 dmx DmxValue::getControledValueLevel(int t_index)
@@ -381,15 +390,12 @@ bool DmxValue::removeControledChildren(const QList<DmxValue *> t_m_L_controledVa
   return ret;
 }
 
-void DmxValue::clearList()
+void DmxValue::clearControledList()
 {
   m_L_controledValue.clear();
   m_L_storedLevels.clear();
-  // emit signal ?
   m_L_controledValue.squeeze();
   m_L_storedLevels.squeeze();
-  // NOTE : do not destroy value args
-  // universe or ? have to do it.
 }
 
 void DmxValue::addChildValue(DmxValue * t_dmxValue)

@@ -29,7 +29,12 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     m_rootChannel(new DmxValue(DmxValue::RootChannel)),
     m_rootOutput(new DmxValue(DmxValue::RootOutput))
 {
-  for (int i = 0; i < m_outputCount; i++)
+  m_rootChannel->setUniverseID(m_ID);
+  m_rootOutput->setUniverseID(m_ID);
+
+  for (int i = 0;
+       i < m_outputCount;
+       i++)
   {
     // create output and channel
     auto dmxOutput = new DmxValue(DmxValue::Output,
@@ -42,11 +47,11 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     dmxChannel->setUniverseID(m_ID);
     dmxChannel->setID(i);
 
-//    dmxChannel->setType(DmxValue::Channel);
     // we start with straight patch
     dmxChannel->addControledChild(dmxOutput);
-    m_L_dmxChannel.append(dmxChannel);
-    m_L_dmxOutput.append(dmxOutput);
+
+    m_rootChannel->addChildValue(dmxChannel);
+    m_rootOutput->addChildValue(dmxOutput);
 
     connect(dmxChannel,
             SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
@@ -64,27 +69,9 @@ DmxUniverse::DmxUniverse(uid t_universeID,
 
 DmxUniverse::~DmxUniverse()
 {
-  // TODO : check that !
-  // do not delete if universe is involved in scene or channel group !
-
   // détruire output et channel !
-  for (const auto &item : std::as_const(m_L_dmxOutput))
-  {
-    item->deleteLater();
-  }
-
-  for (const auto &item : std::as_const(m_L_dmxChannel))
-  {
-    item->deleteLater();
-  }
-
-  m_L_dmxOutput.clear();
-  m_L_dmxOutput.squeeze();
-  m_L_dmxChannel.clear();
-  m_L_dmxChannel.squeeze();
-//  if (DmxUniverse::isConnected)
-//    m_dmxDevice->deleteLater();
-
+  m_rootChannel->deleteLater();
+  m_rootOutput->deleteLater();
 }
 
 void DmxUniverse::onRequestDmxUpdate(id t_ID,

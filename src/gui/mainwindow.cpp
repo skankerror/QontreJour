@@ -88,7 +88,8 @@ void MainWindow::setDirectChannelWidget(int t_universeID)
 {
   auto L_dmxChannel = m_L_dmxManagerWidget.at(t_universeID)
       ->getDmxUniverse()
-      ->getL_dmxChannel();
+      ->getRootChannel()
+      ->getL_childValue();
   auto L_directChannelSlider = QList<DmxValueSlider *>();
   for (const auto &item : std::as_const(L_dmxChannel))
   {
@@ -126,7 +127,6 @@ void MainWindow::createDockWidgets()
 
   auto topDock = new QDockWidget(this);
   topDock->setAllowedAreas(Qt::TopDockWidgetArea);
-
   topDock->setWidget(sequencerWidget);
   topDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::TopDockWidgetArea, topDock);
@@ -155,7 +155,7 @@ void MainWindow::addDmxManagerWidget()
   // we get his universe to get *DmxChannel to set
   // model and delegatefor channel view
   auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
-  auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+  auto L_dmxChannel = dmxUniverse->getRootChannel()->getL_childValue();
   QList<DmxValue *> m_L_controledValue;
 
   // we connect to update views
@@ -170,7 +170,7 @@ void MainWindow::addDmxManagerWidget()
     m_L_controledValue.append(value);
   }
 
-  m_dmxChannelTableWidget->setL_controledValue(m_L_controledValue);
+  m_dmxChannelTableWidget->setRootValue(dmxUniverse->getRootChannel());
   m_dmxChannelTableWidget->setUniverseID(m_universeCount); // count has not been ++ yet
 
   m_universeCount++;
@@ -192,7 +192,7 @@ void MainWindow::removeDmxManagerWidget()
     // on remet le channel output widget au bon endroit
     dmxManagerWidget = m_L_dmxManagerWidget.first(); // we get first universe
     auto dmxUniverse = dmxManagerWidget->getDmxUniverse();
-    auto L_dmxChannel = dmxUniverse->getL_dmxChannel();
+    auto L_dmxChannel = dmxUniverse->getRootChannel()->getL_childValue();
     QList<DmxValue *> m_L_controledValue;
 
     for (const auto &item : std::as_const(L_dmxChannel))
@@ -204,7 +204,7 @@ void MainWindow::removeDmxManagerWidget()
       DmxValue *value = item;
       m_L_controledValue.append(value);
     }
-    m_dmxChannelTableWidget->setL_controledValue(m_L_controledValue);
+    m_dmxChannelTableWidget->setRootValue(dmxUniverse->getRootChannel());
     m_dmxChannelTableWidget->setUniverseID(m_universeCount - 1);
   }
 }

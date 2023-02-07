@@ -18,8 +18,6 @@
 #ifndef DMXUNIVERSE_H
 #define DMXUNIVERSE_H
 
-//#include <QObject>
-//#include <QList>
 #include "dmxvalue.h"
 #include "../qontrejour.h"
 #include "qdmxlib/QDmxManager"
@@ -30,7 +28,7 @@ class DmxUniverse
 
   Q_OBJECT
 
-public:
+public :
 
   // cstr
   explicit DmxUniverse(uid t_universeID,
@@ -45,7 +43,8 @@ public:
   int getOutputCount() const { return m_outputCount; }
   QDmxDevice* getDmxDevice() const { return m_dmxDevice; }
   bool isConnected() const { return m_isConnected; }
-  QList<DmxValue *> getL_dmxChannel() const { return m_L_dmxChannel; }
+  DmxValue *getRootChannel() const{ return m_rootChannel; }
+  DmxValue *getRootOutput() const{ return m_rootOutput; }
 
   // setters
   void setID(uid t_ID) { m_ID = t_ID; }
@@ -53,27 +52,31 @@ public:
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 
 
-signals:
+
+signals :
 
   void dmxOutputUpdateRequired(id, // output id
                                dmx ); // level
 
-private slots:
+public slots :
+
+  void setOutputCount(int t_outputCount){ m_outputCount = t_outputCount; }
+
+
+private slots :
 
   void onRequestDmxUpdate(id t_ID,
                           dmx t_level);
 
-private:
+private :
 
-  QList<DmxValue *> m_L_dmxOutput;
-  QList<DmxValue *> m_L_dmxChannel;
   uid m_ID;
   int m_outputCount;
 
   QDmxDevice *m_dmxDevice;
   bool m_isConnected;
 
-  // root value, parent of all values created for this universe
+  // root values, parents of all values created for this universe
   DmxValue *m_rootChannel;
   DmxValue *m_rootOutput;
 

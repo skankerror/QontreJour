@@ -50,8 +50,8 @@ signals :
 public slots:
 
   void onUniverseCountChanged(int t_universeCount);
-  void setL_controledValue(const QList<DmxValue *> t_m_L_controledValue);
   void setUniverseID(const int t_ID);
+  void setRootValue(DmxValue *t_rootValue);
 
 protected slots :
 
@@ -119,34 +119,41 @@ public:
 
   virtual ~DmxValueTableModel();
 
-  QList<DmxValue *> getL_controledValue() const { return m_L_controledValue; }
+  DmxValue *getRootValue() const{ return m_rootValue; }
   uid getUniverseID() const { return m_universeID; }
   QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
 
-  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue)
-  { m_L_controledValue = t_m_L_controledValue; }
-  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
-
-
 public slots:
 
-  void setEditedIndexes(const QModelIndexList &t_editedIndexes)
-  { m_editedIndexes = t_editedIndexes; }
-  void addEditedIndex(QModelIndex &t_editedIndexes)
-  { m_editedIndexes.append(t_editedIndexes); }
+  void setRootValue(DmxValue *t_rootValue){ m_rootValue = t_rootValue; }
+  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
+  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
+
+  void addEditedIndex(QModelIndex &t_editedIndexes);
 
   void clearSelectionList();
   void selectAll();
 
+
+private slots :
+
+  void editedIndexChanged();
 
 protected :
 
   int rowCount(const QModelIndex &parent) const override;
   int columnCount(const QModelIndex &parent) const override;
   QVariant data(const QModelIndex &index, int role) const override;
-  bool setData(const QModelIndex &index, const QVariant &value, int role) override;
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role) override;
+  bool setData(const QModelIndex &index,
+               const QVariant &value,
+               int role) override;
+  QVariant headerData(int section,
+                      Qt::Orientation orientation,
+                      int role) const override;
+  bool setHeaderData(int section,
+                     Qt::Orientation orientation,
+                     const QVariant &value,
+                     int role) override;
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private :
@@ -156,8 +163,8 @@ private :
 
 protected :
 
-  QList<DmxValue *> m_L_controledValue;
   uid m_universeID;
+  DmxValue *m_rootValue;
   QModelIndexList m_editedIndexes;
 
 };

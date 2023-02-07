@@ -101,12 +101,6 @@ void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
 
 }
 
-void DmxValueTableWidget::setL_controledValue(const QList<DmxValue *> t_m_L_controledValue)
-{
-  m_model->setL_controledValue(t_m_L_controledValue);
-
-}
-
 void DmxValueTableWidget::setUniverseID(const int t_ID)
 {
   m_model->setUniverseID(t_ID);
@@ -123,6 +117,11 @@ void DmxValueTableWidget::setUniverseID(const int t_ID)
           this,
           SLOT(onSpinboxSelected(int)));
 
+}
+
+void DmxValueTableWidget::setRootValue(DmxValue *t_rootValue)
+{
+  m_model->setRootValue(t_rootValue);
 }
 
 void DmxValueTableWidget::onSpinboxSelected(int t_universeID)
@@ -214,11 +213,24 @@ DmxValueTableModel::DmxValueTableModel(QObject *parent)
 DmxValueTableModel::~DmxValueTableModel()
 {}
 
+void DmxValueTableModel::setEditedIndexes(const QModelIndexList &t_editedIndexes)
+{
+  m_editedIndexes = t_editedIndexes;
+  editedIndexChanged();
+}
+
+void DmxValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
+{
+  m_editedIndexes.append(t_editedIndexes);
+  editedIndexChanged();
+}
+
 QModelIndexList DmxValueTableModel::getNon0ValueIndexList() const
 {
   auto listRet = QModelIndexList();
+  auto L_childValue = m_rootValue->getL_childValue();
   for(const auto &item
-      : std::as_const(m_L_controledValue))
+      : std::as_const(L_childValue))
   {
     if (item->getLevel() > 0) // TODO : problem with parked independant
     {
@@ -244,11 +256,27 @@ QModelIndex DmxValueTableModel::getIndexFromValue(const DmxValue *t_value) const
 void DmxValueTableModel::clearSelectionList()
 {
   m_editedIndexes.clear();
+//  editedIndexChanged();
+  emit dataChanged(index(0,0),index(31,31)); // NOTE : BEURK !!
 }
 
 void DmxValueTableModel::selectAll()
 {
   m_editedIndexes = getNon0ValueIndexList();
+  editedIndexChanged();
+}
+
+void DmxValueTableModel::editedIndexChanged()
+{
+  // we try to change the background of selected channels
+  for (const auto &item
+       : std::as_const(m_editedIndexes))
+  {
+    auto myIndex = index(item.row() - 1,
+                         item.column());
+    emit dataChanged(myIndex,
+                     myIndex);
+  }
 }
 
 int DmxValueTableModel::rowCount(const QModelIndex &parent) const
@@ -271,12 +299,11 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
   {
     int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column();
-    if (valueID < 0 || valueID >= m_L_controledValue.size())
+    if (valueID < 0 || valueID >= /*m_L_controledValue.size()*/m_rootValue->getL_ChildValueSize())
       return QVariant();
 
-    auto dmxValue = m_L_controledValue.at(valueID);
+    auto dmxValue = /*m_L_controledValue.at*/m_rootValue->getL_childValue().at(valueID);
     DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
-
 
     switch(role)
     {
@@ -314,7 +341,6 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
       default:
         break;
       }
-
     default:
       return QVariant();
       break;
@@ -324,6 +350,8 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
   {
     int ret = ((index.row() / 2 ) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column() + 1;
+    auto relatedIndex = QAbstractTableModel::index(index.row() + 1,
+                                                   index.column());
     switch(role)
     {
     case Qt::DisplayRole :
@@ -333,8 +361,12 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
     case Qt::TextAlignmentRole :
       return Qt::AlignCenter;
       break;
-    case Qt::BackgroundRole:
-      return QBrush(LIGHT_BLUE_COLOR);
+    case Qt::BackgroundRole :
+      if ((m_editedIndexes.size() == 0)
+          || (m_editedIndexes.indexOf(relatedIndex) == -1))
+        return QBrush(LIGHT_BLUE_COLOR);
+      else
+        return QBrush(LIGHT_YELLOW_COLOR);
       break;
     default:
       return QVariant();
@@ -353,7 +385,7 @@ bool DmxValueTableModel::setData(const QModelIndex &index,
 
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-  auto dmxValue = m_L_controledValue.at(valueID);
+  auto dmxValue = /*m_L_controledValue.at*/m_rootValue->getL_childValue().at(valueID);
   // NOTE : it's ok for the moment, but if we create widget xith channelgroup ?
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());

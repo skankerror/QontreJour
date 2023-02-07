@@ -52,7 +52,7 @@ class DmxValue
 
   Q_OBJECT
 
-public:
+public :
 
   enum ValueType
   {
@@ -155,7 +155,7 @@ public:
   void addControledChildren(const QList<DmxValue *> t_m_L_controledValue);
   bool removeControledChild(const DmxValue *t_dmxValue);
   bool removeControledChildren(const QList<DmxValue *> t_m_L_controledValue);
-  void clearList();
+  void clearControledList();
 
   void addChildValue(DmxValue *t_dmxValue);
 
@@ -169,7 +169,7 @@ protected :
   void setChannelGroupLevel(SignalSenderType t_senderType,
                             dmx t_level);
 
-signals:
+signals :
 
   void levelChanged(DmxValue::SignalSenderType,
                     dmx t_level);
@@ -184,7 +184,7 @@ signals:
 
   void blockDirectChannelSlider(dmx t_level);
 
-public slots:
+public slots :
 
   void setLevel(DmxValue::SignalSenderType t_senderType,
                         dmx t_level);

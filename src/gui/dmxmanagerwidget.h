@@ -32,7 +32,7 @@ class DmxManagerWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DmxManagerWidget(int t_universeID,
                             QWidget *parent = nullptr);
@@ -41,19 +41,20 @@ public:
   // getters
   DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
 
-private:
+private :
 
   void CreateWidget();
   void CreateConnections();
 
-signals:
+signals :
 
-private slots:
+private slots :
 
   void PopulateDevices(const QString &t_driverString = "dummy");
   void Connect();
   void disConnect();
-private:
+
+private :
 
   QLabel *m_universeIDLabel;
   QComboBox *m_dmxDriversComboBox;

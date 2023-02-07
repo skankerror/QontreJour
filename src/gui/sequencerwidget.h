@@ -35,13 +35,11 @@ class SequencerWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit SequencerWidget(QWidget *parent = nullptr);
 
   virtual ~SequencerWidget();
-
-signals:
 
 protected :
 
@@ -58,7 +56,7 @@ class SequencerTreeView
 
   Q_OBJECT
 
-public:
+public :
 
   explicit SequencerTreeView(QWidget *parent = nullptr);
 
@@ -74,7 +72,7 @@ class SequencerTreeModel
 
   Q_OBJECT
 
-public:
+public :
 
   enum HeaderField
   {

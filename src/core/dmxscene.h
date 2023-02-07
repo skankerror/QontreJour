@@ -27,7 +27,7 @@ class DmxScene :
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DmxScene(DmxValue::ValueType t_type /*= Scene*/,
                     DmxScene *t_parent = nullptr);
@@ -52,8 +52,6 @@ public:
 public slots :
 
   void setStepNumber(int t_stepNumber){ m_stepNumber = t_stepNumber; }
-
-signals:
 
 protected :
 
