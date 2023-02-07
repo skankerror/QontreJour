@@ -58,10 +58,6 @@ protected slots :
   void onSpinboxSelected(int t_universeID);
   void repaintTableView();
 
-  void selectAll();
-  void recGroup();
-  void recScene();
-
 protected :
 
   DmxValueTableView *m_tableView;
@@ -101,15 +97,10 @@ signals :
   void beginMouseEditing(QModelIndex, QPoint);
   void endMouseEditing();
 
-public slots :
-
-  void clearSelectionList();
-
 protected :
 
   bool m_isEditing = false;
   QPoint m_originEditingPoint;
-  QModelIndexList m_editedIndexes;
 
 };
 
@@ -129,10 +120,23 @@ public:
   virtual ~DmxValueTableModel();
 
   QList<DmxValue *> getL_controledValue() const { return m_L_controledValue; }
-  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue){ m_L_controledValue = t_m_L_controledValue; }
-  int getUniverseID() const { return m_universeID; }
-  void setUniverseID(int t_universeID) { m_universeID = t_universeID; }
+  uid getUniverseID() const { return m_universeID; }
+  QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
 
+  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue)
+  { m_L_controledValue = t_m_L_controledValue; }
+  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
+
+
+public slots:
+
+  void setEditedIndexes(const QModelIndexList &t_editedIndexes)
+  { m_editedIndexes = t_editedIndexes; }
+  void addEditedIndex(QModelIndex &t_editedIndexes)
+  { m_editedIndexes.append(t_editedIndexes); }
+
+  void clearSelectionList();
+  void selectAll();
 
 
 protected :
@@ -145,10 +149,16 @@ protected :
   bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role) override;
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+private :
+
+  QModelIndex getIndexFromValue(const DmxValue *t_value ) const;
+  QModelIndexList getNon0ValueIndexList() const;
+
 protected :
 
   QList<DmxValue *> m_L_controledValue;
-  int m_universeID;
+  uid m_universeID;
+  QModelIndexList m_editedIndexes;
 
 };
 

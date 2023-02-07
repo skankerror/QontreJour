@@ -22,7 +22,6 @@
 #include <QList>
 #include <QPushButton>
 #include "dmxmanagerwidget.h"
-//#include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
 #include "valuesliderswidget.h"

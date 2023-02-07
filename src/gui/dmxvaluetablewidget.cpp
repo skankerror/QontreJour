@@ -79,8 +79,13 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
 
   connect (m_clearSelectionButton,
            SIGNAL(clicked(bool)),
-           m_tableView,
+           m_model,
            SLOT(clearSelectionList()));
+
+  connect(m_selectAll,
+          SIGNAL(clicked(bool)),
+          m_model,
+          SLOT(selectAll()));
 
 }
 
@@ -130,20 +135,6 @@ void DmxValueTableWidget::repaintTableView()
   emit m_model->layoutChanged();
 }
 
-void DmxValueTableWidget::selectAll()
-{
-
-}
-
-void DmxValueTableWidget::recGroup()
-{
-
-}
-
-void DmxValueTableWidget::recScene()
-{
-
-}
 
 /*************************************************************************/
 
@@ -154,12 +145,6 @@ DmxValueTableView::DmxValueTableView(QWidget *parent)
 DmxValueTableView::~DmxValueTableView()
 {}
 
-void DmxValueTableView::clearSelectionList()
-{
-  m_editedIndexes.clear();
-  clearSelection();
-}
-
 void DmxValueTableView::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton)
@@ -167,9 +152,15 @@ void DmxValueTableView::mousePressEvent(QMouseEvent *event)
     auto index = indexAt(event->pos());
     if (index.flags().testFlag(Qt::ItemIsEditable))
     {
+      auto myModel = static_cast<DmxValueTableModel *>(model());
+      auto indexList = myModel->getEditedIndexes();
       m_isEditing = true;
       m_originEditingPoint = event->pos();
-      m_editedIndexes.append(index);
+      if (indexList.indexOf(index) == -1) // si l'index n'est pas ds la selection
+      {
+        myModel->clearSelectionList(); // on clear
+        myModel->addEditedIndex(index); // on ajoute notre index
+      }
       return;
     }
   }
@@ -178,10 +169,8 @@ void DmxValueTableView::mousePressEvent(QMouseEvent *event)
 
 void DmxValueTableView::mouseReleaseEvent(QMouseEvent *event)
 {
-  if (m_isEditing)
-  {
-    m_isEditing = false;
-  }
+  if (m_isEditing) m_isEditing = false;
+
   QTableView::mouseReleaseEvent(event);
 }
 
@@ -194,14 +183,21 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
 {
   if (m_isEditing)
   {
-    for (const auto &item : std::as_const(m_editedIndexes))
+    auto myModel = static_cast<DmxValueTableModel *>(model());
+    auto indexList = myModel->getEditedIndexes();
+
+    for (const auto &item
+         : std::as_const(indexList))
     {
       auto value = item.data().toInt();
-      auto yValue = event->pos().y() - m_originEditingPoint.y();
+      auto yValue = event->pos().y()
+          - m_originEditingPoint.y();
       value -= yValue;
       if (value > 255) value = 255;
       if (value < 0) value = 0;
-      model()->setData(item, value, Qt::EditRole);
+      model()->setData(item,
+                       value,
+                       Qt::EditRole);
     }
     m_originEditingPoint = event->pos();
     return;
@@ -218,6 +214,43 @@ DmxValueTableModel::DmxValueTableModel(QObject *parent)
 DmxValueTableModel::~DmxValueTableModel()
 {}
 
+QModelIndexList DmxValueTableModel::getNon0ValueIndexList() const
+{
+  auto listRet = QModelIndexList();
+  for(const auto &item
+      : std::as_const(m_L_controledValue))
+  {
+    if (item->getLevel() > 0) // TODO : problem with parked independant
+    {
+      auto index = getIndexFromValue(item);
+      listRet.append(index);
+    }
+  }
+  return listRet;
+}
+
+QModelIndex DmxValueTableModel::getIndexFromValue(const DmxValue *t_value) const
+{
+  auto valueID = t_value->getID();
+  // determine row et column for the value
+  auto row =  (2 * (valueID / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT)) + 1;
+  auto column = valueID % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT;
+
+  auto indexRet = index(row,
+                        column);
+  return indexRet;
+}
+
+void DmxValueTableModel::clearSelectionList()
+{
+  m_editedIndexes.clear();
+}
+
+void DmxValueTableModel::selectAll()
+{
+  m_editedIndexes = getNon0ValueIndexList();
+}
+
 int DmxValueTableModel::rowCount(const QModelIndex &parent) const
 {
   return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT;
@@ -228,7 +261,8 @@ int DmxValueTableModel::columnCount(const QModelIndex &parent) const
   return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT;
 }
 
-QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
+QVariant DmxValueTableModel::data(const QModelIndex &index,
+                                  int role) const
 {
   if (!index.isValid())
     return QVariant();
@@ -285,8 +319,6 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
       return QVariant();
       break;
     }
-
-    //    return dmxChannel->getChannelID(); // just to test it
   }
   else
   {
@@ -312,7 +344,9 @@ QVariant DmxValueTableModel::data(const QModelIndex &index, int role) const
 
 }
 
-bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool DmxValueTableModel::setData(const QModelIndex &index,
+                                 const QVariant &value,
+                                 int role)
 {
   if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
     return false;
@@ -320,6 +354,7 @@ bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
   auto dmxValue = m_L_controledValue.at(valueID);
+  // NOTE : it's ok for the moment, but if we create widget xith channelgroup ?
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());
 
@@ -328,12 +363,17 @@ bool DmxValueTableModel::setData(const QModelIndex &index, const QVariant &value
   return true;
 }
 
-QVariant DmxValueTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant DmxValueTableModel::headerData(int section,
+                                        Qt::Orientation orientation,
+                                        int role) const
 {
   return QVariant();
 }
 
-bool DmxValueTableModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
+bool DmxValueTableModel::setHeaderData(int section,
+                                       Qt::Orientation orientation,
+                                       const QVariant &value,
+                                       int role)
 {
   return true;
 }
@@ -354,3 +394,4 @@ Qt::ItemFlags DmxValueTableModel::flags(const QModelIndex &index) const
   return QAbstractTableModel::flags(index);
 
 }
+
