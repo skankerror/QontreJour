@@ -46,8 +46,7 @@ public slots :
 
   virtual void populateWidget() = 0;
 
-  void setRootValue(DmxValue *t_rootValue)
-  { m_rootValue = t_rootValue; }
+  void setRootValue(DmxValue *t_rootValue);
 
 protected :
 

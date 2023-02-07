@@ -22,20 +22,20 @@
 
 ValueSlidersWidget::ValueSlidersWidget(QWidget *parent)
   : QWidget(parent),
-  m_stackedLayout(new QStackedLayout()),
-  m_changePageComboBox(new QComboBox(this))
+    m_stackedLayout(new QStackedLayout()),
+    m_changePageComboBox(new QComboBox(this))
 {
-auto totalLayout = new QVBoxLayout();
-totalLayout->addWidget(m_changePageComboBox);
-totalLayout->addLayout(m_stackedLayout);
-setLayout(totalLayout);
+  auto totalLayout = new QVBoxLayout();
+  totalLayout->addWidget(m_changePageComboBox);
+  totalLayout->addLayout(m_stackedLayout);
+  setLayout(totalLayout);
 
-setMinimumHeight(200);
+  setMinimumHeight(200);
 
-connect(m_changePageComboBox,
-        &QComboBox::activated,
-        m_stackedLayout,
-        &QStackedLayout::setCurrentIndex);
+  connect(m_changePageComboBox,
+          &QComboBox::activated,
+          m_stackedLayout,
+          &QStackedLayout::setCurrentIndex);
 }
 
 void ValueSlidersWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders)
@@ -50,6 +50,12 @@ void ValueSlidersWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders
 
 }
 
+void ValueSlidersWidget::setRootValue(DmxValue *t_rootValue)
+{
+  m_rootValue = t_rootValue;
+  populateWidget();
+}
+
 /**********************************************************************/
 
 DirectChannelWidget::DirectChannelWidget(QWidget *parent)
@@ -58,6 +64,21 @@ DirectChannelWidget::DirectChannelWidget(QWidget *parent)
 
 void DirectChannelWidget::populateWidget()
 {
+  // on crée les sliders
+  // TODO : vider avant ?
+  auto L_dmxChannel = m_rootValue->getL_childValue();
+  for (const auto &item : std::as_const(L_dmxChannel))
+  {
+    auto directChannelSlider = new DmxValueSlider(item,
+                                                  this);
+    connect(item,
+            SIGNAL(blockDirectChannelSlider(dmx)),
+            directChannelSlider,
+            SLOT(unMoveSlider(dmx)));
+
+    m_L_sliders.append(directChannelSlider);
+  }
+
   // on crée le 1er widget pour contenir 32 sliders
   int page_count = m_L_sliders.size() / SLIDERS_PER_PAGE;
   if (m_L_sliders.size() > page_count * SLIDERS_PER_PAGE)
@@ -102,7 +123,7 @@ void SubmasterWidget::populateWidget()
 {
   // on crée le 1er widget pour contenir 20 sliders
   int page_count = m_L_sliders.size() / 20;
-//  qDebug() << "page count : " << page_count;
+  //  qDebug() << "page count : " << page_count;
   if (m_L_sliders.size() > page_count * 20)
     page_count++;
 

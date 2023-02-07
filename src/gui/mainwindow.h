@@ -37,6 +37,7 @@ class MainWindow
 public :
 
   explicit MainWindow(QWidget *parent = nullptr);
+
   ~MainWindow();
 
 private :

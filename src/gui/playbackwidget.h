@@ -29,13 +29,11 @@ class PlaybackWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit PlaybackWidget(QWidget *parent = nullptr);
 
-signals:
-
-private:
+private :
 
   QSlider *m_ASlider;
   QLabel *m_ALabel;
@@ -57,13 +55,11 @@ class GrandMasterWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit GrandMasterWidget(QWidget *parent = nullptr);
 
-signals:
-
-private:
+private :
 
   QSlider *m_grandMasterslider;
   QPushButton *m_blackOutButton;

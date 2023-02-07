@@ -37,7 +37,7 @@ class DmxValueTableWidget
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DmxValueTableWidget(QWidget *parent = nullptr);
 
@@ -47,7 +47,7 @@ signals :
 
   void askForUniverseChanged(int); // universeID to ask to mainwindow
 
-public slots:
+public slots :
 
   void onUniverseCountChanged(int t_universeCount);
   void setUniverseID(const int t_ID);
@@ -85,7 +85,7 @@ public :
 
   virtual ~DmxValueTableView();
 
-protected:
+protected :
 
   virtual void mousePressEvent(QMouseEvent *event) override;
   virtual void mouseReleaseEvent(QMouseEvent *event) override;
@@ -113,7 +113,7 @@ class DmxValueTableModel
 
   Q_OBJECT
 
-public:
+public :
 
   explicit DmxValueTableModel(QObject *parent = nullptr);
 
@@ -123,7 +123,7 @@ public:
   uid getUniverseID() const { return m_universeID; }
   QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
 
-public slots:
+public slots :
 
   void setRootValue(DmxValue *t_rootValue){ m_rootValue = t_rootValue; }
   void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }

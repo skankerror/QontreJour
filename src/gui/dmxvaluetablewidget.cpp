@@ -34,6 +34,7 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
     m_recScene(new QPushButton("Rec Scene", this)),
     m_clearSelectionButton(new QPushButton("C", this))
 {
+  m_model->setRootValue(nullptr);
   auto totalLayout = new QVBoxLayout();
   auto headerLayout = new QHBoxLayout();
   auto bottomLayout = new QHBoxLayout();
@@ -60,17 +61,14 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
 
   m_tableView->setSortingEnabled(false);
   m_tableView->setUpdatesEnabled(true);
-  m_tableView->horizontalHeader()->setMinimumSectionSize(30);
-  m_tableView->verticalHeader()->setMinimumSectionSize(20);
+  m_tableView->horizontalHeader()->setMinimumSectionSize(38);
   m_tableView->horizontalHeader()->hide();
   m_tableView->verticalHeader()->hide();
-  m_tableView->resizeColumnsToContents();
 
   m_tableView->setModel(m_model);
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
-  //  m_tableView->setMinimumSize(800, 200);
 
   connect(m_universeSpinBox,
           SIGNAL(valueChanged(int)),
@@ -121,7 +119,19 @@ void DmxValueTableWidget::setUniverseID(const int t_ID)
 
 void DmxValueTableWidget::setRootValue(DmxValue *t_rootValue)
 {
+  // we connect to update views
+  auto L_dmxChannel = t_rootValue->getL_childValue();
   m_model->setRootValue(t_rootValue);
+
+  for (const auto &item : std::as_const(L_dmxChannel))
+  {
+    DmxValue *value = item;
+
+    connect(value,
+            SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+            this,
+            SLOT(repaintTableView()));
+  }
 }
 
 void DmxValueTableWidget::onSpinboxSelected(int t_universeID)
@@ -293,6 +303,9 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
                                   int role) const
 {
   if (!index.isValid())
+    return QVariant();
+
+  if (!m_rootValue)
     return QVariant();
 
   if (index.flags().testFlag(Qt::ItemIsEditable))
