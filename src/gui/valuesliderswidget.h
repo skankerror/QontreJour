@@ -37,7 +37,7 @@ public:
 
   // getters
   QList<DmxValueSlider *> getL_sliders() const { return m_L_sliders; }
-  DmxValue *getRootValue() const{ return m_rootChannel; }
+  DmxValue *getRootValue() const{ return m_rootValue; }
 
   // setters
   void setL_sliders(const QList<DmxValueSlider *> &t_L_sliders);
@@ -48,15 +48,15 @@ public slots:
 
   virtual void populateWidget() = 0;
 
-  void setRootValue(DmxValue *t_rootChannel)
-  { m_rootChannel = t_rootChannel; }
+  void setRootValue(DmxValue *t_rootValue)
+  { m_rootValue = t_rootValue; }
 
 protected :
 
   QStackedLayout *m_stackedLayout;
   QComboBox *m_changePageComboBox;
 
-  DmxValue *m_rootChannel;
+  DmxValue *m_rootValue;
   QList<DmxValueSlider *> m_L_sliders;
 
 };

@@ -49,4 +49,27 @@ private:
 
 };
 
+/****************************************************************/
+
+class GrandMasterWidget
+    : public QWidget
+{
+
+  Q_OBJECT
+
+public:
+
+  explicit GrandMasterWidget(QWidget *parent = nullptr);
+
+signals:
+
+private:
+
+  QSlider *m_grandMasterslider;
+  QPushButton *m_blackOutButton;
+  QLabel *m_grandMasterLabel;
+
+};
+
+
 #endif // PLAYBACKWIDGET_H

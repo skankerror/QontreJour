@@ -20,7 +20,6 @@
 #include <QDockWidget>
 #include "qdmxlib/QDmxManager"
 #include "qdmxlib/QDmxUsbDriver"
-#include "valuesliderswidget.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -59,7 +58,7 @@ QWidget *MainWindow::createDmxManagerContainerWidget()
 {
   auto dmxManagerContainerWidget = new QWidget(this);
   auto addDmxManagerButton = new QPushButton("Add universe",
-                                                dmxManagerContainerWidget);
+                                             dmxManagerContainerWidget);
   auto removeDmxManagerButton = new QPushButton("Remove Universe",
                                                 dmxManagerContainerWidget);
   auto buttonsLayout = new QHBoxLayout();

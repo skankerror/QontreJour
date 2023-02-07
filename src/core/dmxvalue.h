@@ -46,8 +46,6 @@ typedef short uid;
 // ** mother of :
 // ** dmxscene
 
-
-
 class DmxValue
     : public QObject
 {

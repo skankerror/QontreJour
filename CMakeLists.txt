@@ -24,14 +24,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #    endif()
 #endif()
 
-add_subdirectory(libs/QMidi)
-add_subdirectory(libs/QOSC)
+#add_subdirectory(libs/QMidi)
+#add_subdirectory(libs/QOSC)
 #add_subdirectory(libs/QEnttecPro)
 add_subdirectory(libs/QDmxLib)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network SerialPort REQUIRED)
-find_package(ossia REQUIRED)
+#find_package(ossia REQUIRED)
 
 set(TS_FILES QontreJour_fr_GF.ts)
 
@@ -54,8 +54,6 @@ set(PROJECT_SOURCES
         src/gui/dmxvaluetablewidget.cpp
         src/gui/valuesliderswidget.h
         src/gui/valuesliderswidget.cpp
-        src/gui/grandmasterwidget.h
-        src/gui/grandmasterwidget.cpp
         src/gui/playbackwidget.h
         src/gui/playbackwidget.cpp
         ${TS_FILES}
@@ -85,8 +83,8 @@ endif()
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::SerialPort)
-target_link_libraries(QontreJour PRIVATE ossia)
-target_link_libraries(QontreJour PUBLIC QMidi QOSC #[[QEnttecPro]] QDmxLib)
+#target_link_libraries(QontreJour PRIVATE ossia)
+target_link_libraries(QontreJour PUBLIC #[[QMidi QOSC QEnttecPro]] QDmxLib)
 
 set_target_properties(QontreJour PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

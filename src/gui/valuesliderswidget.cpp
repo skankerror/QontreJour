@@ -189,8 +189,16 @@ void DmxValueSlider::updateLevel(int t_level)
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
   if (m_dmxValue->getLevel() == t_level) return;
-  m_dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-                       t_level);
+
+  auto type = m_dmxValue->getType();
+
+  if (type == DmxValue::Channel)
+    m_dmxValue->setLevel(DmxValue::DirectChannelEditSender,
+                         t_level);
+
+  if (type == DmxValue::ChannelGroup)
+    m_dmxValue->setLevel(DmxValue::SubmasterSliderSender,
+                         t_level);
 }
 
 void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,

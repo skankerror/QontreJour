@@ -21,16 +21,12 @@
 #include <QMainWindow>
 #include <QList>
 #include <QPushButton>
-#include <ossia-cpp/ossia-cpp98.hpp>
 #include "dmxmanagerwidget.h"
-#include "grandmasterwidget.h"
+//#include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
-//#include "submasterwidget.h"
-//#include "directchannelwidget.h"
 #include "valuesliderswidget.h"
 #include "dmxvaluetablewidget.h"
-#include "../core/dmxscene.h"
 
 
 class MainWindow
@@ -48,7 +44,6 @@ private:
 
   void createCentralWidget();
   QWidget * createDmxManagerContainerWidget();
-//  SubmasterWidget * createSubmasterWidget();
   void createDockWidgets();
 
   void createConnections();
