@@ -52,12 +52,8 @@ set(PROJECT_SOURCES
         src/gui/sequencerwidget.cpp
         src/gui/dmxvaluetablewidget.h
         src/gui/dmxvaluetablewidget.cpp
-        src/gui/dmxvalueslider.h
-        src/gui/dmxvalueslider.cpp
-        src/gui/submasterwidget.h
-        src/gui/submasterwidget.cpp
-        src/gui/directchannelwidget.h
-        src/gui/directchannelwidget.cpp
+        src/gui/valuesliderswidget.h
+        src/gui/valuesliderswidget.cpp
         src/gui/grandmasterwidget.h
         src/gui/grandmasterwidget.cpp
         src/gui/playbackwidget.h

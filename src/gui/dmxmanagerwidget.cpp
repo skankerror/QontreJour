@@ -43,6 +43,7 @@ DmxManagerWidget::~DmxManagerWidget()
   {
     disConnect();
   }
+  // TODO : keep roots value from universe ?
   m_dmxUniverse->deleteLater();
 }
 

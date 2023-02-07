@@ -36,18 +36,18 @@ public:
 
   // getters
   QString getNotes() const{ return m_notes; }
-  double getTimeIn() const{ return m_timeIn; }
-  double getTimeOut() const{ return m_timeOut; }
-  double getDelayIn() const{ return m_delayIn; }
-  double getDelayOut() const{ return m_delayOut; }
+  float getTimeIn() const{ return m_timeIn; }
+  float getTimeOut() const{ return m_timeOut; }
+  float getDelayIn() const{ return m_delayIn; }
+  float getDelayOut() const{ return m_delayOut; }
   int getStepNumber() const;
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
-  void setTimeIn(double t_timeIn){ m_timeIn = t_timeIn; }
-  void setTimeOut(double t_timeOut){ m_timeOut = t_timeOut; }
-  void setDelayIn(double t_delayIn){ m_delayIn = t_delayIn; }
-  void setDelayOut(double t_delayOut){ m_delayOut = t_delayOut; }
+  void setTimeIn(float t_timeIn){ m_timeIn = t_timeIn; }
+  void setTimeOut(float t_timeOut){ m_timeOut = t_timeOut; }
+  void setDelayIn(float t_delayIn){ m_delayIn = t_delayIn; }
+  void setDelayOut(float t_delayOut){ m_delayOut = t_delayOut; }
 
 public slots :
 
@@ -58,10 +58,10 @@ signals:
 protected :
 
   QString m_notes;
-  double m_timeIn;
-  double m_timeOut;
-  double m_delayIn;
-  double m_delayOut;
+  float m_timeIn;
+  float m_timeOut;
+  float m_delayIn;
+  float m_delayOut;
   int m_stepNumber;
 
 };

@@ -65,11 +65,8 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   scene->setTimeOut(5.0);
   scene->setDelayIn(0);
   scene->setDelayOut(0);
-//  scene->setType(DmxScene::MainScene);
-//  scene->setParentSCene(m_rootItem);
   scene->setParentValue(m_rootItem);
   scene->setStepNumber(0);
-//  m_rootItem->addScene(scene);
   m_rootItem->addChildValue(scene);
 
   name = "subScene 10";
@@ -146,9 +143,9 @@ int SequencerTreeModel::rowCount(const QModelIndex &parent) const
 {
   auto parentScene = getScene(parent);
   if (parentScene == m_rootItem)
-    return m_rootItem->/*getSize()*/getChildValueSize();
+    return m_rootItem->/*getSize()*/getL_ChildValueSize();
 
-  int ret = parentScene ? parentScene->/*getSize()*/getChildValueSize() : 0;
+  int ret = parentScene ? parentScene->/*getSize()*/getL_ChildValueSize() : 0;
   return ret;
 }
 
@@ -219,10 +216,10 @@ bool SequencerTreeModel::setData(const QModelIndex &index, const QVariant &value
   case IDField : scene->setID(value.toInt()); emit dataChanged(index,index); return true; break;
   case NameField : scene->setName(value.toString()); emit dataChanged(index,index); return true; break;
   case NoteField : scene->setNotes(value.toString()); emit dataChanged(index,index); return true; break;
-  case InField : scene->setTimeIn(value.toDouble()); emit dataChanged(index,index); return true; break;
-  case OutField : scene->setTimeOut(value.toDouble()); emit dataChanged(index,index); return true; break;
-  case DelayInField : scene->setDelayIn(value.toDouble()); emit dataChanged(index,index); return true; break;
-  case DelayOutField : scene->setDelayOut(value.toDouble()); emit dataChanged(index,index); return true; break;
+  case InField : scene->setTimeIn(value.toFloat()); emit dataChanged(index,index); return true; break;
+  case OutField : scene->setTimeOut(value.toFloat()); emit dataChanged(index,index); return true; break;
+  case DelayInField : scene->setDelayIn(value.toFloat()); emit dataChanged(index,index); return true; break;
+  case DelayOutField : scene->setDelayOut(value.toFloat()); emit dataChanged(index,index); return true; break;
   default : break;
   }
 

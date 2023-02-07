@@ -26,8 +26,9 @@
 #include "grandmasterwidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
-#include "submasterwidget.h"
-#include "directchannelwidget.h"
+//#include "submasterwidget.h"
+//#include "directchannelwidget.h"
+#include "valuesliderswidget.h"
 #include "dmxvaluetablewidget.h"
 #include "../core/dmxscene.h"
 
@@ -47,7 +48,7 @@ private:
 
   void createCentralWidget();
   QWidget * createDmxManagerContainerWidget();
-  SubmasterWidget * createSubmasterWidget();
+//  SubmasterWidget * createSubmasterWidget();
   void createDockWidgets();
 
   void createConnections();

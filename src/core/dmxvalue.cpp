@@ -26,27 +26,35 @@ DmxValue::DmxValue(ValueType t_type,
 {
   switch(m_type)
   {
+  case RootOutput :
+    m_name = "Root Output";
+    break;
   case Output :
-    m_level = 0;
-    m_maxLevel = 255;
+    m_name = "Output";
+    break;
+  case RootChannel :
+    m_name = "Root Channel";
     break;
   case Channel :
-    m_level = 0;
-    m_directChannelEditLevel = 0;
-    m_channelGroupLevel = 0;
-    m_selectedSceneLevel = 0;
-    m_nextSceneLevel = 0;
-    m_isDirectChannelEdited = false;
+    m_name = "Channel";
+    break;
+  case RootChannelGroup :
+    m_name = "Root Channel Group";
     break;
   case ChannelGroup :
-    m_level = 0;
-    m_universeID = -1;
+    m_name = "Channel Group";
+    break;
+  case RootScene :
+    m_name = "Root Scene";
     break;
   case Scene :
-    m_level = 0;
-    m_universeID = -1;
+    m_name = "Scene";
     break;
-  case UnknownValueType : default :
+  case SubScene :
+    m_name = "SubScene";
+    break;
+  case UnknownValueType :
+  default :
     break;
   }
 }
@@ -56,9 +64,9 @@ DmxValue::~DmxValue()
   DmxValue::clearList();
 }
 
-dmx DmxValue::getControledChildLevel(int t_index)
+dmx DmxValue::getControledValueLevel(int t_index)
 {
-  auto value = getControledChild(t_index);
+  auto value = getControledValue(t_index);
   if (value) return value->getLevel();
 
   qWarning() << "problem in DmxValue::getControledChildLevel";
@@ -223,7 +231,7 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
 
 }
 
-DmxValue *DmxValue::getControledChild(int t_index)
+DmxValue *DmxValue::getControledValue(int t_index)
 {
   if (t_index && (t_index < m_L_controledValue.size()))
     return m_L_controledValue.at(t_index);

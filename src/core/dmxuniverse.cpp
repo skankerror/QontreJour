@@ -28,7 +28,6 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     m_dmxDevice(nullptr),
     m_rootChannel(new DmxValue(DmxValue::RootChannel)),
     m_rootOutput(new DmxValue(DmxValue::RootOutput))
-//    m_rootValue(new DmxValue(DmxValue::RootValue))
 {
   for (int i = 0; i < m_outputCount; i++)
   {

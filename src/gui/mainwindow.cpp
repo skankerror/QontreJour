@@ -20,6 +20,7 @@
 #include <QDockWidget>
 #include "qdmxlib/QDmxManager"
 #include "qdmxlib/QDmxUsbDriver"
+#include "valuesliderswidget.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -43,7 +44,7 @@ void MainWindow::createCentralWidget()
 {
   auto dmxManagerContainerWidget = createDmxManagerContainerWidget();
 
-  auto submasterWidget = createSubmasterWidget();
+  auto submasterWidget = new SubmasterWidget(this);
   setDirectChannelWidget(0); // set for first universe
 
   auto tabWidget = new QTabWidget(this);
@@ -82,44 +83,6 @@ QWidget *MainWindow::createDmxManagerContainerWidget()
           SLOT(removeDmxManagerWidget()));
 
   return dmxManagerContainerWidget;
-}
-
-// NOTE : for the moment this method is here for testing,
-// otherwise we can create it elsewhere
-SubmasterWidget *MainWindow::createSubmasterWidget()
-{
-  auto submasterWidget = new SubmasterWidget(this);
-
-// NOTE : for testing purposes we create some channel group
-  auto L_dmxChannel = m_L_dmxManagerWidget.at(0)
-      ->getDmxUniverse()
-      ->getL_dmxChannel();
-  auto L_submasterSlider = QList<SubmasterSlider *>();
-
-
-  for (int i = 0; i < 60; i++)
-  {
-    auto channelGroup = new DmxValue(DmxValue::ChannelGroup);
-    channelGroup->setID(i);
-
-    auto dmxChannel1 = L_dmxChannel.at(i + 10);
-    dmx value1 = i +100;
-    channelGroup->addControledChild(dmxChannel1);
-    channelGroup->setStoredLevel(0, value1);
-    auto dmxChannel2 = L_dmxChannel.at(i + 100);
-    dmx value2 = i + 150;
-    channelGroup->addControledChild(dmxChannel2);
-    channelGroup->setStoredLevel(1 , value2);
-
-
-    auto slider = new SubmasterSlider(channelGroup,
-                                      submasterWidget);
-    L_submasterSlider.append(slider);
-  }
-  submasterWidget->setL_sliders(L_submasterSlider);
-  submasterWidget->populateWidget();
-
-  return submasterWidget;
 }
 
 void MainWindow::setDirectChannelWidget(int t_universeID)
