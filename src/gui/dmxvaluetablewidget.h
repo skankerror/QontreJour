@@ -94,7 +94,8 @@ protected :
 
 signals :
 
-  void beginMouseEditing(QModelIndex, QPoint);
+  void beginMouseEditing(QModelIndex,
+                         QPoint);
   void endMouseEditing();
 
 protected :
@@ -133,6 +134,7 @@ public slots :
 
   void clearSelectionList();
   void selectAll();
+  void recordGroup();
 
 
 private slots :

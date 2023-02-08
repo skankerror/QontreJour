@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DMXMANAGERWIDGET_H
-#define DMXMANAGERWIDGET_H
+#ifndef DMXUNIVERSEWIDGET_H
+#define DMXUNIVERSEWIDGET_H
 
 #include <QWidget>
 #include <QComboBox>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "qdmxlib/QDmxManager"
 #include "../core/dmxuniverse.h"
+#include "../core/dmxmanager.h"
 
-class DmxManagerWidget
+class DmxUniverseWidget
     : public QWidget
 {
 
@@ -34,9 +34,9 @@ class DmxManagerWidget
 
 public :
 
-  explicit DmxManagerWidget(int t_universeID,
+  explicit DmxUniverseWidget(int t_universeID,
                             QWidget *parent = nullptr);
-  ~DmxManagerWidget();
+  ~DmxUniverseWidget();
 
   // getters
   DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
@@ -61,10 +61,6 @@ private :
   QComboBox *m_dmxDevicesComboBox;
   QPushButton *m_dmxConnect;
 
-  QDmxManager *m_dmxManager;
-  QDmxDriver *m_dmxDriver;
-  QDmxDevice *m_dmxDevice;
-
   DmxUniverse *m_dmxUniverse;
   int m_universeID;
 
@@ -72,4 +68,4 @@ private :
 
 };
 
-#endif // DMXMANAGERWIDGET_H
+#endif // DMXUNIVERSEWIDGET_H

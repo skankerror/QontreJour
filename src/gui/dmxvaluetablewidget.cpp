@@ -85,6 +85,11 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
           m_model,
           SLOT(selectAll()));
 
+  connect(m_recGroup,
+          SIGNAL(clicked(bool)),
+          m_model,
+          SLOT(recordGroup()));
+
 }
 
 DmxValueTableWidget::~DmxValueTableWidget()
@@ -274,6 +279,11 @@ void DmxValueTableModel::selectAll()
 {
   m_editedIndexes = getNon0ValueIndexList();
   editedIndexChanged();
+}
+
+void DmxValueTableModel::recordGroup()
+{
+
 }
 
 void DmxValueTableModel::editedIndexChanged()

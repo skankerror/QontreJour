@@ -25,7 +25,6 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     m_ID(t_universeID), // first universe will have id 0
     m_outputCount(t_outputCount),
     m_isConnected(false),
-    m_dmxDevice(nullptr),
     m_rootChannel(new DmxValue(DmxValue::RootChannel)),
     m_rootOutput(new DmxValue(DmxValue::RootOutput))
 {
@@ -80,11 +79,8 @@ void DmxUniverse::onRequestDmxUpdate(id t_ID,
   if (!m_isConnected)
     return;
 
-  QDmxManager::instance()->writeData(m_ID,
-                                     t_ID,
-                                     t_level);
-
-  qDebug() << "writeData(" << m_ID << t_ID << t_level << ")";
-
+  emit dmxOutputUpdateRequired(t_ID,
+                               t_level);
+  // TODO : connect this to dmxmanager
 }
 

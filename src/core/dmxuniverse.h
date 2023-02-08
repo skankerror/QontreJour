@@ -20,7 +20,6 @@
 
 #include "dmxvalue.h"
 #include "../qontrejour.h"
-#include "qdmxlib/QDmxManager"
 
 class DmxUniverse
     : public QObject
@@ -41,14 +40,12 @@ public :
   // getters
   uid getID() const { return m_ID; }
   int getOutputCount() const { return m_outputCount; }
-  QDmxDevice* getDmxDevice() const { return m_dmxDevice; }
   bool isConnected() const { return m_isConnected; }
   DmxValue *getRootChannel() const{ return m_rootChannel; }
   DmxValue *getRootOutput() const{ return m_rootOutput; }
 
   // setters
   void setID(uid t_ID) { m_ID = t_ID; }
-  void setDmxDevice(QDmxDevice *t_dmxDevice) { m_dmxDevice = t_dmxDevice; }
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
 
 
@@ -73,7 +70,6 @@ private :
   uid m_ID;
   int m_outputCount;
 
-  QDmxDevice *m_dmxDevice;
   bool m_isConnected;
 
   // root values, parents of all values created for this universe

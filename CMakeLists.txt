@@ -44,10 +44,12 @@ set(PROJECT_SOURCES
         src/core/dmxvalue.cpp
         src/core/dmxscene.h
         src/core/dmxscene.cpp
+        src/core/dmxmanager.h
+        src/core/dmxmanager.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
-        src/gui/dmxmanagerwidget.h
-        src/gui/dmxmanagerwidget.cpp
+        src/gui/dmxuniversewidget.h
+        src/gui/dmxuniversewidget.cpp
         src/gui/sequencerwidget.h
         src/gui/sequencerwidget.cpp
         src/gui/dmxvaluetablewidget.h

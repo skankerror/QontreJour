@@ -16,12 +16,12 @@
  */
 
 #include <QDebug>
-#include "dmxmanagerwidget.h"
+#include "dmxuniversewidget.h"
 #include "../qontrejour.h"
 
 
-DmxManagerWidget::DmxManagerWidget(int t_universeID,
-                                   QWidget *parent)
+DmxUniverseWidget::DmxUniverseWidget(int t_universeID,
+                                     QWidget *parent)
   : QWidget(parent),
     m_universeIDLabel(new QLabel(this)),
     m_dmxDriversComboBox(new QComboBox(this)),
@@ -37,26 +37,20 @@ DmxManagerWidget::DmxManagerWidget(int t_universeID,
   CreateConnections();
 }
 
-DmxManagerWidget::~DmxManagerWidget()
+DmxUniverseWidget::~DmxUniverseWidget()
 {
   if (m_isConnected)
   {
     disConnect();
   }
-  // TODO : keep roots value from universe ?
-  m_dmxUniverse->deleteLater();
 }
 
-void DmxManagerWidget::CreateWidget()
+void DmxUniverseWidget::CreateWidget()
 {
   auto layout = new QHBoxLayout();
 
-  m_dmxManager = QDmxManager::instance();
-  m_dmxManager->init();
-  for(auto d : m_dmxManager->availableDrivers())
-  {
-    m_dmxDriversComboBox->addItem(d->name());
-  }
+  auto dmxManager = DmxManager::instance();
+  m_dmxDriversComboBox->addItems(dmxManager->getAvailableDriversNames());
 
   PopulateDevices();
 
@@ -71,40 +65,32 @@ void DmxManagerWidget::CreateWidget()
 
 }
 
-void DmxManagerWidget::CreateConnections()
+void DmxUniverseWidget::CreateConnections()
 {
   QObject::connect(m_dmxDriversComboBox,
-          SIGNAL(currentTextChanged(QString)),
-          this,
-          SLOT(PopulateDevices(QString)));
+                   SIGNAL(currentTextChanged(QString)),
+                   this,
+                   SLOT(PopulateDevices(QString)));
   QObject::connect(m_dmxConnect,
-          SIGNAL(clicked(bool)),
-          this,
-          SLOT(Connect()));
+                   SIGNAL(clicked(bool)),
+                   this,
+                   SLOT(Connect()));
 }
 
-void DmxManagerWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
+void DmxUniverseWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
 {
-  m_dmxDriver = m_dmxManager->driver(t_driverString);
-  Q_ASSERT(m_dmxDriver);
-  m_dmxDriver->setEnabled(true);
+  auto dmxManager = DmxManager::instance();
 
   m_dmxDevicesComboBox->clear();
 
-  for(auto d : m_dmxDriver->availableDevices())
-  {
-    m_dmxDevicesComboBox->addItem(d->name());
-  }
+  m_dmxDevicesComboBox->addItems(dmxManager->getAvailableDevicesNames(t_driverString));
 
   if (!m_dmxDevicesComboBox->count())
     m_dmxDevicesComboBox->addItem("No device");
 }
 
-void DmxManagerWidget::Connect()
+void DmxUniverseWidget::Connect()
 {
-  m_dmxDevice = m_dmxManager->device(m_dmxDriversComboBox->currentText(),
-                                     m_dmxDevicesComboBox->currentText());
-
   // TODO: this if is really ugly, bad work !
   if (m_dmxDevicesComboBox->currentText() == "No device")
   {
@@ -112,15 +98,16 @@ void DmxManagerWidget::Connect()
   }
   else
   {
-    if(m_dmxManager->patch(QDmxManager::Output,
-                           m_dmxDevice,
-                           0, // TODO : handle several output ports
-                           m_universeID,
-                           QDmxManager::HTP)) // TODO : voir ça...
+    auto driverString = m_dmxDriversComboBox->currentText();
+    auto deviceString = m_dmxDevicesComboBox->currentText();
+    if (DmxManager::instance()
+        ->hwConnect(DmxManager::HwOutput,
+                    driverString,
+                    deviceString,
+                    0, // first output...
+                    m_universeID))
     {
       m_isConnected = true;
-      m_dmxUniverse->setConnected(true);
-      m_dmxUniverse->setDmxDevice(m_dmxDevice);
       m_dmxConnect->setText("Disconnect");
 
       QObject::disconnect(m_dmxConnect,
@@ -136,16 +123,14 @@ void DmxManagerWidget::Connect()
   }
 }
 
-void DmxManagerWidget::disConnect()
+void DmxUniverseWidget::disConnect()
 {
-  if (m_dmxDevice->isStarted())
+  if (m_isConnected)
   {
-    if (m_dmxManager->unpatch(QDmxManager::Output,
-                              m_dmxDevice))
+    if (DmxManager::instance()
+        ->hwDisconnect(m_universeID))
     {
-      m_isConnected = true;
-      m_dmxUniverse->setConnected(false);
-      m_dmxUniverse->setDmxDevice(nullptr);
+      m_isConnected = false;
       m_dmxConnect->setText("Connect");
 
       QObject::disconnect(m_dmxConnect,

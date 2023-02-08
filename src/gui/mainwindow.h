@@ -21,11 +21,12 @@
 #include <QMainWindow>
 #include <QList>
 #include <QPushButton>
-#include "dmxmanagerwidget.h"
+#include "dmxuniversewidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
 #include "valuesliderswidget.h"
 #include "dmxvaluetablewidget.h"
+#include "../core/dmxmanager.h"
 
 
 class MainWindow
@@ -43,7 +44,7 @@ public :
 private :
 
   void createCentralWidget();
-  QWidget * createDmxManagerContainerWidget();
+  QWidget * createDmxUniverseContainerWidget();
   void createDockWidgets();
 
   void createConnections();
@@ -54,19 +55,19 @@ signals :
 
 private slots :
 
-  void addDmxManagerWidget();
-  void removeDmxManagerWidget();
+  void addDmxUniverseWidget();
+  void removeDmxUniverseWidget();
   void setDirectChannelWidget(int t_universeID);
 
 private :
 
   DirectChannelWidget *m_directChannelWidget;
-  QVBoxLayout *m_dmxManagerContainerLayout;
-  QList<DmxManagerWidget *> m_L_dmxManagerWidget;
+  QVBoxLayout *m_dmxUniverseWidgetContainerLayout;
+  QList<DmxUniverseWidget *> m_L_dmxUniverseWidget;
 
   DmxValueTableWidget *m_dmxChannelTableWidget;
 
-  QDmxManager *m_dmxManager;
+  DmxManager *m_dmxManager;
 
   int m_universeCount;
 
