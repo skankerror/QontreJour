@@ -27,8 +27,9 @@
 
 ValueTableWidget::ValueTableWidget(QWidget *parent)
   : QWidget(parent),
-    m_tableView(new DmxValueTableView(this)),
-    m_model(new DmxValueTableModel(this)),
+    m_tableView(new ValueTableView(this)),
+    m_model(new ValueTableModel(this)),
+//    m_proxyModel(new ValueTableProxyModel(this)),
     m_universeSpinBox(new QSpinBox(this)),
     m_selectAll(new QPushButton("All", this)),
     m_recGroup(new QPushButton("Rec Group", this)),
@@ -36,6 +37,8 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_clearSelectionButton(new QPushButton("C", this))
 {
   m_model->setRootValue(nullptr);
+//  m_proxyModel->setSourceModel(m_model);
+
   auto totalLayout = new QVBoxLayout();
   auto headerLayout = new QHBoxLayout();
   auto bottomLayout = new QHBoxLayout();
@@ -67,6 +70,7 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
   m_tableView->verticalHeader()->hide();
 
   m_tableView->setModel(m_model);
+//  m_tableView->setModel(m_proxyModel);
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
@@ -153,21 +157,21 @@ void ValueTableWidget::repaintTableView()
 
 /*************************************************************************/
 
-DmxValueTableView::DmxValueTableView(QWidget *parent)
+ValueTableView::ValueTableView(QWidget *parent)
   :QTableView(parent)
 {}
 
-DmxValueTableView::~DmxValueTableView()
+ValueTableView::~ValueTableView()
 {}
 
-void DmxValueTableView::mousePressEvent(QMouseEvent *event)
+void ValueTableView::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton)
   {
     auto index = indexAt(event->pos());
     if (index.flags().testFlag(Qt::ItemIsEditable))
     {
-      auto myModel = static_cast<DmxValueTableModel *>(model());
+      auto myModel = static_cast<ValueTableModel *>(model());
       auto indexList = myModel->getEditedIndexes();
       m_isEditing = true;
       m_originEditingPoint = event->pos();
@@ -182,23 +186,23 @@ void DmxValueTableView::mousePressEvent(QMouseEvent *event)
   QTableView::mousePressEvent(event);
 }
 
-void DmxValueTableView::mouseReleaseEvent(QMouseEvent *event)
+void ValueTableView::mouseReleaseEvent(QMouseEvent *event)
 {
   if (m_isEditing) m_isEditing = false;
 
   QTableView::mouseReleaseEvent(event);
 }
 
-void DmxValueTableView::mouseDoubleClickEvent(QMouseEvent *event)
+void ValueTableView::mouseDoubleClickEvent(QMouseEvent *event)
 {
   QTableView::mouseDoubleClickEvent(event);
 }
 
-void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
+void ValueTableView::mouseMoveEvent(QMouseEvent *event)
 {
   if (m_isEditing)
   {
-    auto myModel = static_cast<DmxValueTableModel *>(model());
+    auto myModel = static_cast<ValueTableModel *>(model());
     auto indexList = myModel->getEditedIndexes();
 
     for (const auto &item
@@ -222,26 +226,26 @@ void DmxValueTableView::mouseMoveEvent(QMouseEvent *event)
 
 /************************************************************************/
 
-DmxValueTableModel::DmxValueTableModel(QObject *parent)
+ValueTableModel::ValueTableModel(QObject *parent)
   : QAbstractTableModel(parent)
 {}
 
-DmxValueTableModel::~DmxValueTableModel()
+ValueTableModel::~ValueTableModel()
 {}
 
-void DmxValueTableModel::setEditedIndexes(const QModelIndexList &t_editedIndexes)
+void ValueTableModel::setEditedIndexes(const QModelIndexList &t_editedIndexes)
 {
   m_editedIndexes = t_editedIndexes;
   editedIndexChanged();
 }
 
-void DmxValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
+void ValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
 {
   m_editedIndexes.append(t_editedIndexes);
   editedIndexChanged();
 }
 
-QModelIndexList DmxValueTableModel::getNon0ValueIndexList() const
+QModelIndexList ValueTableModel::getNon0ValueIndexList() const
 {
   auto listRet = QModelIndexList();
   auto L_childValue = m_rootValue->getL_childValue();
@@ -257,7 +261,7 @@ QModelIndexList DmxValueTableModel::getNon0ValueIndexList() const
   return listRet;
 }
 
-QModelIndex DmxValueTableModel::getIndexFromValue(const DmxValue *t_value) const
+QModelIndex ValueTableModel::getIndexFromValue(const DmxValue *t_value) const
 {
   auto valueID = t_value->getID();
   // determine row et column for the value
@@ -269,29 +273,29 @@ QModelIndex DmxValueTableModel::getIndexFromValue(const DmxValue *t_value) const
   return indexRet;
 }
 
-void DmxValueTableModel::clearSelectionList()
+void ValueTableModel::clearSelectionList()
 {
   m_editedIndexes.clear();
-//  editedIndexChanged();
+  //  editedIndexChanged();
   emit dataChanged(index(0,0),index(31,31)); // NOTE : BEURK !!
 }
 
-void DmxValueTableModel::selectAll()
+void ValueTableModel::selectAll()
 {
   m_editedIndexes = getNon0ValueIndexList();
   editedIndexChanged();
 }
 
-void DmxValueTableModel::recordGroup()
+void ValueTableModel::recordGroup()
 {
-//  auto L_channel = QList<DmxValue *>();
+  //  auto L_channel = QList<DmxValue *>();
 
   DmxManager::instance()
       ->createChannelGroup(getValuesFromIndexList(
                              getNon0ValueIndexList()));
 }
 
-void DmxValueTableModel::editedIndexChanged()
+void ValueTableModel::editedIndexChanged()
 {
   // we try to change the background of selected channels
   for (const auto &item
@@ -304,18 +308,18 @@ void DmxValueTableModel::editedIndexChanged()
   }
 }
 
-int DmxValueTableModel::rowCount(const QModelIndex &parent) const
+int ValueTableModel::rowCount(const QModelIndex &parent) const
 {
   return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT;
 }
 
-int DmxValueTableModel::columnCount(const QModelIndex &parent) const
+int ValueTableModel::columnCount(const QModelIndex &parent) const
 {
   return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT;
 }
 
-QVariant DmxValueTableModel::data(const QModelIndex &index,
-                                  int role) const
+QVariant ValueTableModel::data(const QModelIndex &index,
+                               int role) const
 {
   if (!index.isValid())
     return QVariant();
@@ -403,9 +407,9 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
   }
 }
 
-bool DmxValueTableModel::setData(const QModelIndex &index,
-                                 const QVariant &value,
-                                 int role)
+bool ValueTableModel::setData(const QModelIndex &index,
+                              const QVariant &value,
+                              int role)
 {
   if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
     return false;
@@ -422,22 +426,22 @@ bool DmxValueTableModel::setData(const QModelIndex &index,
   return true;
 }
 
-QVariant DmxValueTableModel::headerData(int section,
-                                        Qt::Orientation orientation,
-                                        int role) const
+QVariant ValueTableModel::headerData(int section,
+                                     Qt::Orientation orientation,
+                                     int role) const
 {
   return QVariant();
 }
 
-bool DmxValueTableModel::setHeaderData(int section,
-                                       Qt::Orientation orientation,
-                                       const QVariant &value,
-                                       int role)
+bool ValueTableModel::setHeaderData(int section,
+                                    Qt::Orientation orientation,
+                                    const QVariant &value,
+                                    int role)
 {
   return true;
 }
 
-Qt::ItemFlags DmxValueTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
 {
   // TODO : handle universe with less than 512 channel
   if (!index.isValid())
@@ -454,7 +458,7 @@ Qt::ItemFlags DmxValueTableModel::flags(const QModelIndex &index) const
 
 }
 
-DmxValue *DmxValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
+DmxValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
 {
   int valueID = (((t_index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + t_index.column();
@@ -465,7 +469,7 @@ DmxValue *DmxValueTableModel::getValueFromIndex(const QModelIndex &t_index) cons
 
 }
 
-QList<DmxValue *> DmxValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
+QList<DmxValue *> ValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
 {
   auto L_channel = QList<DmxValue *>();
   for (auto item : t_L_index)
@@ -476,4 +480,33 @@ QList<DmxValue *> DmxValueTableModel::getValuesFromIndexList(const QModelIndexLi
   }
   return L_channel;
 }
+
+/*****************************************************************************/
+
+//ValueTableProxyModel::ValueTableProxyModel(QObject *parent)
+//  : QSortFilterProxyModel(parent)
+//{}
+
+//QModelIndex ValueTableProxyModel::mapToSource(const QModelIndex &proxyIndex) const
+//{
+//  return proxyIndex;
+//}
+
+//QModelIndex ValueTableProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
+//{
+//  auto indexList = static_cast<ValueTableModel *>(sourceModel())
+//      ->getNon0ValueIndexList();
+
+//  if (indexList.contains(sourceIndex))
+//    return sourceIndex;
+//  else
+//    return QModelIndex();
+//}
+
+//QModelIndexList ValueTableProxyModel::getEditedIndexes() const
+//{
+//  return static_cast<ValueTableModel *>(sourceModel())->getEditedIndexes();
+//}
+
+
 

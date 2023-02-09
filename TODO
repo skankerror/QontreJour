@@ -10,3 +10,7 @@ SubSc %
 ce doit être un double.
 caler par défaut 10 après le dernier chiffre des dizaines sauf en cas de *9.99
 
+
+
+QLabel::setBuddy() ! pour pas se faire chier
+

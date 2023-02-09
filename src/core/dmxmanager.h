@@ -46,6 +46,9 @@ public :
 
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
+  int getUniverseCount() const{ return m_L_universe.size() ;}
+  int getGroupCount() const
+  { return m_rootChannelGroup->getL_ChildValueSize(); }
   int getSequenceCount() const{ return m_L_rootScene.size(); }
   DmxValue * getRootChannel(uid t_ID) const
   { return m_L_universe.at(t_ID)->getRootChannel(); }
@@ -55,7 +58,6 @@ public :
   bool createSequence();
   bool createChannelGroup(QList<DmxValue *> t_L_channel);
 
-  int getUniverseCount() const{ return m_L_universe.size() ;}
 
   bool hwConnect(DmxManager::HwPortType t_type,
                  QString &t_driver,

@@ -25,11 +25,12 @@
 #include <QTableView>
 #include <QAbstractTableModel>
 #include <QEvent>
+#include <QSortFilterProxyModel>
 #include "../core/dmxvalue.h"
 
 
-class DmxValueTableView;
-class DmxValueTableModel;
+class ValueTableView;
+class ValueTableModel;
 
 class ValueTableWidget
     : public QWidget
@@ -60,8 +61,9 @@ protected slots :
 
 protected :
 
-  DmxValueTableView *m_tableView;
-  DmxValueTableModel *m_model;
+  ValueTableView *m_tableView;
+  ValueTableModel *m_model;
+
   QSpinBox *m_universeSpinBox;
   QPushButton *m_selectAll;
   QPushButton *m_recGroup;
@@ -73,7 +75,7 @@ protected :
 
 /******************************************************************/
 
-class DmxValueTableView
+class ValueTableView
     : public QTableView
 {
 
@@ -81,9 +83,9 @@ class DmxValueTableView
 
 public :
 
-  explicit DmxValueTableView(QWidget *parent = nullptr);
+  explicit ValueTableView(QWidget *parent = nullptr);
 
-  virtual ~DmxValueTableView();
+  virtual ~ValueTableView();
 
 protected :
 
@@ -108,7 +110,7 @@ protected :
 
 /********************************************************************/
 
-class DmxValueTableModel
+class ValueTableModel
     : public QAbstractTableModel
 {
 
@@ -116,9 +118,9 @@ class DmxValueTableModel
 
 public :
 
-  explicit DmxValueTableModel(QObject *parent = nullptr);
+  explicit ValueTableModel(QObject *parent = nullptr);
 
-  virtual ~DmxValueTableModel();
+  virtual ~ValueTableModel();
 
   DmxValue *getRootValue() const{ return m_rootValue; }
   uid getUniverseID() const { return m_universeID; }
@@ -136,7 +138,6 @@ public slots :
   void selectAll();
   void recordGroup();
 
-
 private slots :
 
   void editedIndexChanged();
@@ -145,7 +146,8 @@ protected :
 
   int rowCount(const QModelIndex &parent) const override;
   int columnCount(const QModelIndex &parent) const override;
-  QVariant data(const QModelIndex &index, int role) const override;
+  QVariant data(const QModelIndex &index,
+                int role) const override;
   bool setData(const QModelIndex &index,
                const QVariant &value,
                int role) override;
@@ -172,5 +174,7 @@ protected :
   QModelIndexList m_editedIndexes;
 
 };
+
+
 
 #endif // VALUETABLEWIDGET_H

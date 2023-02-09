@@ -60,6 +60,8 @@ set(PROJECT_SOURCES
         src/gui/valuesliderswidget.cpp
         src/gui/playbackwidget.h
         src/gui/playbackwidget.cpp
+        src/gui/valueeditwidget.h
+        src/gui/valueeditwidget.cpp
         ${TS_FILES}
         ${DATA_FILES}
 )

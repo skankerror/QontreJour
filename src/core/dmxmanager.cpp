@@ -17,6 +17,7 @@
 
 #include "dmxmanager.h"
 #include <QDebug>
+#include "../gui/valueeditwidget.h"
 
 DmxManager *DmxManager::instance()
 {
@@ -94,8 +95,20 @@ bool DmxManager::createSequence()
 
 bool DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
 {
-//  qDebug() << "channel group size :"
-//           << t_L_channel.size();
+  auto newGroup = new DmxValue(DmxValue::ChannelGroup);
+  newGroup->setID(getGroupCount());
+  newGroup->setL_controledValue(t_L_channel);
+  auto L_storedLevels = QList<dmx>();
+  for (const auto item : std::as_const(t_L_channel))
+  {
+    auto level = item->getLevel();
+    L_storedLevels.append(level);
+  }
+  newGroup->setL_storedLevels(L_storedLevels);
+  m_rootChannelGroup->addChildValue(newGroup);
+  auto groupEditWidget = new ValueEditWidget(newGroup);
+  groupEditWidget->show();
+
   return true;
 }
 
@@ -158,7 +171,8 @@ void DmxManager::onUniverseRequest(uid t_uid,
 
 DmxManager::DmxManager(QObject *parent)
   : QObject(parent),
-    m_hwManager(QDmxManager::instance())
+    m_hwManager(QDmxManager::instance()),
+    m_rootChannelGroup(new DmxValue(DmxValue::RootChannelGroup))
 {
   m_hwManager->init();
   // we create first universe
@@ -167,6 +181,7 @@ DmxManager::DmxManager(QObject *parent)
   // and the main sequence :
   auto rootScene = new DmxScene(DmxValue::RootScene);
   m_L_rootScene.append(rootScene);
+
 
   connect(universe,
           SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),

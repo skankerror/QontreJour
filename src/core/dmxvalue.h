@@ -28,14 +28,14 @@ typedef quint8 dmx ;
 // needed when editing channel group level
 // when one channel is at 0 or 255, the editing group can still change
 // when need to keep decay between unchanged values, and those who are still changing
-typedef short overdmx;
+typedef qint16 overdmx;
 
 // id for every output, channel, channel group, etc...
 // not unsigned cos it can be -1 to specify no id
-typedef short id;
+typedef qint16 id;
 
 // id for universe. signed cos it can be -1 for channel group, scene, etc...
-typedef short uid;
+typedef qint16 uid;
 
 /******************************************************************************/
 
@@ -188,7 +188,7 @@ signals :
 public slots :
 
   void setLevel(DmxValue::SignalSenderType t_senderType,
-                        dmx t_level);
+                dmx t_level);
   void setDirectChannelEditLevel(dmx t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
   void setChannelGroupLevel(dmx t_channelGroupLevel);
