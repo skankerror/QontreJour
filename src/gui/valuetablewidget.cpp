@@ -29,7 +29,6 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
   : QWidget(parent),
     m_tableView(new ValueTableView(this)),
     m_model(new ValueTableModel(this)),
-//    m_proxyModel(new ValueTableProxyModel(this)),
     m_universeSpinBox(new QSpinBox(this)),
     m_selectAll(new QPushButton("All", this)),
     m_recGroup(new QPushButton("Rec Group", this)),
@@ -37,7 +36,6 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_clearSelectionButton(new QPushButton("C", this))
 {
   m_model->setRootValue(nullptr);
-//  m_proxyModel->setSourceModel(m_model);
 
   auto totalLayout = new QVBoxLayout();
   auto headerLayout = new QHBoxLayout();
@@ -288,8 +286,6 @@ void ValueTableModel::selectAll()
 
 void ValueTableModel::recordGroup()
 {
-  //  auto L_channel = QList<DmxValue *>();
-
   DmxManager::instance()
       ->createChannelGroup(getValuesFromIndexList(
                              getNon0ValueIndexList()));
@@ -480,33 +476,5 @@ QList<DmxValue *> ValueTableModel::getValuesFromIndexList(const QModelIndexList 
   }
   return L_channel;
 }
-
-/*****************************************************************************/
-
-//ValueTableProxyModel::ValueTableProxyModel(QObject *parent)
-//  : QSortFilterProxyModel(parent)
-//{}
-
-//QModelIndex ValueTableProxyModel::mapToSource(const QModelIndex &proxyIndex) const
-//{
-//  return proxyIndex;
-//}
-
-//QModelIndex ValueTableProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
-//{
-//  auto indexList = static_cast<ValueTableModel *>(sourceModel())
-//      ->getNon0ValueIndexList();
-
-//  if (indexList.contains(sourceIndex))
-//    return sourceIndex;
-//  else
-//    return QModelIndex();
-//}
-
-//QModelIndexList ValueTableProxyModel::getEditedIndexes() const
-//{
-//  return static_cast<ValueTableModel *>(sourceModel())->getEditedIndexes();
-//}
-
 
 
