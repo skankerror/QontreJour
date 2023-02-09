@@ -47,6 +47,9 @@ public :
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getSequenceCount() const{ return m_L_rootScene.size(); }
+  DmxValue * getRootChannel(uid t_ID) const
+  { return m_L_universe.at(t_ID)->getRootChannel(); }
+
 
   bool createUniverse(uid t_universeID);
   bool createSequence();
@@ -67,6 +70,12 @@ private :
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
 
 signals :
+
+private slots :
+
+  void onUniverseRequest(uid t_uid,
+                         id t_id,
+                         dmx t_level); // TODO :
 
 private :
 

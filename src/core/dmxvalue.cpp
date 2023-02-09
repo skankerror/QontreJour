@@ -205,7 +205,8 @@ void DmxValue::setOutputLevel(SignalSenderType t_senderType,
 
   m_level = level;
 
-  emit requestDmxUpdate(m_ID,
+  emit requestDmxUpdate(m_universeID,
+                        m_ID,
                         m_level);
 
 }

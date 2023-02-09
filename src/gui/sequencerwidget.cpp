@@ -53,7 +53,6 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   m_rootItem = new DmxScene(DmxValue::RootScene);
   m_rootItem->setID(0);
   m_rootItem->setName(name);
-//  m_rootItem->setType(DmxScene::RootScene);
 
   // test
   name = QString("accueil public");
@@ -70,8 +69,7 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   m_rootItem->addChildValue(scene);
 
   name = "subScene 10";
-  auto subScene = new DmxScene(/*10, name, this*/
-                               DmxValue::SubScene,
+  auto subScene = new DmxScene(DmxValue::SubScene,
                                scene);
   subScene->setID(10);
   subScene->setName(name);
@@ -80,10 +78,9 @@ SequencerTreeModel::SequencerTreeModel(QAbstractItemModel *parent)
   subScene->setDelayIn(1);
   subScene->setDelayOut(3);
   subScene->setType(DmxScene::SubScene);
-//  subScene->setParentSCene(scene);
   subScene->setParentValue(scene);
   subScene->setStepNumber(0);
-  scene->/*addScene*/addChildValue(subScene);
+  scene->addChildValue(subScene);
 
 }
 
@@ -154,25 +151,6 @@ int SequencerTreeModel::columnCount(const QModelIndex &parent) const
   return HeaderFieldCount;
 }
 
-//bool SequencerTreeModel::hasChildren(const QModelIndex &parent) const
-//{
-////  if (!parentScene) return false;
-////  if (parentScene == m_rootItem) return true;
-//  if (!parent.isValid()) return false;
-//  int row = parent.row();
-//  int col = parent.column();
-//  if (row == 0
-//      && col == 0)
-//    return true;
-//  auto parentScene = static_cast<DmxScene *>(parent.internalPointer());
-
-//  auto parentType = parentScene->DmxScene::getType();
-//  if (parentType == DmxScene::RootScene) return true;
-//  if (parentType == DmxScene::SubScene) return false;
-//  if (parentType == DmxScene::MainScene) return parentScene->getSize();
-//  return false;
-//}
-
 QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
 {
   if (!index.isValid())
@@ -181,7 +159,6 @@ QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
   if (role != Qt::DisplayRole && role != Qt::EditRole)
     return QVariant();
 
-//  auto scene = static_cast<DmxScene *>(index.internalPointer());
   auto scene = getScene(index);
   int col = index.column();
   switch(col)

@@ -52,7 +52,8 @@ public :
 
 signals :
 
-  void dmxOutputUpdateRequired(id, // output id
+  void dmxOutputUpdateRequired(uid, //universe id
+                               id, // output id
                                dmx ); // level
 
 public slots :
@@ -62,7 +63,8 @@ public slots :
 
 private slots :
 
-  void onRequestDmxUpdate(id t_ID,
+  void onRequestDmxUpdate(uid t_universeId,
+                          id t_ID,
                           dmx t_level);
 
 private :

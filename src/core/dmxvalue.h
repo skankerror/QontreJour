@@ -173,7 +173,8 @@ signals :
 
   void levelChanged(DmxValue::SignalSenderType,
                     dmx t_level);
-  void requestDmxUpdate(id m_outputID,
+  void requestDmxUpdate(uid t_universeID,
+                        id t_outputID,
                         dmx t_level);
   void m_L_controledValueChanged();
 

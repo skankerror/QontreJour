@@ -58,9 +58,9 @@ DmxUniverse::DmxUniverse(uid t_universeID,
             SLOT(setLevel(DmxValue::SignalSenderType,dmx)));
 
     connect(dmxOutput,
-            SIGNAL(requestDmxUpdate(id,dmx)),
+            SIGNAL(requestDmxUpdate(uid,id,dmx)),
             this,
-            SLOT(onRequestDmxUpdate(id,dmx)));
+            SLOT(onRequestDmxUpdate(uid,id,dmx)));
 
 
   }
@@ -73,14 +73,15 @@ DmxUniverse::~DmxUniverse()
   m_rootOutput->deleteLater();
 }
 
-void DmxUniverse::onRequestDmxUpdate(id t_ID,
+void DmxUniverse::onRequestDmxUpdate(uid t_universeId,
+                                     id t_ID,
                                      dmx t_level)
 {
   if (!m_isConnected)
     return;
 
-  emit dmxOutputUpdateRequired(t_ID,
+  emit dmxOutputUpdateRequired(t_universeId,
+                               t_ID,
                                t_level);
-  // TODO : connect this to dmxmanager
 }
 

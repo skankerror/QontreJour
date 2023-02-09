@@ -28,9 +28,6 @@ DmxUniverseWidget::DmxUniverseWidget(int t_universeID,
     m_dmxDevicesComboBox(new QComboBox(this)),
     m_dmxConnect(new QPushButton(this)),
     m_isConnected(false),
-    m_dmxUniverse(new DmxUniverse(t_universeID,
-                                  UNIVERSE_OUTPUT_COUNT_DEFAULT,
-                                  this)),
     m_universeID(t_universeID)
 {
   CreateWidget();

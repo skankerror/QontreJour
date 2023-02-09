@@ -86,9 +86,8 @@ QWidget *MainWindow::createDmxUniverseContainerWidget()
 
 void MainWindow::setDirectChannelWidget(int t_universeID)
 {
-  auto rootChannel = m_L_dmxUniverseWidget.at(t_universeID)
-      ->getDmxUniverse()
-      ->getRootChannel();
+  auto rootChannel = DmxManager::instance()
+      ->getRootChannel(t_universeID);
   m_directChannelWidget->setRootValue(rootChannel);
 
 }
@@ -117,10 +116,8 @@ void MainWindow::createDockWidgets()
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
   auto bottomDock = new QDockWidget();
-  m_dmxChannelTableWidget->setRootValue(m_L_dmxUniverseWidget
-                                        .first()
-                                        ->getDmxUniverse()
-                                        ->getRootChannel());
+  m_dmxChannelTableWidget->setRootValue(DmxManager::instance()
+                                        ->getRootChannel(0));
   m_dmxChannelTableWidget->setUniverseID(0);
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
   bottomDock->setWidget(m_dmxChannelTableWidget);
@@ -137,7 +134,7 @@ void MainWindow::createDockWidgets()
 void MainWindow::addDmxUniverseWidget()
 {
   auto dmxUniverseWidget = new DmxUniverseWidget(m_universeCount,
-                                               /*m_dmxUniverseContainerWidget*/this);
+                                                 this);
 
   m_L_dmxUniverseWidget.append(dmxUniverseWidget);
   m_dmxUniverseWidgetContainerLayout->addWidget(dmxUniverseWidget);
@@ -151,7 +148,6 @@ void MainWindow::removeDmxUniverseWidget()
 {
   if (m_L_dmxUniverseWidget.size() > 1) // we always keep one universe
   {
-    // TODO : préserver l'univers quelque part !
     auto dmxUniverseWidget = m_L_dmxUniverseWidget.last();
     m_L_dmxUniverseWidget.removeLast();
     dmxUniverseWidget->deleteLater();
@@ -159,10 +155,9 @@ void MainWindow::removeDmxUniverseWidget()
     emit universeCountChanged(--m_universeCount);
 
     // on remet le channel output widget au bon endroit
-    dmxUniverseWidget = m_L_dmxUniverseWidget.first(); // we get first universe
-    auto dmxUniverse = dmxUniverseWidget->getDmxUniverse();
     m_dmxChannelTableWidget->setUniverseID(m_universeCount - 1);
-    m_dmxChannelTableWidget->setRootValue(dmxUniverse->getRootChannel());
+    m_dmxChannelTableWidget->setRootValue(DmxManager::instance()
+                                          ->getRootChannel(m_universeCount - 1));
   }
 }
 

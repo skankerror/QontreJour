@@ -23,7 +23,6 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "../core/dmxuniverse.h"
 #include "../core/dmxmanager.h"
 
 class DmxUniverseWidget
@@ -38,15 +37,10 @@ public :
                             QWidget *parent = nullptr);
   ~DmxUniverseWidget();
 
-  // getters
-  DmxUniverse *getDmxUniverse() const { return m_dmxUniverse; }
-
 private :
 
   void CreateWidget();
   void CreateConnections();
-
-signals :
 
 private slots :
 
@@ -61,7 +55,6 @@ private :
   QComboBox *m_dmxDevicesComboBox;
   QPushButton *m_dmxConnect;
 
-  DmxUniverse *m_dmxUniverse;
   int m_universeID;
 
   bool m_isConnected;

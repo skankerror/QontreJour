@@ -57,6 +57,12 @@ bool DmxManager::createUniverse(uid t_universeID)
   {
     auto universe = new DmxUniverse(t_universeID);
     m_L_universe.append(universe);
+
+    connect(universe,
+            SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+            this,
+            SLOT(onUniverseRequest(uid,id,dmx)));
+
     return true;
   }
   else if (t_universeID < getUniverseCount())
@@ -68,6 +74,12 @@ bool DmxManager::createUniverse(uid t_universeID)
     auto universe = new DmxUniverse(getUniverseCount());
     qDebug() << "universe id asked is too much high";
     m_L_universe.append(universe);
+
+    connect(universe,
+            SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+            this,
+            SLOT(onUniverseRequest(uid,id,dmx)));
+
     return true;
   }
   return false;
@@ -86,8 +98,8 @@ bool DmxManager::hwConnect(HwPortType t_type,
                            quint8 t_port,
                            uid t_ID)
 {
-//  if (t_type == DmxManager::HwOutput)
-  if(m_hwManager->patch(QDmxManager::Input,
+  //  if (t_type == DmxManager::HwOutput)
+  if(m_hwManager->patch(QDmxManager::Output,
                         t_driver,
                         t_device,
                         t_port,
@@ -123,9 +135,34 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
+void DmxManager::onUniverseRequest(uid t_uid,
+                                   id t_id,
+                                   dmx t_level)
+{
+  m_hwManager->writeData(t_uid,
+                         t_id,
+                         t_level);
+
+  qDebug() << "write uid :"  << t_uid
+           << "id :" << t_id
+           << "level :" << t_level;
+
+}
+
 DmxManager::DmxManager(QObject *parent)
   : QObject(parent),
     m_hwManager(QDmxManager::instance())
 {
   m_hwManager->init();
+  // we create first universe
+  auto universe = new DmxUniverse(0);
+  m_L_universe.append(universe);
+  // and the main sequence :
+  auto rootScene = new DmxScene(DmxValue::RootScene);
+  m_L_rootScene.append(rootScene);
+
+  connect(universe,
+          SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+          this,
+          SLOT(onUniverseRequest(uid,id,dmx)));
 }
