@@ -92,6 +92,13 @@ bool DmxManager::createSequence()
   return true;
 }
 
+bool DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
+{
+//  qDebug() << "channel group size :"
+//           << t_L_channel.size();
+  return true;
+}
+
 bool DmxManager::hwConnect(HwPortType t_type,
                            QString &t_driver,
                            QString &t_device,

@@ -52,9 +52,9 @@ public :
 
 signals :
 
-  void dmxOutputUpdateRequired(uid, //universe id
-                               id, // output id
-                               dmx ); // level
+  void dmxOutputUpdateRequired(uid t_universeID,
+                               id t_outputID,
+                               dmx t_level);
 
 public slots :
 

@@ -35,6 +35,8 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Seri
 
 set(TS_FILES QontreJour_fr_GF.ts)
 
+set(DATA_FILES README.md TODO)
+
 set(PROJECT_SOURCES
         src/main.cpp
         src/qontrejour.h
@@ -48,17 +50,18 @@ set(PROJECT_SOURCES
         src/core/dmxmanager.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
-        src/gui/dmxuniversewidget.h
-        src/gui/dmxuniversewidget.cpp
+        src/gui/universewidget.h
+        src/gui/universewidget.cpp
         src/gui/sequencerwidget.h
         src/gui/sequencerwidget.cpp
-        src/gui/dmxvaluetablewidget.h
-        src/gui/dmxvaluetablewidget.cpp
+        src/gui/valuetablewidget.h
+        src/gui/valuetablewidget.cpp
         src/gui/valuesliderswidget.h
         src/gui/valuesliderswidget.cpp
         src/gui/playbackwidget.h
         src/gui/playbackwidget.cpp
         ${TS_FILES}
+        ${DATA_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

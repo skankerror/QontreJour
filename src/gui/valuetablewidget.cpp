@@ -15,16 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dmxvaluetablewidget.h"
+#include "valuetablewidget.h"
 #include "../qontrejour.h"
 #include <QLayout>
 #include <QHeaderView>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
+#include "../core/dmxmanager.h"
 
 
-DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
+ValueTableWidget::ValueTableWidget(QWidget *parent)
   : QWidget(parent),
     m_tableView(new DmxValueTableView(this)),
     m_model(new DmxValueTableModel(this)),
@@ -92,10 +93,10 @@ DmxValueTableWidget::DmxValueTableWidget(QWidget *parent)
 
 }
 
-DmxValueTableWidget::~DmxValueTableWidget()
+ValueTableWidget::~ValueTableWidget()
 {}
 
-void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
+void ValueTableWidget::onUniverseCountChanged(int t_universeCount)
 {
   m_universeCount = t_universeCount;
   m_universeSpinBox->setMaximum(t_universeCount);
@@ -104,7 +105,7 @@ void DmxValueTableWidget::onUniverseCountChanged(int t_universeCount)
 
 }
 
-void DmxValueTableWidget::setUniverseID(const int t_ID)
+void ValueTableWidget::setUniverseID(const uid t_ID)
 {
   m_model->setUniverseID(t_ID);
 
@@ -122,7 +123,7 @@ void DmxValueTableWidget::setUniverseID(const int t_ID)
 
 }
 
-void DmxValueTableWidget::setRootValue(DmxValue *t_rootValue)
+void ValueTableWidget::setRootValue(DmxValue *t_rootValue)
 {
   // we connect to update views
   auto L_dmxChannel = t_rootValue->getL_childValue();
@@ -139,12 +140,12 @@ void DmxValueTableWidget::setRootValue(DmxValue *t_rootValue)
   }
 }
 
-void DmxValueTableWidget::onSpinboxSelected(int t_universeID)
+void ValueTableWidget::onSpinboxSelected(int t_universeID)
 {
   emit askForUniverseChanged(t_universeID - 1);
 }
 
-void DmxValueTableWidget::repaintTableView()
+void ValueTableWidget::repaintTableView()
 {
   emit m_model->layoutChanged();
 }
@@ -283,7 +284,11 @@ void DmxValueTableModel::selectAll()
 
 void DmxValueTableModel::recordGroup()
 {
+//  auto L_channel = QList<DmxValue *>();
 
+  DmxManager::instance()
+      ->createChannelGroup(getValuesFromIndexList(
+                             getNon0ValueIndexList()));
 }
 
 void DmxValueTableModel::editedIndexChanged()
@@ -322,10 +327,10 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
   {
     int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column();
-    if (valueID < 0 || valueID >= /*m_L_controledValue.size()*/m_rootValue->getL_ChildValueSize())
+    if (valueID < 0 || valueID >= m_rootValue->getL_ChildValueSize())
       return QVariant();
 
-    auto dmxValue = /*m_L_controledValue.at*/m_rootValue->getL_childValue().at(valueID);
+    auto dmxValue = m_rootValue->getL_childValue().at(valueID);
     DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
 
     switch(role)
@@ -396,7 +401,6 @@ QVariant DmxValueTableModel::data(const QModelIndex &index,
       break;
     }
   }
-
 }
 
 bool DmxValueTableModel::setData(const QModelIndex &index,
@@ -408,7 +412,7 @@ bool DmxValueTableModel::setData(const QModelIndex &index,
 
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-  auto dmxValue = /*m_L_controledValue.at*/m_rootValue->getL_childValue().at(valueID);
+  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
   // NOTE : it's ok for the moment, but if we create widget xith channelgroup ?
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());
@@ -448,5 +452,28 @@ Qt::ItemFlags DmxValueTableModel::flags(const QModelIndex &index) const
 
   return QAbstractTableModel::flags(index);
 
+}
+
+DmxValue *DmxValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
+{
+  int valueID = (((t_index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+      + t_index.column();
+  if (valueID < 0 || valueID >= m_rootValue->getL_ChildValueSize())
+    return nullptr;
+
+  return m_rootValue->getL_childValue().at(valueID);
+
+}
+
+QList<DmxValue *> DmxValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
+{
+  auto L_channel = QList<DmxValue *>();
+  for (auto item : t_L_index)
+  {
+    auto channel = getValueFromIndex(item);
+    if (channel)
+      L_channel.append(channel);
+  }
+  return L_channel;
 }
 

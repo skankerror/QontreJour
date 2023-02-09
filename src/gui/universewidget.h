@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DMXUNIVERSEWIDGET_H
-#define DMXUNIVERSEWIDGET_H
+#ifndef UNIVERSEWIDGET_H
+#define UNIVERSEWIDGET_H
 
 #include <QWidget>
 #include <QComboBox>
@@ -25,7 +25,7 @@
 #include <QLabel>
 #include "../core/dmxmanager.h"
 
-class DmxUniverseWidget
+class UniverseWidget
     : public QWidget
 {
 
@@ -33,9 +33,9 @@ class DmxUniverseWidget
 
 public :
 
-  explicit DmxUniverseWidget(int t_universeID,
+  explicit UniverseWidget(int t_universeID,
                             QWidget *parent = nullptr);
-  ~DmxUniverseWidget();
+  ~UniverseWidget();
 
 private :
 
@@ -61,4 +61,4 @@ private :
 
 };
 
-#endif // DMXUNIVERSEWIDGET_H
+#endif // UNIVERSEWIDGET_H

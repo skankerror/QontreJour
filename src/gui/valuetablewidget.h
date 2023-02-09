@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DMXVALUETABLEWIDGET_H
-#define DMXVALUETABLEWIDGET_H
+#ifndef VALUETABLEWIDGET_H
+#define VALUETABLEWIDGET_H
 
 #include <QWidget>
 #include <QLabel>
@@ -31,7 +31,7 @@
 class DmxValueTableView;
 class DmxValueTableModel;
 
-class DmxValueTableWidget
+class ValueTableWidget
     : public QWidget
 {
 
@@ -39,9 +39,9 @@ class DmxValueTableWidget
 
 public :
 
-  explicit DmxValueTableWidget(QWidget *parent = nullptr);
+  explicit ValueTableWidget(QWidget *parent = nullptr);
 
-  virtual ~DmxValueTableWidget();
+  virtual ~ValueTableWidget();
 
 signals :
 
@@ -50,7 +50,7 @@ signals :
 public slots :
 
   void onUniverseCountChanged(int t_universeCount);
-  void setUniverseID(const int t_ID);
+  void setUniverseID(const uid t_ID);
   void setRootValue(DmxValue *t_rootValue);
 
 protected slots :
@@ -160,6 +160,8 @@ protected :
 
 private :
 
+  DmxValue *getValueFromIndex(const QModelIndex &t_index) const;
+  QList<DmxValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
   QModelIndex getIndexFromValue(const DmxValue *t_value ) const;
   QModelIndexList getNon0ValueIndexList() const;
 
@@ -171,4 +173,4 @@ protected :
 
 };
 
-#endif // DMXVALUETABLEWIDGET_H
+#endif // VALUETABLEWIDGET_H

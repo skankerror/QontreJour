@@ -25,9 +25,9 @@
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
     m_dmxManager(DmxManager::instance()),
-    m_dmxChannelTableWidget(new DmxValueTableWidget(this)),
+    m_dmxChannelTableWidget(new ValueTableWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
-    m_dmxUniverseWidgetContainerLayout(new QVBoxLayout()),
+    m_universeWidgetContainerLayout(new QVBoxLayout()),
     m_universeCount(0)
 {
   createCentralWidget();
@@ -64,22 +64,22 @@ QWidget *MainWindow::createDmxUniverseContainerWidget()
   auto buttonsLayout = new QHBoxLayout();
   buttonsLayout->addWidget(addDmxUniverseButton);
   buttonsLayout->addWidget(removeDmxUniverseButton);
-  m_dmxUniverseWidgetContainerLayout->addLayout(buttonsLayout);
+  m_universeWidgetContainerLayout->addLayout(buttonsLayout);
 
   // create first dmx manager widget for first universe
-  addDmxUniverseWidget();
+  addUniverseWidget();
 
-  dmxUniverseContainerWidget->setLayout(m_dmxUniverseWidgetContainerLayout);
+  dmxUniverseContainerWidget->setLayout(m_universeWidgetContainerLayout);
 
   connect(addDmxUniverseButton,
           SIGNAL(clicked()),
           this,
-          SLOT(addDmxUniverseWidget()));
+          SLOT(addUniverseWidget()));
 
   connect(removeDmxUniverseButton,
           SIGNAL(clicked()),
           this,
-          SLOT(removeDmxUniverseWidget()));
+          SLOT(removeUniverseWidget()));
 
   return dmxUniverseContainerWidget;
 }
@@ -131,26 +131,26 @@ void MainWindow::createDockWidgets()
 
 }
 
-void MainWindow::addDmxUniverseWidget()
+void MainWindow::addUniverseWidget()
 {
-  auto dmxUniverseWidget = new DmxUniverseWidget(m_universeCount,
+  auto universeWidget = new UniverseWidget(m_universeCount,
                                                  this);
 
-  m_L_dmxUniverseWidget.append(dmxUniverseWidget);
-  m_dmxUniverseWidgetContainerLayout->addWidget(dmxUniverseWidget);
+  m_L_universeWidget.append(universeWidget);
+  m_universeWidgetContainerLayout->addWidget(universeWidget);
 
   m_universeCount++;
 
   emit universeCountChanged(m_universeCount);
 }
 
-void MainWindow::removeDmxUniverseWidget()
+void MainWindow::removeUniverseWidget()
 {
-  if (m_L_dmxUniverseWidget.size() > 1) // we always keep one universe
+  if (m_L_universeWidget.size() > 1) // we always keep one universe
   {
-    auto dmxUniverseWidget = m_L_dmxUniverseWidget.last();
-    m_L_dmxUniverseWidget.removeLast();
-    dmxUniverseWidget->deleteLater();
+    auto universeWidget = m_L_universeWidget.last();
+    m_L_universeWidget.removeLast();
+    universeWidget->deleteLater();
 
     emit universeCountChanged(--m_universeCount);
 

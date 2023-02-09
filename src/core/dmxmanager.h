@@ -53,6 +53,8 @@ public :
 
   bool createUniverse(uid t_universeID);
   bool createSequence();
+  bool createChannelGroup(QList<DmxValue *> t_L_channel);
+
   int getUniverseCount() const{ return m_L_universe.size() ;}
 
   bool hwConnect(DmxManager::HwPortType t_type,

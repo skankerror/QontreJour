@@ -16,11 +16,11 @@
  */
 
 #include <QDebug>
-#include "dmxuniversewidget.h"
+#include "universewidget.h"
 #include "../qontrejour.h"
 
 
-DmxUniverseWidget::DmxUniverseWidget(int t_universeID,
+UniverseWidget::UniverseWidget(int t_universeID,
                                      QWidget *parent)
   : QWidget(parent),
     m_universeIDLabel(new QLabel(this)),
@@ -34,7 +34,7 @@ DmxUniverseWidget::DmxUniverseWidget(int t_universeID,
   CreateConnections();
 }
 
-DmxUniverseWidget::~DmxUniverseWidget()
+UniverseWidget::~UniverseWidget()
 {
   if (m_isConnected)
   {
@@ -42,7 +42,7 @@ DmxUniverseWidget::~DmxUniverseWidget()
   }
 }
 
-void DmxUniverseWidget::CreateWidget()
+void UniverseWidget::CreateWidget()
 {
   auto layout = new QHBoxLayout();
 
@@ -62,7 +62,7 @@ void DmxUniverseWidget::CreateWidget()
 
 }
 
-void DmxUniverseWidget::CreateConnections()
+void UniverseWidget::CreateConnections()
 {
   QObject::connect(m_dmxDriversComboBox,
                    SIGNAL(currentTextChanged(QString)),
@@ -74,7 +74,7 @@ void DmxUniverseWidget::CreateConnections()
                    SLOT(Connect()));
 }
 
-void DmxUniverseWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
+void UniverseWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
 {
   auto dmxManager = DmxManager::instance();
 
@@ -86,7 +86,7 @@ void DmxUniverseWidget::PopulateDevices(const QString &t_driverString /* = "dumm
     m_dmxDevicesComboBox->addItem("No device");
 }
 
-void DmxUniverseWidget::Connect()
+void UniverseWidget::Connect()
 {
   // TODO: this if is really ugly, bad work !
   if (m_dmxDevicesComboBox->currentText() == "No device")
@@ -120,7 +120,7 @@ void DmxUniverseWidget::Connect()
   }
 }
 
-void DmxUniverseWidget::disConnect()
+void UniverseWidget::disConnect()
 {
   if (m_isConnected)
   {

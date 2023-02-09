@@ -21,11 +21,11 @@
 #include <QMainWindow>
 #include <QList>
 #include <QPushButton>
-#include "dmxuniversewidget.h"
+#include "universewidget.h"
 #include "playbackwidget.h"
 #include "sequencerwidget.h"
 #include "valuesliderswidget.h"
-#include "dmxvaluetablewidget.h"
+#include "valuetablewidget.h"
 #include "../core/dmxmanager.h"
 
 
@@ -55,17 +55,17 @@ signals :
 
 private slots :
 
-  void addDmxUniverseWidget();
-  void removeDmxUniverseWidget();
+  void addUniverseWidget();
+  void removeUniverseWidget();
   void setDirectChannelWidget(int t_universeID);
 
 private :
 
   DirectChannelWidget *m_directChannelWidget;
-  QVBoxLayout *m_dmxUniverseWidgetContainerLayout;
-  QList<DmxUniverseWidget *> m_L_dmxUniverseWidget;
+  QVBoxLayout *m_universeWidgetContainerLayout;
+  QList<UniverseWidget *> m_L_universeWidget;
 
-  DmxValueTableWidget *m_dmxChannelTableWidget;
+  ValueTableWidget *m_dmxChannelTableWidget;
 
   DmxManager *m_dmxManager;
 
