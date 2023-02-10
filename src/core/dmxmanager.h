@@ -52,7 +52,7 @@ public :
   int getSequenceCount() const{ return m_L_rootScene.size(); }
   DmxValue * getRootChannel(uid t_ID) const
   { return m_L_universe.at(t_ID)->getRootChannel(); }
-
+  DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
 
   bool createUniverse(uid t_universeID);
   bool createSequence();
@@ -66,6 +66,7 @@ public :
                  uid t_ID);
 
   bool hwDisconnect(uid t_ID);
+
 
 private :
 

@@ -20,15 +20,15 @@
 #include "../qontrejour.h"
 
 
-UniverseWidget::UniverseWidget(int t_universeID,
-                                     QWidget *parent)
+UniverseWidget::UniverseWidget(uid t_uid,
+                               QWidget *parent)
   : QWidget(parent),
     m_universeIDLabel(new QLabel(this)),
     m_dmxDriversComboBox(new QComboBox(this)),
     m_dmxDevicesComboBox(new QComboBox(this)),
     m_dmxConnect(new QPushButton(this)),
     m_isConnected(false),
-    m_universeID(t_universeID)
+    m_universeID(t_uid)
 {
   CreateWidget();
   CreateConnections();

@@ -26,7 +26,6 @@
 #include "sequencerwidget.h"
 #include "valuesliderswidget.h"
 #include "valuetablewidget.h"
-#include "../core/dmxmanager.h"
 
 
 class MainWindow
@@ -44,20 +43,13 @@ public :
 private :
 
   void createCentralWidget();
-  QWidget * createDmxUniverseContainerWidget();
+  QWidget * createUniverseContainerWidget();
   void createDockWidgets();
-
-  void createConnections();
-
-signals :
-
-  void universeCountChanged(int);
 
 private slots :
 
   void addUniverseWidget();
   void removeUniverseWidget();
-  void setDirectChannelWidget(int t_universeID);
 
 private :
 
@@ -65,11 +57,7 @@ private :
   QVBoxLayout *m_universeWidgetContainerLayout;
   QList<UniverseWidget *> m_L_universeWidget;
 
-  ValueTableWidget *m_dmxChannelTableWidget;
-
-  DmxManager *m_dmxManager;
-
-  int m_universeCount;
+  ValueTableWidget *m_channelTableWidget;
 
 };
 #endif // MAINWINDOW_H

@@ -16,6 +16,13 @@
  */
 
 #include "valueeditwidget.h"
+#include "../qontrejour.h"
+#include "valuetablewidget.h"
+#include "../core/dmxmanager.h"
+#include <QLabel>
+#include <QLineEdit>
+#include <QSpinBox>
+
 
 ValueEditWidget::ValueEditWidget(DmxValue *t_rootValue,
                                  QWidget *parent)
@@ -60,5 +67,46 @@ GroupEditWidget::GroupEditWidget(DmxValue *t_rootValue,
   : QWidget(parent),
     m_rootValue(t_rootValue)
 {
+  auto totalLayout = new QVBoxLayout();
 
+  auto nameLayout = new QHBoxLayout();
+  auto nameLabel = new QLabel("Channel Group Name -->", this);
+  auto nameEdit = new QLineEdit(this);
+  nameEdit->setText(m_rootValue->getName());
+  connect(nameEdit,
+          SIGNAL(textEdited(QString)),
+          m_rootValue,
+          SLOT(setName(QString)));
+  nameLayout->addWidget(nameLabel);
+  nameLayout->addWidget(nameEdit);
+
+  auto sliderLayout = new QHBoxLayout();
+  auto sliderLabel = new QLabel("Choose Slider -->", this);
+  auto spinboxSlider = new QSpinBox(this);
+  spinboxSlider->setMinimum(1);
+  spinboxSlider->setMaximum((SUBMASTER_SLIDERS_COUNT_PER_PAGE
+                            * SUBMASTER_SLIDERS_PAGE_COUNT)
+                            + 1);
+  // TODO :connect spinbox
+  sliderLayout->addWidget(sliderLabel);
+  sliderLayout->addWidget(spinboxSlider);
+
+  auto channelTableWidget = new ValueTableWidget(this);
+  channelTableWidget->setRootValue(DmxManager::instance()
+                                   ->getRootChannel(0)); // start with uid 1
+  channelTableWidget->hideRecButtons();
+
+  auto validationLayout = new QHBoxLayout();
+  auto cancelButton = new QPushButton("Cancel", this);
+  auto okButton = new QPushButton("Ok", this);
+  // TODO :connect buttons
+  validationLayout->addStretch();
+  validationLayout->addWidget(cancelButton);
+  validationLayout->addWidget(okButton);
+
+  totalLayout->addLayout(nameLayout);
+  totalLayout->addLayout(sliderLayout);
+  totalLayout->addWidget(channelTableWidget);
+  totalLayout->addLayout(validationLayout);
+  setLayout(totalLayout);
 }

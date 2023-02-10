@@ -23,7 +23,7 @@
 #include <QComboBox>
 #include "../core/dmxvalue.h"
 
-class DmxValueSlider;
+class ValueSlider;
 
 class ValueSlidersWidget
     : public QWidget
@@ -36,17 +36,19 @@ public :
   explicit ValueSlidersWidget(QWidget *parent = nullptr);
 
   // getters
-  QList<DmxValueSlider *> getL_sliders() const { return m_L_sliders; }
+  QList<ValueSlider *> getL_sliders() const { return m_L_sliders; }
   DmxValue *getRootValue() const{ return m_rootValue; }
-
-  // setters
-  void setL_sliders(const QList<DmxValueSlider *> &t_L_sliders);
 
 public slots :
 
   virtual void populateWidget() = 0;
 
+  // for direct channel widget
+
   void setRootValue(DmxValue *t_rootValue);
+  void connectSlider(int t_sliderID,
+                     DmxValue *t_value);
+  void disconnectSlider(int t_sliderID);
 
 protected :
 
@@ -54,7 +56,7 @@ protected :
   QComboBox *m_changePageComboBox;
 
   DmxValue *m_rootValue;
-  QList<DmxValueSlider *> m_L_sliders;
+  QList<ValueSlider *> m_L_sliders;
 
 };
 
@@ -71,6 +73,9 @@ public :
   explicit DirectChannelWidget(QWidget *parent = nullptr);
 
   void populateWidget() override;
+
+  void setDirectChannelUniverseID(uid t_uid);
+
 
 };
 
@@ -94,7 +99,7 @@ public slots:
 
 /*************************************************************************/
 
-class DmxValueSlider
+class ValueSlider
     : public QSlider
 {
 
@@ -102,12 +107,12 @@ class DmxValueSlider
 
 public :
 
-  explicit DmxValueSlider(QWidget *parent = nullptr);
+  explicit ValueSlider(QWidget *parent = nullptr);
 
-  DmxValueSlider(DmxValue *t_dmxValue,
-                 QWidget *parent = nullptr);
+  ValueSlider(DmxValue *t_dmxValue,
+              QWidget *parent = nullptr);
 
-  virtual ~DmxValueSlider();
+  virtual ~ValueSlider();
 
   DmxValue *getDmxValue() const{ return m_dmxValue; }
   void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }

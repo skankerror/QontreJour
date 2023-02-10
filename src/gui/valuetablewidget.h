@@ -18,6 +18,7 @@
 #ifndef VALUETABLEWIDGET_H
 #define VALUETABLEWIDGET_H
 
+
 #include <QWidget>
 #include <QLabel>
 #include <QSpinBox>
@@ -25,8 +26,8 @@
 #include <QTableView>
 #include <QAbstractTableModel>
 #include <QEvent>
-#include <QSortFilterProxyModel>
 #include "../core/dmxvalue.h"
+#include "../core/dmxmanager.h"
 
 
 class ValueTableView;
@@ -44,6 +45,8 @@ public :
 
   virtual ~ValueTableWidget();
 
+  void hideRecButtons();
+
 signals :
 
   void askForUniverseChanged(int); // universeID to ask to mainwindow
@@ -53,6 +56,8 @@ public slots :
   void onUniverseCountChanged(int t_universeCount);
   void setUniverseID(const uid t_ID);
   void setRootValue(DmxValue *t_rootValue);
+
+  void setRootValueFromUid(uid t_uid);
 
 protected slots :
 
@@ -148,9 +153,14 @@ protected :
   int columnCount(const QModelIndex &parent) const override;
   QVariant data(const QModelIndex &index,
                 int role) const override;
+  QVariant filterData(const QModelIndex &index,
+                      int role) const;
   bool setData(const QModelIndex &index,
                const QVariant &value,
                int role) override;
+  bool setFilterData(const QModelIndex &index,
+                     const QVariant &value,
+                     int role);
   QVariant headerData(int section,
                       Qt::Orientation orientation,
                       int role) const override;

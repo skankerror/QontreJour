@@ -18,22 +18,16 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include <QDockWidget>
-#include "qdmxlib/QDmxManager"
-#include "qdmxlib/QDmxUsbDriver"
 
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent),
-    m_dmxManager(DmxManager::instance()),
-    m_dmxChannelTableWidget(new ValueTableWidget(this)),
+    m_channelTableWidget(new ValueTableWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
-    m_universeWidgetContainerLayout(new QVBoxLayout()),
-    m_universeCount(0)
+    m_universeWidgetContainerLayout(new QVBoxLayout())
 {
   createCentralWidget();
   createDockWidgets();
-
-  createConnections();
 }
 
 MainWindow::~MainWindow()
@@ -41,55 +35,46 @@ MainWindow::~MainWindow()
 
 void MainWindow::createCentralWidget()
 {
-  auto dmxUniverseContainerWidget = createDmxUniverseContainerWidget();
+  auto dmxUniverseContainerWidget = createUniverseContainerWidget();
 
   auto submasterWidget = new SubmasterWidget(this);
-  setDirectChannelWidget(0); // set for first universe
-
+  m_directChannelWidget->setDirectChannelUniverseID(0);
   auto tabWidget = new QTabWidget(this);
   tabWidget->addTab(submasterWidget, "Submasters");
   tabWidget->addTab(m_directChannelWidget, "Direct Channels");
   tabWidget->addTab(dmxUniverseContainerWidget, "DMX Connections");
 
-  setCentralWidget(tabWidget);
+  QMainWindow::setCentralWidget(tabWidget);
 }
 
-QWidget *MainWindow::createDmxUniverseContainerWidget()
+QWidget *MainWindow::createUniverseContainerWidget()
 {
-  auto dmxUniverseContainerWidget = new QWidget(this);
-  auto addDmxUniverseButton = new QPushButton("Add universe",
-                                             dmxUniverseContainerWidget);
-  auto removeDmxUniverseButton = new QPushButton("Remove Universe",
-                                                dmxUniverseContainerWidget);
+  auto universeContainerWidget = new QWidget(this);
+  auto addUniverseButton = new QPushButton("Add universe",
+                                           universeContainerWidget);
+  auto removeUniverseButton = new QPushButton("Remove Universe",
+                                              universeContainerWidget);
   auto buttonsLayout = new QHBoxLayout();
-  buttonsLayout->addWidget(addDmxUniverseButton);
-  buttonsLayout->addWidget(removeDmxUniverseButton);
+  buttonsLayout->addWidget(addUniverseButton);
+  buttonsLayout->addWidget(removeUniverseButton);
   m_universeWidgetContainerLayout->addLayout(buttonsLayout);
 
   // create first dmx manager widget for first universe
   addUniverseWidget();
 
-  dmxUniverseContainerWidget->setLayout(m_universeWidgetContainerLayout);
+  universeContainerWidget->setLayout(m_universeWidgetContainerLayout);
 
-  connect(addDmxUniverseButton,
+  connect(addUniverseButton,
           SIGNAL(clicked()),
           this,
           SLOT(addUniverseWidget()));
 
-  connect(removeDmxUniverseButton,
+  connect(removeUniverseButton,
           SIGNAL(clicked()),
           this,
           SLOT(removeUniverseWidget()));
 
-  return dmxUniverseContainerWidget;
-}
-
-void MainWindow::setDirectChannelWidget(int t_universeID)
-{
-  auto rootChannel = DmxManager::instance()
-      ->getRootChannel(t_universeID);
-  m_directChannelWidget->setRootValue(rootChannel);
-
+  return universeContainerWidget;
 }
 
 void MainWindow::createDockWidgets()
@@ -116,11 +101,10 @@ void MainWindow::createDockWidgets()
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
   auto bottomDock = new QDockWidget();
-  m_dmxChannelTableWidget->setRootValue(DmxManager::instance()
-                                        ->getRootChannel(0));
-  m_dmxChannelTableWidget->setUniverseID(0);
+  m_channelTableWidget->setRootValueFromUid(0);
+  m_channelTableWidget->setUniverseID(0);
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-  bottomDock->setWidget(m_dmxChannelTableWidget);
+  bottomDock->setWidget(m_channelTableWidget);
   bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
   addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
@@ -128,20 +112,15 @@ void MainWindow::createDockWidgets()
   setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
   setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-
 }
 
 void MainWindow::addUniverseWidget()
 {
-  auto universeWidget = new UniverseWidget(m_universeCount,
-                                                 this);
-
+  auto universeWidget = new UniverseWidget(m_L_universeWidget.size(),
+                                           this);
   m_L_universeWidget.append(universeWidget);
   m_universeWidgetContainerLayout->addWidget(universeWidget);
 
-  m_universeCount++;
-
-  emit universeCountChanged(m_universeCount);
 }
 
 void MainWindow::removeUniverseWidget()
@@ -152,25 +131,8 @@ void MainWindow::removeUniverseWidget()
     m_L_universeWidget.removeLast();
     universeWidget->deleteLater();
 
-    emit universeCountChanged(--m_universeCount);
-
-    // on remet le channel output widget au bon endroit
-    m_dmxChannelTableWidget->setUniverseID(m_universeCount - 1);
-    m_dmxChannelTableWidget->setRootValue(DmxManager::instance()
-                                          ->getRootChannel(m_universeCount - 1));
+    // TODO : gérer ça via manager, dire au channel table d'aller
+    // upgrader son universe ?
+    // ou bien faire un slot qui réagit à un signal du manager ?
   }
-}
-
-void MainWindow::createConnections()
-{
-  connect(this,
-          SIGNAL(universeCountChanged(int)),
-          m_dmxChannelTableWidget,
-          SLOT(onUniverseCountChanged(int)));
-
-  connect(m_dmxChannelTableWidget,
-          SIGNAL(askForUniverseChanged(int)),
-          this,
-          SLOT(setDirectChannelWidget(int)));
-
 }

@@ -35,7 +35,8 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_recScene(new QPushButton("Rec Scene", this)),
     m_clearSelectionButton(new QPushButton("C", this))
 {
-  m_model->setRootValue(nullptr);
+  setRootValue(DmxManager::instance()
+               ->getRootChannel(0));
 
   auto totalLayout = new QVBoxLayout();
   auto headerLayout = new QHBoxLayout();
@@ -43,6 +44,8 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
 
   auto label = new QLabel("Channels on Universe :", this);
 
+  // TODO : not good because this widget appear in edit windows
+  // after first instanciation
   m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
   m_universeSpinBox->setMinimum(1);// there's always at least one universe
 
@@ -68,7 +71,6 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
   m_tableView->verticalHeader()->hide();
 
   m_tableView->setModel(m_model);
-//  m_tableView->setModel(m_proxyModel);
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
@@ -97,6 +99,12 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
 
 ValueTableWidget::~ValueTableWidget()
 {}
+
+void ValueTableWidget::hideRecButtons()
+{
+  m_recGroup->hide();
+  m_recScene->hide();
+}
 
 void ValueTableWidget::onUniverseCountChanged(int t_universeCount)
 {
@@ -140,6 +148,12 @@ void ValueTableWidget::setRootValue(DmxValue *t_rootValue)
             this,
             SLOT(repaintTableView()));
   }
+}
+
+void ValueTableWidget::setRootValueFromUid(uid t_uid)
+{
+  setRootValue(DmxManager::instance()
+               ->getRootChannel(t_uid));
 }
 
 void ValueTableWidget::onSpinboxSelected(int t_universeID)
@@ -317,6 +331,10 @@ int ValueTableModel::columnCount(const QModelIndex &parent) const
 QVariant ValueTableModel::data(const QModelIndex &index,
                                int role) const
 {
+  // test
+//  return filterData(index,
+//                    role);
+
   if (!index.isValid())
     return QVariant();
 
@@ -403,9 +421,123 @@ QVariant ValueTableModel::data(const QModelIndex &index,
   }
 }
 
+QVariant ValueTableModel::filterData(const QModelIndex &index, int role) const
+{
+  if (!index.isValid())
+    return QVariant();
+
+  if (!m_rootValue)
+    return QVariant();
+
+  if (!(m_editedIndexes.size()))
+    return QVariant();
+
+  if (index.flags().testFlag(Qt::ItemIsEditable))
+  {
+    int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+        + index.column();
+    if (valueID < 0 || valueID >= m_editedIndexes.size())
+      return QVariant();
+
+    auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
+    DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
+
+    switch(role)
+    {
+    case Qt::DisplayRole :
+    case Qt::EditRole :
+      return dmxValue->getLevel();
+      break;
+    case Qt::TextAlignmentRole :
+      return Qt::AlignCenter;
+      break;
+    case Qt::BackgroundRole:
+      return QBrush(QColor(BLACK_COLOR));
+      break;
+    case Qt::ForegroundRole :
+      switch(flag)
+      {
+      case DmxValue::SelectedSceneFlag :
+        return QBrush(QColor(LIGHT_GREEN_COLOR));
+        break;
+      case DmxValue::DirectChannelFlag :
+        return QBrush(QColor(LIGHT_YELLOW_COLOR));
+        break;
+      case DmxValue::ChannelGroupFlag :
+        return QBrush(QColor(LIGHT_BLUE_COLOR));
+        break;
+      case DmxValue::ParkedFlag :
+        return QBrush(QColor(RED_COLOR));
+        break;
+      case DmxValue::IndependantFlag :
+        return QBrush(QColor(PURPLE_COLOR));
+        break;
+      case DmxValue::UnknownFlag :
+        return QBrush(QColor(LIGHT_GREY_COLOR));
+        break;
+      default:
+        break;
+      }
+    default:
+      return QVariant();
+      break;
+    }
+  }
+  else
+  {
+    int ret = ((index.row() / 2 ) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+        + index.column()/* + 1*/;
+    if (ret >= m_editedIndexes.size())
+      return QVariant();
+    auto index = m_editedIndexes.at(ret);
+    auto value = getValueFromIndex(index);
+
+    switch(role)
+    {
+    case Qt::DisplayRole :
+    case Qt::EditRole :
+      return value->getID() + 1;
+      break;
+    case Qt::TextAlignmentRole :
+      return Qt::AlignCenter;
+      break;
+    case Qt::BackgroundRole :
+        return QBrush(LIGHT_YELLOW_COLOR);
+      break;
+    default:
+      return QVariant();
+      break;
+    }
+  }
+
+}
+
 bool ValueTableModel::setData(const QModelIndex &index,
                               const QVariant &value,
                               int role)
+{
+  // test
+//  return setFilterData(index,
+//                       value,
+//                       role);
+
+  if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
+    return false;
+
+  int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+      + index.column();
+//  auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
+  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
+  // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
+  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
+                     value.toInt());
+
+  emit dataChanged(index,index);
+
+  return true;
+}
+
+bool ValueTableModel::setFilterData(const QModelIndex &index, const QVariant &value, int role)
 {
   if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
     return false;
@@ -413,13 +545,14 @@ bool ValueTableModel::setData(const QModelIndex &index,
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
   auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-  // NOTE : it's ok for the moment, but if we create widget xith channelgroup ?
+  // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
   dmxValue->setLevel(DmxValue::DirectChannelEditSender,
                      value.toInt());
 
   emit dataChanged(index,index);
 
   return true;
+
 }
 
 QVariant ValueTableModel::headerData(int section,

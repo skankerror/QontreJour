@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QWidget>
 
 
 // 0 to 255, value for dmx levels
@@ -60,9 +61,9 @@ public :
     Output, // stored in root
     RootChannel, // stored in universe
     Channel, // stored in root
-    RootChannelGroup, // stored in submasterwidget
+    RootChannelGroup, // stored in manager
     ChannelGroup, // stored in root
-    RootScene, // stored in sequencerwidget
+    RootScene, // stored in manager
     Scene, // stored in root
     SubScene, // stored in scene
     UnknownValueType
@@ -137,6 +138,10 @@ public :
   QList<dmx> getL_storedLevels() const{ return m_L_storedLevels; }
   int getL_ControledValueSize() const{ return m_L_controledValue.size(); }
 
+  // for values controled by a widget
+  QWidget *getAssignedWidget() const{ return m_assignedWidget; }
+
+
 /****************************** SETTERS *********************************/
 
   // setters
@@ -145,7 +150,6 @@ public :
   void setID(id t_ID);
   // setter different from the slot, needed by property
   void setPropertyLevel(dmx t_level);
-  void setName(const QString &t_name) { m_name = t_name; }
   void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue)
   { m_L_controledValue = t_m_L_controledValue; }
   void setType(ValueType t_type){ m_type = t_type; }
@@ -189,6 +193,7 @@ public slots :
 
   void setLevel(DmxValue::SignalSenderType t_senderType,
                 dmx t_level);
+  void setName(const QString &t_name) { m_name = t_name; }
   void setDirectChannelEditLevel(dmx t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
   void setChannelGroupLevel(dmx t_channelGroupLevel);
@@ -212,6 +217,9 @@ public slots :
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
 
   void setOverOffset(overdmx t_overOffset){ m_overOffset = t_overOffset; }
+
+  void setAssignedWidget(QWidget *t_assignedWidget)
+  { m_assignedWidget = t_assignedWidget; }
 
 protected :
 
@@ -282,6 +290,9 @@ protected :
   // this is easy way to implement fu****g tree model in Qt.
   // so in a way a root scene is a sequence.
   DmxValue *m_parentValue = nullptr;
+
+  // widget assigned to value, this may be a slider...
+  QWidget *m_assignedWidget = nullptr;
 
   Q_PROPERTY(dmx level
              READ getLevel

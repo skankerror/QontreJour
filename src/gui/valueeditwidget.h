@@ -20,10 +20,9 @@
 
 #include <QWidget>
 #include <QLayout>
-#include <QLabel>
-#include <QSpinBox>
 #include "../core/dmxvalue.h"
-#include "../core/dmxscene.h"
+#include "valuetablewidget.h"
+
 
 class GroupEditWidget;
 

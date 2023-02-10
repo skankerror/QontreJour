@@ -17,7 +17,9 @@
 
 #include "valuesliderswidget.h"
 #include "../qontrejour.h"
+#include "../core/dmxmanager.h"
 #include <QLabel>
+#include <QDebug>
 
 
 ValueSlidersWidget::ValueSlidersWidget(QWidget *parent)
@@ -38,22 +40,59 @@ ValueSlidersWidget::ValueSlidersWidget(QWidget *parent)
           &QStackedLayout::setCurrentIndex);
 }
 
-void ValueSlidersWidget::setL_sliders(const QList<DmxValueSlider *> &t_L_sliders)
-{
-  for (const auto &item : std::as_const(m_L_sliders))
-  {
-    item->deleteLater();
-  }
-  m_L_sliders.squeeze();
-
-  m_L_sliders = t_L_sliders;
-
-}
-
 void ValueSlidersWidget::setRootValue(DmxValue *t_rootValue)
 {
   m_rootValue = t_rootValue;
   populateWidget();
+}
+
+void ValueSlidersWidget::connectSlider(int t_sliderID,
+                                       DmxValue *t_value)
+{
+  if (t_sliderID < 0
+      || t_sliderID >= m_L_sliders.size()
+      || (!t_value))
+  {
+    qDebug() << "problem in ValueSlidersWidget::connectSlider";
+    return;
+  }
+
+  auto slider = m_L_sliders.at(t_sliderID);
+  slider->setDmxValue(t_value);
+
+  connect(slider,
+          SIGNAL(valueChanged(int)),
+          slider,
+          SLOT(updateLevel(int)));
+
+  connect(t_value,
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+          slider,
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+
+}
+
+void ValueSlidersWidget::disconnectSlider(int t_sliderID)
+{
+  if (t_sliderID < 0
+      || t_sliderID >= m_L_sliders.size())
+  {
+    qDebug() << "problem in ValueSlidersWidget::disConnectSlider";
+    return;
+  }
+  auto slider = m_L_sliders.at(t_sliderID);
+  disconnect(slider,
+             SIGNAL(valueChanged(int)),
+             slider,
+             SLOT(updateLevel(int)));
+
+  auto value = slider->getDmxValue();
+
+  disconnect(value,
+             SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+             slider,
+             SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+
 }
 
 /**********************************************************************/
@@ -69,8 +108,8 @@ void DirectChannelWidget::populateWidget()
   auto L_dmxChannel = m_rootValue->getL_childValue();
   for (const auto &item : std::as_const(L_dmxChannel))
   {
-    auto directChannelSlider = new DmxValueSlider(item,
-                                                  this);
+    auto directChannelSlider = new ValueSlider(item,
+                                               this);
     connect(item,
             SIGNAL(blockDirectChannelSlider(dmx)),
             directChannelSlider,
@@ -113,22 +152,35 @@ void DirectChannelWidget::populateWidget()
   }
 }
 
+void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
+{
+  setRootValue(DmxManager::instance()->getRootChannel(t_uid));
+}
+
+
 /*************************************************************************/
 
 SubmasterWidget::SubmasterWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
-{}
+{
+  setRootValue(DmxManager::instance()
+               ->getRootChannelGroup());
+}
 
 void SubmasterWidget::populateWidget()
 {
-  // on crée le 1er widget pour contenir 20 sliders
-  int page_count = m_L_sliders.size() / 20;
-  //  qDebug() << "page count : " << page_count;
-  if (m_L_sliders.size() > page_count * 20)
-    page_count++;
+  // on crée 200 sliders
+  for (int i = 0;
+       i < SUBMASTER_SLIDERS_COUNT_PER_PAGE * SUBMASTER_SLIDERS_PAGE_COUNT;
+       i++)
+  {
+    auto submasterSlider = new ValueSlider(this);
+    m_L_sliders.append(submasterSlider);
+  }
 
-  // TODO : probably crashes with with non 512ch universe.
-  for (int i = 0; i < page_count; i++) // for each page
+  for (int i = 0;
+       i < SUBMASTER_SLIDERS_PAGE_COUNT;
+       i++) // for each page
   {
     auto widget = new QWidget(this);
     auto pageLayout = new QHBoxLayout();
@@ -136,10 +188,10 @@ void SubmasterWidget::populateWidget()
     for (int j = 0; j < 20; j++) // for each slider
     {
       auto layout = new QVBoxLayout();
-      auto label = new QLabel(QString::number(j + (i * 20) + 1),
+      auto label = new QLabel(QString::number(j + (i * SUBMASTER_SLIDERS_COUNT_PER_PAGE) + 1),
                               widget);
       label->setAlignment(Qt::AlignHCenter);
-      auto slider = m_L_sliders.at(j + (i * 20));
+      auto slider = m_L_sliders.at(j + (i * SUBMASTER_SLIDERS_COUNT_PER_PAGE));
 
       layout->addWidget(slider);
       layout->addWidget(label);
@@ -151,22 +203,22 @@ void SubmasterWidget::populateWidget()
     m_stackedLayout->addWidget(widget);
     m_changePageComboBox->addItem(tr("page %1 --> Channel Group %2 - %3")
                                   .arg(i + 1)
-                                  .arg((i * 20) + 1)
-                                  .arg((i + 1) * 20));
+                                  .arg((i * SUBMASTER_SLIDERS_COUNT_PER_PAGE) + 1)
+                                  .arg((i + 1) * SUBMASTER_SLIDERS_COUNT_PER_PAGE));
   }
 }
 
 /**********************************************************************/
 
-DmxValueSlider::DmxValueSlider(QWidget *parent)
+ValueSlider::ValueSlider(QWidget *parent)
   :QSlider(parent)
 {
   setMinimum(0);
   setMaximum(255);
 }
 
-DmxValueSlider::DmxValueSlider(DmxValue *t_dmxValue,
-                               QWidget *parent)
+ValueSlider::ValueSlider(DmxValue *t_dmxValue,
+                         QWidget *parent)
   : QSlider(parent),
     m_dmxValue(t_dmxValue)
 {
@@ -185,10 +237,10 @@ DmxValueSlider::DmxValueSlider(DmxValue *t_dmxValue,
 
 }
 
-DmxValueSlider::~DmxValueSlider()
+ValueSlider::~ValueSlider()
 {}
 
-void DmxValueSlider::unMoveSlider(dmx t_level)
+void ValueSlider::unMoveSlider(dmx t_level)
 {
   // we disconnect to avoid connecting loop
   disconnect(this,
@@ -205,7 +257,7 @@ void DmxValueSlider::unMoveSlider(dmx t_level)
           SLOT(updateLevel(int)));
 }
 
-void DmxValueSlider::updateLevel(int t_level)
+void ValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
@@ -222,8 +274,8 @@ void DmxValueSlider::updateLevel(int t_level)
                          t_level);
 }
 
-void DmxValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
-                                         dmx t_level)
+void ValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
+                                      dmx t_level)
 {
   Q_UNUSED(t_type)
 

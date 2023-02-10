@@ -320,12 +320,12 @@ void DmxValue::setID(id t_ID)
 
 void DmxValue::setPropertyLevel(dmx t_level)
 {
-  if (m_level == t_level
-      || (t_level < 0)
-      || (t_level > 255))
-    return;
+//  if (m_level == t_level
+//      || (t_level < 0)
+//      || (t_level > 255))
+//    return;
 
-  m_level = t_level;
+//  m_level = t_level;
   // TODO : implement that
   //  emit levelChanged(/*m_ID,*/
   //                    m_level);

@@ -19,6 +19,7 @@
 #include <QLayout>
 #include <QDebug>
 
+
 SequencerWidget::SequencerWidget(QWidget *parent)
   : QWidget(parent),
     m_treeView(new SequencerTreeView(this)),
@@ -130,9 +131,9 @@ QModelIndex SequencerTreeModel::parent(const QModelIndex &child) const
 
   auto parentCast = static_cast<DmxScene *>(parentScene);
 
-  return createIndex(/*parentScene*/parentCast->getStepNumber(),
+  return createIndex(parentCast->getStepNumber(),
                      0,
-                     /*parentScene*/parentCast);
+                     parentCast);
 
 }
 

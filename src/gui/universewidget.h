@@ -33,14 +33,21 @@ class UniverseWidget
 
 public :
 
-  explicit UniverseWidget(int t_universeID,
-                            QWidget *parent = nullptr);
+  explicit UniverseWidget(uid t_uid,
+                          QWidget *parent = nullptr);
+
   ~UniverseWidget();
+
+  uid getUniverseID() const{ return m_universeID; }
 
 private :
 
   void CreateWidget();
   void CreateConnections();
+
+public slots:
+
+  void setUniverseID(uid t_universeID){ m_universeID = t_universeID; }
 
 private slots :
 
@@ -55,7 +62,7 @@ private :
   QComboBox *m_dmxDevicesComboBox;
   QPushButton *m_dmxConnect;
 
-  int m_universeID;
+  uid m_universeID;
 
   bool m_isConnected;
 
