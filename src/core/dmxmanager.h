@@ -24,6 +24,7 @@
 #include "dmxscene.h"
 #include "dmxuniverse.h"
 
+#define MANAGER DmxManager::instance()
 
 class DmxManager
     : public QObject
@@ -56,7 +57,7 @@ public :
 
   bool createUniverse(uid t_universeID);
   bool createSequence();
-  bool createChannelGroup(QList<DmxValue *> t_L_channel);
+  DmxValue *createChannelGroup(QList<DmxValue *> t_L_channel);
 
 
   bool hwConnect(DmxManager::HwPortType t_type,
@@ -80,7 +81,7 @@ private slots :
 
   void onUniverseRequest(uid t_uid,
                          id t_id,
-                         dmx t_level); // TODO :
+                         dmx t_level);
 
 private :
 

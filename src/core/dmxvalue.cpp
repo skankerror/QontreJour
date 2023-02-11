@@ -164,7 +164,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
       m_flag = SelectedSceneFlag;
     }
   }
-  // TODO : ici gérer le offset ovredmx
+  // TODO : ici gérer le offset overdmx
   if (m_level == level
       || (level < 0)
       || (level > 255))

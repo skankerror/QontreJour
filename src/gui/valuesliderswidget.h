@@ -43,8 +43,6 @@ public slots :
 
   virtual void populateWidget() = 0;
 
-  // for direct channel widget
-
   void setRootValue(DmxValue *t_rootValue);
   void connectSlider(int t_sliderID,
                      DmxValue *t_value);
@@ -130,6 +128,7 @@ protected slots :
 protected :
 
   DmxValue *m_dmxValue;
+
 };
 
 

@@ -46,8 +46,8 @@ void UniverseWidget::CreateWidget()
 {
   auto layout = new QHBoxLayout();
 
-  auto dmxManager = DmxManager::instance();
-  m_dmxDriversComboBox->addItems(dmxManager->getAvailableDriversNames());
+//  auto dmxManager = DmxManager::instance();
+  m_dmxDriversComboBox->addItems(MANAGER->getAvailableDriversNames());
 
   PopulateDevices();
 
@@ -76,11 +76,11 @@ void UniverseWidget::CreateConnections()
 
 void UniverseWidget::PopulateDevices(const QString &t_driverString /* = "dummy" */)
 {
-  auto dmxManager = DmxManager::instance();
+//  auto dmxManager = DmxManager::instance();
 
   m_dmxDevicesComboBox->clear();
 
-  m_dmxDevicesComboBox->addItems(dmxManager->getAvailableDevicesNames(t_driverString));
+  m_dmxDevicesComboBox->addItems(MANAGER->getAvailableDevicesNames(t_driverString));
 
   if (!m_dmxDevicesComboBox->count())
     m_dmxDevicesComboBox->addItem("No device");
@@ -97,12 +97,11 @@ void UniverseWidget::Connect()
   {
     auto driverString = m_dmxDriversComboBox->currentText();
     auto deviceString = m_dmxDevicesComboBox->currentText();
-    if (DmxManager::instance()
-        ->hwConnect(DmxManager::HwOutput,
-                    driverString,
-                    deviceString,
-                    0, // first output...
-                    m_universeID))
+    if (MANAGER->hwConnect(DmxManager::HwOutput,
+                           driverString,
+                           deviceString,
+                           0, // first output...
+                           m_universeID))
     {
       m_isConnected = true;
       m_dmxConnect->setText("Disconnect");
@@ -124,7 +123,7 @@ void UniverseWidget::disConnect()
 {
   if (m_isConnected)
   {
-    if (DmxManager::instance()
+    if (MANAGER
         ->hwDisconnect(m_universeID))
     {
       m_isConnected = false;

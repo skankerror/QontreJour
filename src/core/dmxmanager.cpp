@@ -17,7 +17,7 @@
 
 #include "dmxmanager.h"
 #include <QDebug>
-#include "../gui/valueeditwidget.h"
+//#include "../gui/valueeditwidget.h"
 
 DmxManager *DmxManager::instance()
 {
@@ -93,7 +93,7 @@ bool DmxManager::createSequence()
   return true;
 }
 
-bool DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
+DmxValue *DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
 {
   auto newGroup = new DmxValue(DmxValue::ChannelGroup);
   newGroup->setID(getGroupCount());
@@ -106,10 +106,10 @@ bool DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
   }
   newGroup->setL_storedLevels(L_storedLevels);
   m_rootChannelGroup->addChildValue(newGroup);
-  auto groupEditWidget = new ValueEditWidget(newGroup);
-  groupEditWidget->show();
+//  auto groupEditWidget = new ValueEditWidget(newGroup);
+//  groupEditWidget->show();
 
-  return true;
+  return newGroup;
 }
 
 bool DmxManager::hwConnect(HwPortType t_type,

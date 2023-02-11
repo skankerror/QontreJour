@@ -93,6 +93,8 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
              slider,
              SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
+  value->setAssignedWidget(nullptr);
+
 }
 
 /**********************************************************************/
@@ -154,7 +156,8 @@ void DirectChannelWidget::populateWidget()
 
 void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
 {
-  setRootValue(DmxManager::instance()->getRootChannel(t_uid));
+  setRootValue(MANAGER->getRootChannel(t_uid));
+//  TODO : changer le spinbox
 }
 
 
@@ -163,7 +166,7 @@ void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
 SubmasterWidget::SubmasterWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
 {
-  setRootValue(DmxManager::instance()
+  setRootValue(MANAGER
                ->getRootChannelGroup());
 }
 
@@ -234,6 +237,8 @@ ValueSlider::ValueSlider(DmxValue *t_dmxValue,
           SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
           this,
           SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+
+  m_dmxValue->setAssignedWidget(this);
 
 }
 

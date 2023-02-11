@@ -45,7 +45,10 @@ public :
 
   virtual ~ValueTableWidget();
 
+  // for value edit widget
   void hideRecButtons();
+
+  ValueTableModel *getModel() const{ return m_model; }
 
 signals :
 
@@ -143,8 +146,9 @@ public slots :
   void selectAll();
   void recordGroup();
 
-private slots :
+//private slots :
 
+  //public because we need this edit widgets
   void editedIndexChanged();
 
 protected :
@@ -153,14 +157,9 @@ protected :
   int columnCount(const QModelIndex &parent) const override;
   QVariant data(const QModelIndex &index,
                 int role) const override;
-  QVariant filterData(const QModelIndex &index,
-                      int role) const;
   bool setData(const QModelIndex &index,
                const QVariant &value,
                int role) override;
-  bool setFilterData(const QModelIndex &index,
-                     const QVariant &value,
-                     int role);
   QVariant headerData(int section,
                       Qt::Orientation orientation,
                       int role) const override;
@@ -169,6 +168,14 @@ protected :
                      const QVariant &value,
                      int role) override;
   Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+  // to show only non 0 values
+  QVariant filterData(const QModelIndex &index,
+                      int role) const;
+  bool setFilterData(const QModelIndex &index,
+                     const QVariant &value,
+                     int role);
+
 
 private :
 

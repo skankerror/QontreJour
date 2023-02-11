@@ -16,13 +16,15 @@
  */
 
 #include "valuetablewidget.h"
-#include "../qontrejour.h"
+
 #include <QLayout>
 #include <QHeaderView>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
+#include "../qontrejour.h"
 #include "../core/dmxmanager.h"
+#include "valueeditwidget.h"
 
 
 ValueTableWidget::ValueTableWidget(QWidget *parent)
@@ -35,7 +37,7 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_recScene(new QPushButton("Rec Scene", this)),
     m_clearSelectionButton(new QPushButton("C", this))
 {
-  setRootValue(DmxManager::instance()
+  setRootValue(MANAGER
                ->getRootChannel(0));
 
   auto totalLayout = new QVBoxLayout();
@@ -152,7 +154,7 @@ void ValueTableWidget::setRootValue(DmxValue *t_rootValue)
 
 void ValueTableWidget::setRootValueFromUid(uid t_uid)
 {
-  setRootValue(DmxManager::instance()
+  setRootValue(MANAGER
                ->getRootChannel(t_uid));
 }
 
@@ -300,9 +302,14 @@ void ValueTableModel::selectAll()
 
 void ValueTableModel::recordGroup()
 {
-  DmxManager::instance()
-      ->createChannelGroup(getValuesFromIndexList(
-                             getNon0ValueIndexList()));
+//  DmxManager::instance()
+//      ->createChannelGroup(getValuesFromIndexList(
+//                             getNon0ValueIndexList()));
+  auto L_channel = getValuesFromIndexList(getEditedIndexes());
+  auto newGroup = MANAGER->createChannelGroup(L_channel);
+  auto groupEditWidget = new ValueEditWidget(newGroup);
+  groupEditWidget->show();
+
 }
 
 void ValueTableModel::editedIndexChanged()

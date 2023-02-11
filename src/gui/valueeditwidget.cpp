@@ -92,9 +92,10 @@ GroupEditWidget::GroupEditWidget(DmxValue *t_rootValue,
   sliderLayout->addWidget(spinboxSlider);
 
   auto channelTableWidget = new ValueTableWidget(this);
-  channelTableWidget->setRootValue(DmxManager::instance()
-                                   ->getRootChannel(0)); // start with uid 1
+  channelTableWidget->setRootValue(MANAGER->getRootChannel(0)); // start with uid 1
   channelTableWidget->hideRecButtons();
+  // NOTE : does it change something ?
+  channelTableWidget->getModel()->editedIndexChanged();
 
   auto validationLayout = new QHBoxLayout();
   auto cancelButton = new QPushButton("Cancel", this);

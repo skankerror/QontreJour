@@ -21,7 +21,6 @@
 #include <QWidget>
 #include <QLayout>
 #include "../core/dmxvalue.h"
-#include "valuetablewidget.h"
 
 
 class GroupEditWidget;
