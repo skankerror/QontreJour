@@ -20,6 +20,9 @@
 
 #include <QWidget>
 #include <QLayout>
+#include <QLineEdit>
+#include <QComboBox>
+#include "valuetablewidget.h"
 #include "../core/dmxvalue.h"
 
 
@@ -33,19 +36,29 @@ class ValueEditWidget
 
 public :
 
+  // cstr for edit existing group
   explicit ValueEditWidget(DmxValue *t_rootValue,
+                           QWidget *parent = nullptr);
+
+  // cstr for new group
+  explicit ValueEditWidget(DmxValue::ValueType t_type,
+                           QList<DmxValue *> t_L_value,
                            QWidget *parent = nullptr);
 
 private :
 
   void createGroupEditWidget();
+  void createNewGroupWidget();
 
-signals :
+private slots :
+
+  void closeEditor();
 
 private :
 
   QHBoxLayout *m_layout;
   DmxValue *m_rootValue;
+  QList<DmxValue *> m_L_value;
 
 };
 
@@ -59,12 +72,35 @@ class GroupEditWidget
 
 public :
 
+  // cstr for edit existing group
   explicit GroupEditWidget(DmxValue *t_rootValue,
+                           QWidget *parent = nullptr);
+
+  // cstr for new group
+  explicit GroupEditWidget(QList<DmxValue *> t_L_value,
                            QWidget *parent = nullptr);
 
 private :
 
+  void createWidget();
+
+signals :
+
+  void closeEditor();
+
+private slots :
+
+  void okSlot();
+  void cancelSlot();
+
+private :
+
   DmxValue *m_rootValue;
+  QList<DmxValue *> m_L_value;
+
+  QLineEdit *m_nameEdit;
+  QComboBox *m_slidersComboBox;
+  ValueTableWidget *m_tableWidget;
 
 };
 

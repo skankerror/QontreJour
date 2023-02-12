@@ -302,12 +302,11 @@ void ValueTableModel::selectAll()
 
 void ValueTableModel::recordGroup()
 {
-//  DmxManager::instance()
-//      ->createChannelGroup(getValuesFromIndexList(
-//                             getNon0ValueIndexList()));
   auto L_channel = getValuesFromIndexList(getEditedIndexes());
-  auto newGroup = MANAGER->createChannelGroup(L_channel);
-  auto groupEditWidget = new ValueEditWidget(newGroup);
+//  auto newGroup = MANAGER->createChannelGroup(L_channel);
+//  auto groupEditWidget = new ValueEditWidget(newGroup);
+  auto groupEditWidget = new ValueEditWidget(DmxValue::ChannelGroup,
+                                             L_channel);
   groupEditWidget->show();
 
 }

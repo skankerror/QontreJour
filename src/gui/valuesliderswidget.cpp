@@ -58,6 +58,12 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
   }
 
   auto slider = m_L_sliders.at(t_sliderID);
+
+  if (slider->getIsConnected())
+  {
+    disconnectSlider(t_sliderID);
+  }
+
   slider->setDmxValue(t_value);
 
   connect(slider,
@@ -70,6 +76,20 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
           slider,
           SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
+  slider->setIsConnected(true);
+  t_value->setAssignedWidget(slider);
+
+}
+
+void ValueSlidersWidget::connectSlider(int t_sliderID,
+                                       id valueID)
+{
+  auto value = m_rootValue->getChildValue(valueID);
+  if (value)
+  {
+    return connectSlider(t_sliderID,
+                         value);
+  }
 }
 
 void ValueSlidersWidget::disconnectSlider(int t_sliderID)
@@ -93,6 +113,7 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
              slider,
              SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
+  slider->setIsConnected(false);
   value->setAssignedWidget(nullptr);
 
 }
@@ -166,8 +187,32 @@ void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
 SubmasterWidget::SubmasterWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
 {
-  setRootValue(MANAGER
-               ->getRootChannelGroup());
+  auto manager = MANAGER;
+  setRootValue(manager->getRootChannelGroup());
+
+  connect(manager,
+          SIGNAL(connectGroupToSubmasterSlider(int,id)),
+          this,
+          SLOT(connectSlider(int,id)));
+
+  connect(manager,
+          SIGNAL(disconnectGroupFromSubmasterSlider(int)),
+          this,
+          SLOT(disconnectSlider(int)));
+
+}
+
+bool SubmasterWidget::getIsSLiderConnected(int t_sliderID)
+{
+  if (t_sliderID < 0
+      || t_sliderID >= m_L_sliders.size())
+  {
+    qDebug() << "SubmasterWidget::getIsSLiderConnected";
+    return false;
+  }
+  auto slider = m_L_sliders.at(t_sliderID);
+  return slider->getIsConnected();
+
 }
 
 void SubmasterWidget::populateWidget()
@@ -178,6 +223,7 @@ void SubmasterWidget::populateWidget()
        i++)
   {
     auto submasterSlider = new ValueSlider(this);
+    submasterSlider->setID(i);
     m_L_sliders.append(submasterSlider);
   }
 
@@ -214,7 +260,8 @@ void SubmasterWidget::populateWidget()
 /**********************************************************************/
 
 ValueSlider::ValueSlider(QWidget *parent)
-  :QSlider(parent)
+  :QSlider(parent),
+    m_isConnected(false)
 {
   setMinimum(0);
   setMaximum(255);
@@ -239,6 +286,7 @@ ValueSlider::ValueSlider(DmxValue *t_dmxValue,
           SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
   m_dmxValue->setAssignedWidget(this);
+  m_isConnected = true;
 
 }
 

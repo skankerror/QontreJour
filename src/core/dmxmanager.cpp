@@ -106,10 +106,23 @@ DmxValue *DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
   }
   newGroup->setL_storedLevels(L_storedLevels);
   m_rootChannelGroup->addChildValue(newGroup);
-//  auto groupEditWidget = new ValueEditWidget(newGroup);
-//  groupEditWidget->show();
 
   return newGroup;
+}
+
+void DmxManager::connectValueToWidget(WidgetType t_widgetType,
+                                      int t_widgetID,
+                                      DmxValue::ValueType t_valueType,
+                                      id t_valueID)
+{
+  if (t_widgetType == DmxSlider)
+  {
+    if (t_valueType == DmxValue::ChannelGroup)
+    {
+      emit connectGroupToSubmasterSlider(t_widgetID,
+                                         t_valueID);
+    }
+  }
 }
 
 bool DmxManager::hwConnect(HwPortType t_type,

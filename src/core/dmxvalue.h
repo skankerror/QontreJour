@@ -128,13 +128,14 @@ public :
   // child values
   int getL_ChildValueSize() const{ return m_L_childValue.size(); }
   QList<DmxValue *> getL_childValue() const{ return m_L_childValue; }
+  DmxValue *getChildValue(id t_id) const;
   // parent
   DmxValue *getParentValue() const{ return m_parentValue; }
 
   // controled values
   QList<DmxValue *> getL_controledValue() const{ return m_L_controledValue; }
-  DmxValue * getControledValue(int t_index);
-  dmx getControledValueLevel(int t_index);
+  DmxValue * getControledValue(id t_index);
+  dmx getControledValueLevel(id t_index);
   QList<dmx> getL_storedLevels() const{ return m_L_storedLevels; }
   int getL_ControledValueSize() const{ return m_L_controledValue.size(); }
 

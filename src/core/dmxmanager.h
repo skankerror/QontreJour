@@ -40,11 +40,19 @@ public :
     HwOutput
   }; Q_ENUM(HwPortType)
 
+  enum WidgetType
+  {
+    DmxSlider,
+    DmxTableView,
+    UnknownWidgetType
+  }; Q_ENUM(WidgetType)
+
 
   static DmxManager *instance();
 
   ~DmxManager();
 
+  // getters
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
@@ -55,11 +63,18 @@ public :
   { return m_L_universe.at(t_ID)->getRootChannel(); }
   DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
 
+  // create everything we need
   bool createUniverse(uid t_universeID);
   bool createSequence();
   DmxValue *createChannelGroup(QList<DmxValue *> t_L_channel);
 
+  // connect values with widget
+  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
+                            int t_widgetID,
+                            DmxValue::ValueType t_valueType,
+                            id t_valueID);
 
+  // hardware connection
   bool hwConnect(DmxManager::HwPortType t_type,
                  QString &t_driver,
                  QString &t_device,
@@ -76,6 +91,10 @@ private :
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
 
 signals :
+
+  void connectGroupToSubmasterSlider(int t_sliderID,
+                                     id valueID);
+  void disconnectGroupFromSubmasterSlider(int t_sliderID);
 
 private slots :
 

@@ -42,10 +42,14 @@ public :
 public slots :
 
   virtual void populateWidget() = 0;
-
   void setRootValue(DmxValue *t_rootValue);
+
+protected slots :
+
   void connectSlider(int t_sliderID,
                      DmxValue *t_value);
+  void connectSlider(int t_sliderID,
+                     id valueID);
   void disconnectSlider(int t_sliderID);
 
 protected :
@@ -55,6 +59,7 @@ protected :
 
   DmxValue *m_rootValue;
   QList<ValueSlider *> m_L_sliders;
+
 
 };
 
@@ -89,6 +94,8 @@ public :
 
   explicit SubmasterWidget(QWidget *parent = nullptr);
 
+  bool getIsSLiderConnected(int t_sliderID);
+
 public slots:
 
   void populateWidget() override;
@@ -113,11 +120,18 @@ public :
   virtual ~ValueSlider();
 
   DmxValue *getDmxValue() const{ return m_dmxValue; }
+  id getID() const{ return m_ID; }
+  bool getIsConnected() const{ return m_isConnected; }
+
   void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }
+
+
 
 public slots :
 
   void unMoveSlider(dmx t_level);
+  void setIsConnected(bool t_isConnected){ m_isConnected = t_isConnected; }
+  void setID(id t_ID){ m_ID = t_ID; }
 
 protected slots :
 
@@ -128,6 +142,8 @@ protected slots :
 protected :
 
   DmxValue *m_dmxValue;
+  bool m_isConnected;
+  id m_ID;
 
 };
 

@@ -73,7 +73,15 @@ DmxValue::~DmxValue()
   DmxValue::clearControledList();
 }
 
-dmx DmxValue::getControledValueLevel(int t_index)
+DmxValue *DmxValue::getChildValue(id t_id) const
+{
+  if (t_id && (t_id < m_L_childValue.size()))
+    return m_L_childValue.at(t_id);
+  else
+    return nullptr;
+}
+
+dmx DmxValue::getControledValueLevel(id t_index)
 {
   auto value = getControledValue(t_index);
   if (value) return value->getLevel();
@@ -241,7 +249,7 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
 
 }
 
-DmxValue *DmxValue::getControledValue(int t_index)
+DmxValue *DmxValue::getControledValue(id t_index)
 {
   if (t_index && (t_index < m_L_controledValue.size()))
     return m_L_controledValue.at(t_index);
