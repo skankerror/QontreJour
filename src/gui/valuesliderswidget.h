@@ -123,7 +123,7 @@ public :
   id getID() const{ return m_ID; }
   bool getIsConnected() const{ return m_isConnected; }
 
-  void setDmxValue(DmxValue *t_dmxValue){ m_dmxValue = t_dmxValue; }
+  void setDmxValue(DmxValue *t_dmxValue);
 
 
 

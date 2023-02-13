@@ -75,7 +75,8 @@ DmxValue::~DmxValue()
 
 DmxValue *DmxValue::getChildValue(id t_id) const
 {
-  if (t_id && (t_id < m_L_childValue.size()))
+  if ((t_id > -1)
+      && (t_id < m_L_childValue.size()))
     return m_L_childValue.at(t_id);
   else
     return nullptr;

@@ -66,18 +66,18 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
 
   slider->setDmxValue(t_value);
 
-  connect(slider,
-          SIGNAL(valueChanged(int)),
-          slider,
-          SLOT(updateLevel(int)));
+//  connect(slider,
+//          SIGNAL(valueChanged(int)),
+//          slider,
+//          SLOT(updateLevel(int)));
 
-  connect(t_value,
-          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
-          slider,
-          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+//  connect(t_value,
+//          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+//          slider,
+//          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
 
-  slider->setIsConnected(true);
-  t_value->setAssignedWidget(slider);
+//  slider->setIsConnected(true);
+//  t_value->setAssignedWidget(slider);
 
 }
 
@@ -292,6 +292,25 @@ ValueSlider::ValueSlider(DmxValue *t_dmxValue,
 
 ValueSlider::~ValueSlider()
 {}
+
+void ValueSlider::setDmxValue(DmxValue *t_dmxValue)
+{
+  m_dmxValue = t_dmxValue;
+  connect(this,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(updateLevel(int)));
+
+  connect(m_dmxValue,
+          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+          this,
+          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+
+  m_dmxValue->setAssignedWidget(this);
+  m_isConnected = true;
+
+
+}
 
 void ValueSlider::unMoveSlider(dmx t_level)
 {
