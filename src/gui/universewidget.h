@@ -25,6 +25,7 @@
 #include <QLabel>
 #include "../core/dmxmanager.h"
 
+
 class UniverseWidget
     : public QWidget
 {

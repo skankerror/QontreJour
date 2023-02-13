@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include <QComboBox>
+#include <QLabel>
 #include "../core/dmxvalue.h"
 
 class ValueSlider;
@@ -59,7 +60,7 @@ protected :
 
   DmxValue *m_rootValue;
   QList<ValueSlider *> m_L_sliders;
-
+  QList<QLabel *> m_L_nameLabels;
 
 };
 
@@ -96,9 +97,14 @@ public :
 
   bool getIsSLiderConnected(int t_sliderID);
 
+signals :
+
+  void aSliderMoved();
+
 public slots:
 
   void populateWidget() override;
+
 
 };
 
@@ -125,7 +131,9 @@ public :
 
   void setDmxValue(DmxValue *t_dmxValue);
 
+signals :
 
+  void valueSliderMoved();
 
 public slots :
 
@@ -144,6 +152,7 @@ protected :
   DmxValue *m_dmxValue;
   bool m_isConnected;
   id m_ID;
+
 
 };
 

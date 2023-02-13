@@ -43,7 +43,7 @@ public :
 private :
 
   void createCentralWidget();
-  QWidget * createUniverseContainerWidget();
+  QWidget *createUniverseContainerWidget();
   void createDockWidgets();
 
 private slots :

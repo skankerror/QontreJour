@@ -168,6 +168,16 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
+void DmxManager::updateSubmasters()
+{
+  auto L_channelGroup = m_rootChannelGroup->getL_childValue();
+  for (const auto &item : std::as_const(L_channelGroup))
+  {
+    item->setLevel(DmxValue::SubmasterSliderSender,
+                   item->getLevel());
+  }
+}
+
 void DmxManager::onUniverseRequest(uid t_uid,
                                    id t_id,
                                    dmx t_level)

@@ -46,7 +46,6 @@ void UniverseWidget::CreateWidget()
 {
   auto layout = new QHBoxLayout();
 
-//  auto dmxManager = DmxManager::instance();
   m_dmxDriversComboBox->addItems(MANAGER->getAvailableDriversNames());
 
   PopulateDevices();
@@ -123,8 +122,7 @@ void UniverseWidget::disConnect()
 {
   if (m_isConnected)
   {
-    if (MANAGER
-        ->hwDisconnect(m_universeID))
+    if (MANAGER->hwDisconnect(m_universeID))
     {
       m_isConnected = false;
       m_dmxConnect->setText("Connect");

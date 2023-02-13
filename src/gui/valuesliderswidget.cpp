@@ -18,7 +18,6 @@
 #include "valuesliderswidget.h"
 #include "../qontrejour.h"
 #include "../core/dmxmanager.h"
-#include <QLabel>
 #include <QDebug>
 
 
@@ -58,27 +57,15 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
   }
 
   auto slider = m_L_sliders.at(t_sliderID);
+  auto label = m_L_nameLabels.at(t_sliderID);
 
   if (slider->getIsConnected())
   {
     disconnectSlider(t_sliderID);
   }
 
+  label->setText(t_value->getName());
   slider->setDmxValue(t_value);
-
-//  connect(slider,
-//          SIGNAL(valueChanged(int)),
-//          slider,
-//          SLOT(updateLevel(int)));
-
-//  connect(t_value,
-//          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
-//          slider,
-//          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
-
-//  slider->setIsConnected(true);
-//  t_value->setAssignedWidget(slider);
-
 }
 
 void ValueSlidersWidget::connectSlider(int t_sliderID,
@@ -101,6 +88,8 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
     return;
   }
   auto slider = m_L_sliders.at(t_sliderID);
+  auto label = m_L_nameLabels.at(t_sliderID);
+
   disconnect(slider,
              SIGNAL(valueChanged(int)),
              slider,
@@ -115,6 +104,7 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
 
   slider->setIsConnected(false);
   value->setAssignedWidget(nullptr);
+  label->setText("");
 
 }
 
@@ -178,7 +168,7 @@ void DirectChannelWidget::populateWidget()
 void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
 {
   setRootValue(MANAGER->getRootChannel(t_uid));
-//  TODO : changer le spinbox
+  //  TODO : changer le spinbox
 }
 
 
@@ -200,6 +190,11 @@ SubmasterWidget::SubmasterWidget(QWidget *parent)
           this,
           SLOT(disconnectSlider(int)));
 
+//  connect(this,
+//          SIGNAL(aSliderMoved()),
+//          manager,
+//          SLOT(onSubmasterWidgetRequest()));
+
 }
 
 bool SubmasterWidget::getIsSLiderConnected(int t_sliderID)
@@ -217,16 +212,6 @@ bool SubmasterWidget::getIsSLiderConnected(int t_sliderID)
 
 void SubmasterWidget::populateWidget()
 {
-  // on crée 200 sliders
-  for (int i = 0;
-       i < SUBMASTER_SLIDERS_COUNT_PER_PAGE * SUBMASTER_SLIDERS_PAGE_COUNT;
-       i++)
-  {
-    auto submasterSlider = new ValueSlider(this);
-    submasterSlider->setID(i);
-    m_L_sliders.append(submasterSlider);
-  }
-
   for (int i = 0;
        i < SUBMASTER_SLIDERS_PAGE_COUNT;
        i++) // for each page
@@ -236,15 +221,28 @@ void SubmasterWidget::populateWidget()
 
     for (int j = 0; j < 20; j++) // for each slider
     {
-      auto layout = new QVBoxLayout();
-      auto label = new QLabel(QString::number(j + (i * SUBMASTER_SLIDERS_COUNT_PER_PAGE) + 1),
-                              widget);
-      label->setAlignment(Qt::AlignHCenter);
-      auto slider = m_L_sliders.at(j + (i * SUBMASTER_SLIDERS_COUNT_PER_PAGE));
+      auto submasterSlider = new ValueSlider(this);
+      submasterSlider->setID(i);
+      m_L_sliders.append(submasterSlider);
+      connect(submasterSlider,
+              SIGNAL(valueSliderMoved()),
+              MANAGER,
+              SLOT(updateSubmasters()));
 
-      layout->addWidget(slider);
-      layout->addWidget(label);
-      layout->setAlignment(slider,
+      auto nameLabel = new QLabel("", this);
+      nameLabel->setAlignment(Qt::AlignHCenter);
+      nameLabel->setWordWrap(true);
+      m_L_nameLabels.append(nameLabel);
+
+      auto layout = new QVBoxLayout();
+      auto idLabel = new QLabel(QString::number(j + (i * SUBMASTER_SLIDERS_COUNT_PER_PAGE) + 1),
+                                widget);
+      idLabel->setAlignment(Qt::AlignHCenter);
+
+      layout->addWidget(submasterSlider);
+      layout->addWidget(idLabel);
+      layout->addWidget(nameLabel);
+      layout->setAlignment(submasterSlider,
                            Qt::AlignHCenter);
       pageLayout->addLayout(layout);
     }
@@ -342,8 +340,11 @@ void ValueSlider::updateLevel(int t_level)
                          t_level);
 
   if (type == DmxValue::ChannelGroup)
+  {
     m_dmxValue->setLevel(DmxValue::SubmasterSliderSender,
                          t_level);
+    emit valueSliderMoved();
+  }
 }
 
 void ValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,

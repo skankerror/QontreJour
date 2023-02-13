@@ -96,6 +96,11 @@ signals :
                                      id valueID);
   void disconnectGroupFromSubmasterSlider(int t_sliderID);
 
+public slots :
+
+  void updateSubmasters();
+//  void onSubmasterWidgetRequest();
+
 private slots :
 
   void onUniverseRequest(uid t_uid,

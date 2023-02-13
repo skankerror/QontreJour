@@ -168,7 +168,8 @@ public :
 protected :
 
   void setChannelLevel(SignalSenderType t_senderType,
-                       dmx t_level);
+                       dmx t_level/*,
+                       id t_channelGroupID = -1*/);
   void setOutputLevel(SignalSenderType t_senderType,
                       dmx t_level);
   void setChannelGroupLevel(SignalSenderType t_senderType,
@@ -193,7 +194,8 @@ signals :
 public slots :
 
   void setLevel(DmxValue::SignalSenderType t_senderType,
-                dmx t_level);
+                dmx t_level/*,
+                id t_channelGroupId = -1*/);
   void setName(const QString &t_name) { m_name = t_name; }
   void setDirectChannelEditLevel(dmx t_directChannelEditLevel);
   void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
@@ -239,14 +241,13 @@ protected :
   // for channel
   dmx m_directChannelEditLevel = 0;
   dmx m_channelGroupLevel = 0;
+//  id m_highestGroupLevel = -1;
   dmx m_selectedSceneLevel = 0;
   dmx m_nextSceneLevel = 0;
   overdmx m_overOffset = 0;
   ChannelFlag m_flag = UnknownFlag;
   bool m_isDirectChannelEdited = false;
 
-  // faire aussi une autre value pour channel group ?
-  // si ça reçoit de plusieurs sources ?
 
   // for all except subscene, output and channel group
   // children of instance

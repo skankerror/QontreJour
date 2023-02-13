@@ -27,7 +27,6 @@
 #include <QAbstractTableModel>
 #include <QEvent>
 #include "../core/dmxvalue.h"
-#include "../core/dmxmanager.h"
 
 
 class ValueTableView;

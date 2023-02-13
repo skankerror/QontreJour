@@ -100,9 +100,22 @@ void DmxValue::setLevel(SignalSenderType t_senderType,
 
   switch(m_type)
   {
-  case Channel : return setChannelLevel(t_senderType, t_level); break;
-  case Output : return setOutputLevel(t_senderType, t_level); break;
-  case ChannelGroup : return setChannelGroupLevel(t_senderType, t_level); break;
+  case Channel :
+    return setChannelLevel(t_senderType,
+                           t_level/*,
+                           t_channelGroupId*/);
+    break;
+
+  case Output :
+    return setOutputLevel(t_senderType,
+                          t_level);
+    break;
+
+  case ChannelGroup :
+    return setChannelGroupLevel(t_senderType,
+                                t_level);
+    break;
+
   default :   // TODO, implement other type
     if (m_level == t_level
         || (t_level < 0)
@@ -110,7 +123,6 @@ void DmxValue::setLevel(SignalSenderType t_senderType,
       return;
     break;
   }
-
 }
 
 void DmxValue::setChannelLevel(SignalSenderType t_senderType,
@@ -121,7 +133,13 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
   case ChannelGroupSender :
     if (m_channelGroupLevel == t_level)
       return;
+//    if (t_channelGroupID == m_highestGroupLevel)
     m_channelGroupLevel = t_level;
+//    else if (t_level > m_channelGroupLevel)
+//    {
+//      m_channelGroupLevel = t_level;
+//      m_highestGroupLevel = t_channelGroupID;
+//    }
     break;
   case DirectChannelEditSender :
     if (m_directChannelEditLevel == t_level)
@@ -143,7 +161,7 @@ void DmxValue::setChannelLevel(SignalSenderType t_senderType,
     break;
   }
 
-  // here we determine if output level change
+  // here we determine if channel level change
   int level; // final set. keep an int ? or dmx, overdmx ?
   if (m_isDirectChannelEdited)
   {
@@ -244,10 +262,10 @@ void DmxValue::setChannelGroupLevel(SignalSenderType t_senderType,
       double coef = double(m_level)/255.0f;
       if (t_senderType != NextSceneSender)
         dmxChannel->setLevel(DmxValue::ChannelGroupSender,
-                             (dmx)(coef * level));
+                             (dmx)(coef * level)/*,
+                             m_ID*/);
     }
   }
-
 }
 
 DmxValue *DmxValue::getControledValue(id t_index)
@@ -414,9 +432,6 @@ void DmxValue::addChildValue(DmxValue * t_dmxValue)
   if(t_dmxValue && !m_L_childValue.contains(t_dmxValue))
   {
     m_L_childValue.append(t_dmxValue);
-    dmx storedLevel = 0;
-    //    m_L_storedLevels.append(storedLevel);
-    //    emit m_L_childValueChanged();
   }
   else
     qWarning() << "cant add child value";
