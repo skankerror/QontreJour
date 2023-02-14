@@ -96,6 +96,7 @@ protected :
 
 class LeveledValue;
 
+
 class RootValue
     : public DmxValue
 {
@@ -240,6 +241,8 @@ public :
 
   dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
+  QMap<id, dmx> getM_channelGroup_Id_Level() const
+  { return m_M_channelGroup_Id_Level; }
   dmx getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   dmx getnextSceneLevel() const{ return m_nextSceneLevel; }
   overdmx getOverOffset() const{ return m_overOffset; }
@@ -259,7 +262,8 @@ public :
   void setIsDirectChannelEdited(bool t_isDirectChannelEdited)
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
   void setOverOffset(overdmx t_overOffset){ m_overOffset = t_overOffset; }
-
+  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
+  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutputList(QList<DmxOutput *> t_L_controledOutput);
@@ -267,6 +271,10 @@ public :
   void removeOutputList(const QList<id> t_L_index);
   void clearControledOutput();
 
+  void addChannelGroupControler(id t_id);
+  void addChannelGroupControlerList(QList<id> t_L_id);
+  void removeChannelGroupControler(id t_id);
+  void removeChannelGroupControlerList(QList<id> t_L_id);
 
 private :
 
@@ -274,6 +282,7 @@ private :
 
   dmx m_directChannelEditLevel = 0;
   dmx m_channelGroupLevel = 0;
+  QMap<id, dmx> m_M_channelGroup_Id_Level;
   dmx m_selectedSceneLevel = 0;
   dmx m_nextSceneLevel = 0;
   overdmx m_overOffset = 0;

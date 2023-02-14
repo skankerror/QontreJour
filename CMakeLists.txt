@@ -48,6 +48,8 @@ set(PROJECT_SOURCES
 #        src/core/dmxscene.cpp
         src/core/dmxmanager.h
         src/core/dmxmanager.cpp
+        src/core/dmxengine.h
+        src/core/dmxengine.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
 #        src/gui/universewidget.h

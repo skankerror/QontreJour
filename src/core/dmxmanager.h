@@ -21,7 +21,7 @@
 #include <QObject>
 #include "qdmxlib/QDmxManager"
 #include "dmxvalue.h"
-#include "dmxscene.h"
+//#include "dmxscene.h"
 #include "dmxuniverse.h"
 
 #define MANAGER DmxManager::instance()

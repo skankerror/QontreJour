@@ -240,6 +240,47 @@ void DmxChannel::clearControledOutput()
   m_L_controledOutput.squeeze();
 }
 
+void DmxChannel::addChannelGroupControler(id t_id)
+{
+  if (m_M_channelGroup_Id_Level.contains(t_id))
+  {
+    qWarning() << "DmxChannel::addChannelGroupControler"
+               << "id yet in the map";
+    return;
+  }
+  m_M_channelGroup_Id_Level.insert(t_id,
+                                   0);
+}
+
+void DmxChannel::addChannelGroupControlerList(QList<id> t_L_id)
+{
+  for (const auto item
+       : std::as_const(t_L_id))
+  {
+    addChannelGroupControler(item);
+  }
+}
+
+void DmxChannel::removeChannelGroupControler(id t_id)
+{
+  if (m_M_channelGroup_Id_Level.contains(t_id))
+  {
+    m_M_channelGroup_Id_Level.remove(t_id);
+    return;
+  }
+  qWarning() << "DmxChannel::addChannelGroupControler"
+             << "id yet in the map";
+}
+
+void DmxChannel::removeChannelGroupControlerList(QList<id> t_L_id)
+{
+  for (const auto item
+       : std::as_const(t_L_id))
+  {
+    removeChannelGroupControler(item);
+  }
+}
+
 
 /********************************** DMXCHANNELGROUP ************************************/
 
@@ -304,6 +345,7 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
   {
     m_L_controledChannel.append(t_dmxChannel);
     m_L_storedLevel.append((t_storedLevel));
+    t_dmxChannel->addChannelGroupControler(m_id);
   }
   else
     qWarning() << "cant add channel";
@@ -323,12 +365,16 @@ void DmxChannelGroup::addChannelList(QList<DmxChannel *> t_L_controledChannel,
   }
 }
 
+// NOTE : warning this id represent the number in the list and the
+// channel id.
 void DmxChannelGroup::removeChannel(const id t_index)
 {
   if ((t_index > -1)
       && (t_index < m_L_controledChannel.size())
       && (t_index < m_L_storedLevel.size()))
   {
+    auto channel = m_L_controledChannel.at(t_index);
+    channel->removeChannelGroupControler(m_id);
     m_L_controledChannel.removeAt(t_index);
     m_L_storedLevel.removeAt(t_index);
   }

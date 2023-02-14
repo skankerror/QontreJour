@@ -17,6 +17,7 @@
 
 #include "dmxmanager.h"
 #include <QDebug>
+#include "dmxengine.h"
 //#include "../gui/valueeditwidget.h"
 
 DmxManager *DmxManager::instance()
@@ -224,6 +225,11 @@ DmxManager::DmxManager(QObject *parent)
     channel->setID(i);
     m_rootChannel->addChildValue(channel);
   }
+
+  // start with straight patch between our channels
+  // and outputs from 1st universe
+  ENGINE->straightPatch(m_rootChannel,
+                        universe->getRootOutput());
 
   // and the main sequence :
 //  auto rootScene = new DmxScene(DmxValue::RootScene);
