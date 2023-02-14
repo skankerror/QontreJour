@@ -14,6 +14,3 @@ caler par défaut 10 après le dernier chiffre des dizaines sauf en cas de *9.99
 
 QLabel::setBuddy() ! pour pas se faire chier
 
-
-probleme avec les groups, qd un channel est sur pls groupes, baisser un group baisse
-sa value même si un autre groupe est là

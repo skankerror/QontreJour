@@ -22,7 +22,6 @@
 #include <QString>
 #include <QWidget>
 
-
 // 0 to 255, value for dmx levels
 typedef quint8 dmx ;
 
@@ -38,14 +37,14 @@ typedef qint16 id;
 // id for universe. signed cos it can be -1 for channel group, scene, etc...
 typedef qint16 uid;
 
-/******************************************************************************/
+#define NO_ID -1
+#define NO_UID -1
 
-// class for :
-// dmxoutput,
-// dmxchannel,
-// dmxchannelgroup
-// ** mother of :
-// ** dmxscene
+#define DEFAULT_OUTPUT_NAME "OUT"
+#define DEFAULT_CHANNEL_NAME "CH"
+#define DEFAULT_GROUP_NAME "GROUP"
+
+/******************************** DMXVALUE **************************************/
 
 class DmxValue
     : public QObject
@@ -63,27 +62,160 @@ public :
     Channel, // stored in root
     RootChannelGroup, // stored in manager
     ChannelGroup, // stored in root
-    RootScene, // stored in manager
-    Scene, // stored in root
-    SubScene, // stored in scene
     UnknownValueType
   };
   Q_ENUM(ValueType)
 
-  // enum for signals
-  enum SignalSenderType
-  {
-    SubmasterSliderSender,
-    ChannelGroupSender,
-    DirectChannelEditSender,
-    SelectedSceneSender,
-    NextSceneSender,
-    IndependantSender,
-    ChannelToOutputSender,
-    OutputToUniverseSender,
-    UnknownSender
-  };
-  Q_ENUM(SignalSenderType)
+
+
+  explicit DmxValue(ValueType t_type = UnknownValueType,
+                    DmxValue *t_parent = nullptr);
+
+  virtual ~DmxValue();
+
+  id getID() const{ return m_ID; }
+  uid getUniverseID() const { return m_universeID; }
+  QString getName() const{ return m_name; }
+  ValueType getType() const{ return m_type; }
+
+  void setID(id t_ID){ m_ID = t_ID; }
+  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
+  void setName(const QString &t_name) { m_name = t_name; }
+  void setType(ValueType t_type){ m_type = t_type; }
+
+protected :
+
+  id m_ID = NO_ID;
+  uid m_universeID = NO_UID;
+  QString m_name = "Unknow Value";
+  ValueType m_type = UnknownValueType;
+
+};
+
+/********************************* ROOTVALUE *************************************/
+
+class LeveledValue;
+
+class RootValue
+    : public DmxValue
+{
+
+  Q_OBJECT
+
+public :
+
+  RootValue(ValueType t_type = UnknownValueType,
+            DmxValue *t_parent = nullptr);
+
+  ~RootValue();
+
+  // child values
+  int getL_ChildValueSize() const{ return m_L_childValue.size(); }
+  QList<LeveledValue *> getL_childValue() const{ return m_L_childValue; }
+  LeveledValue *getChildValue(id t_id) const;
+
+  void setL_childValue(const QList<LeveledValue *> &t_L_childValue)
+  { m_L_childValue = t_L_childValue; }
+
+  void addChildValue(LeveledValue *t_value);
+  void addChlidList(QList<LeveledValue *> t_L_value);
+  void removeChildValue(id t_index);
+  void removeChildValueList(QList<id> t_L_index);
+
+private :
+
+  QList<LeveledValue *> m_L_childValue;
+
+};
+
+/******************************** LEVELEDVALUE **************************************/
+
+class LeveledValue
+    : public DmxValue
+{
+
+  Q_OBJECT
+
+public :
+
+  LeveledValue(ValueType t_type = UnknownValueType,
+               RootValue *t_parent = nullptr);
+
+  virtual ~LeveledValue();
+
+  dmx getLevel() const{ return m_level; }
+  RootValue *getParentValue() const{ return m_parentValue; }
+  QWidget *getAssignedWidget() const{ return m_assignedWidget; }
+
+signals :
+
+  void levelChanged(dmx level);
+
+public slots :
+
+  void setLevel(dmx t_level);
+  // TODO: Adapt
+  void resetLevel(){ setLevel({}); }
+  void setParentValue(RootValue *t_parentValue)
+  { m_parentValue = t_parentValue; }
+  void setAssignedWidget(QWidget *t_assignedWidget)
+  { m_assignedWidget = t_assignedWidget; }
+
+protected :
+
+  dmx m_level = 0;
+  RootValue *m_parentValue = nullptr;
+
+  // widget assigned to value, this may be a slider...
+  // rotate button...
+  QWidget *m_assignedWidget = nullptr;
+
+  Q_PROPERTY(dmx level
+             READ getLevel
+             WRITE setLevel
+             RESET resetLevel
+             NOTIFY levelChanged)
+};
+
+/********************************* DMXOUTPUT *************************************/
+
+class DmxOutput
+    : public LeveledValue
+{
+
+  Q_OBJECT
+
+public :
+
+  DmxOutput(ValueType t_type = Output,
+            RootValue *t_parent = nullptr);
+
+  virtual ~DmxOutput();
+
+  dmx getMaxLevel() const{ return m_maxLevel; }
+  bool getIsParked() const{ return m_isParked; }
+
+public slots :
+
+  void setMaxLevel(dmx t_maxLevel){ m_maxLevel = t_maxLevel; }
+  void setIsParked(bool t_isParked){ m_isParked = t_isParked; }
+
+private :
+
+  dmx m_maxLevel = 255;
+  bool m_isParked;
+
+};
+
+/********************************** DMXCHANNEL ************************************/
+
+class DmxChannel
+    : public LeveledValue
+{
+
+  Q_OBJECT
+
+public :
 
   enum ChannelFlag
   {
@@ -96,27 +228,11 @@ public :
   };
   Q_ENUM(ChannelFlag)
 
-  // cstr
-  explicit DmxValue(ValueType t_type = UnknownValueType,
-                    DmxValue *t_parent = nullptr);
+  DmxChannel(ValueType t_type = Channel,
+             RootValue *t_parent = nullptr);
 
-  // dstr
-  virtual ~DmxValue();
+  virtual ~DmxChannel();
 
- /************************** GETTERS ***************************/
-  // common
-  id getID() const{ return m_ID; }
-  uid getUniverseID() const { return m_universeID; }
-  QString getName() const{ return m_name; }
-  ValueType getType() const{ return m_type; }
-
-  // all except root ones
-  dmx getLevel() const{ return m_level; }
-
-  // output
-  dmx getMaxLevel() const { return m_maxLevel; }
-
-  // channel
   dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
   dmx getselectedSceneLevel() const{ return m_selectedSceneLevel; }
@@ -125,181 +241,101 @@ public :
   ChannelFlag getChannelFlag() const{ return m_flag; }
   bool getIsDirectChannelEdited() const{ return m_isDirectChannelEdited; }
 
-  // child values
-  int getL_ChildValueSize() const{ return m_L_childValue.size(); }
-  QList<DmxValue *> getL_childValue() const{ return m_L_childValue; }
-  DmxValue *getChildValue(id t_id) const;
-  // parent
-  DmxValue *getParentValue() const{ return m_parentValue; }
-
   // controled values
-  QList<DmxValue *> getL_controledValue() const{ return m_L_controledValue; }
-  DmxValue * getControledValue(id t_index);
-  dmx getControledValueLevel(id t_index);
-  QList<dmx> getL_storedLevels() const{ return m_L_storedLevels; }
-  int getL_ControledValueSize() const{ return m_L_controledValue.size(); }
-
-  // for values controled by a widget
-  QWidget *getAssignedWidget() const{ return m_assignedWidget; }
-
-
-/****************************** SETTERS *********************************/
+  QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
+  DmxOutput *getControledOutput(const id t_index);
+  dmx getControledOutputLevel(const id t_index);
+  int getL_ControledOutputSize() const{ return m_L_controledOutput.size(); }
 
   // setters
-  void setMaxLevel(dmx t_maxLevel);
-  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
-  void setID(id t_ID);
-  // setter different from the slot, needed by property
-  void setPropertyLevel(dmx t_level);
-  void setL_controledValue(const QList<DmxValue *> &t_m_L_controledValue)
-  { m_L_controledValue = t_m_L_controledValue; }
-  void setType(ValueType t_type){ m_type = t_type; }
-
-  // meths for controled children
-  void addControledChild(DmxValue *t_dmxValue);
-  void addControledChildren(const QList<DmxValue *> t_m_L_controledValue);
-  bool removeControledChild(const DmxValue *t_dmxValue);
-  bool removeControledChildren(const QList<DmxValue *> t_m_L_controledValue);
-  void clearControledList();
-
-  void addChildValue(DmxValue *t_dmxValue);
-
-
-protected :
-
-  void setChannelLevel(SignalSenderType t_senderType,
-                       dmx t_level/*,
-                       id t_channelGroupID = -1*/);
-  void setOutputLevel(SignalSenderType t_senderType,
-                      dmx t_level);
-  void setChannelGroupLevel(SignalSenderType t_senderType,
-                            dmx t_level);
-
-signals :
-
-  void levelChanged(DmxValue::SignalSenderType,
-                    dmx t_level);
-  void requestDmxUpdate(uid t_universeID,
-                        id t_outputID,
-                        dmx t_level);
-  void m_L_controledValueChanged();
-
-  void directChannelEditLevelChanged(dmx directChannelEditLevel);
-  void channelGroupLevelChanged(dmx channelGroupLevel);
-  void selectedSceneLevelChanged(dmx selectedSceneLevel);
-  void nextSceneLevelChanged(dmx nextSceneLevel);
-
-  void blockDirectChannelSlider(dmx t_level);
-
-public slots :
-
-  void setLevel(DmxValue::SignalSenderType t_senderType,
-                dmx t_level/*,
-                id t_channelGroupId = -1*/);
-  void setName(const QString &t_name) { m_name = t_name; }
-  void setDirectChannelEditLevel(dmx t_directChannelEditLevel);
-  void resetDirectChannelEditLevel(){ setDirectChannelEditLevel(0); }
-  void setChannelGroupLevel(dmx t_channelGroupLevel);
-  void setSelectedSceneLevel(dmx t_selectedSceneLevel);
-  void setNextSceneLevel(dmx t_nextSceneLevel);
-  void setControledChildLevel(DmxValue::SignalSenderType t_senderType,
-                              int t_index,
-                              dmx t_level);
-  void setStoredLevel(int t_childIndex,
-                      dmx t_level);
-
-  void setFlag(DmxValue::ChannelFlag t_flag){ m_flag = t_flag; }
-
-  void setParentValue(DmxValue *t_parentValue){ m_parentValue = t_parentValue; }
-
-  void setL_childValue(const QList<DmxValue *> &t_L_childValue)
-  { m_L_childValue = t_L_childValue;}
-  void setL_storedLevels(const QList<dmx> &t_L_storedLevels)
-  {  m_L_storedLevels = t_L_storedLevels; }
+  void setL_controledOutput(QList<DmxOutput *> &t_L_controledOutput)
+  { m_L_controledOutput = t_L_controledOutput; }
+  void setChannelFlag(DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
   void setIsDirectChannelEdited(bool t_isDirectChannelEdited)
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
-
   void setOverOffset(overdmx t_overOffset){ m_overOffset = t_overOffset; }
 
-  void setAssignedWidget(QWidget *t_assignedWidget)
-  { m_assignedWidget = t_assignedWidget; }
 
-protected :
+  void addOutput(DmxOutput *t_dmxOutput);
+  void addOutputList(QList<DmxOutput *> t_L_controledOutput);
+  void removeOutput(const id t_index);
+  void removeOutputList(const QList<id> t_L_index);
+  void clearControledOutput();
 
-  // commons for all types :
-  id m_ID = 0;
-  uid m_universeID = -1;
-  QString m_name = "Unknow Value";
-  ValueType m_type = UnknownValueType;
 
-  // for all except root ones
-  dmx m_level = 0;
+private :
 
-  // for output
-  dmx m_maxLevel = 255;
+  QList<DmxOutput *>m_L_controledOutput;
 
-  // for channel
   dmx m_directChannelEditLevel = 0;
   dmx m_channelGroupLevel = 0;
-//  id m_highestGroupLevel = -1;
   dmx m_selectedSceneLevel = 0;
   dmx m_nextSceneLevel = 0;
   overdmx m_overOffset = 0;
   ChannelFlag m_flag = UnknownFlag;
   bool m_isDirectChannelEdited = false;
 
-
-  // for all except subscene, output and channel group
-  // children of instance
-  // this will be output for root output
-  // channels for root channel
-  // channel(s) for channel group
-  // channel group(s) and channel(s) for scene and subscene
-  // scene for sub scene
-  QList<DmxValue *> m_L_childValue;
-
-  // for all except root Values, and output
-  // value controled by instance
-  // it's set by setLevel() slot that is emited and recieved
-  // from value to value.
-  // scene
-  // subscene
-  // setLevel for
-  //   -channel group
-  //  | and channel
-  //  set level for
-  //        channel
-  // and then channel to output
-  // all htp decisions are taken by channel
-  // knowing if it's a direct edit
-  // a channel group value
-  // a channel group via scene
-  // a scene, subscene, a nextscene
-  // to determine wich value set to output and how present it
-  // to mvc.
-  // this is done with enum flags
-  QList<DmxValue *> m_L_controledValue;
-
-  // for controled channel or channel group levels
-  // in scene, subscene or channelgroup
-  QList<dmx> m_L_storedLevels;
-
-  // parent value
-  // for output and channels it will be root. universe will destroy
-  // it on his destruction.
-  // for scene this will be root scene
-  // for subscene this will be a scene.
-  // this is easy way to implement fu****g tree model in Qt.
-  // so in a way a root scene is a sequence.
-  DmxValue *m_parentValue = nullptr;
-
-  // widget assigned to value, this may be a slider...
-  QWidget *m_assignedWidget = nullptr;
-
-  Q_PROPERTY(dmx level
-             READ getLevel
-             WRITE setPropertyLevel
-             NOTIFY levelChanged)
 };
+
+/********************************** DMXCHANNELGROUP ************************************/
+
+class DmxChannelGroup
+    : public LeveledValue
+
+{
+
+  Q_OBJECT
+
+public :
+
+  DmxChannelGroup(ValueType t_type = ChannelGroup,
+                  RootValue *t_parent = nullptr);
+
+  ~DmxChannelGroup();
+
+  // controled values
+  QList<DmxChannel *> getL_controledChannel() const{ return m_L_controledChannel; }
+  DmxChannel *getControledChannel(const id t_index);
+  dmx getControledChannelLevel(const id t_index);
+  dmx getControledChannelStoredLevel(const id t_index);
+  int getL_ControledChannelSize() const{ return m_L_controledChannel.size(); }
+
+  // setters
+  void setL_controledChannel(QList<DmxChannel *> &t_L_controledChannel)
+  { m_L_controledChannel = t_L_controledChannel; }
+
+  void addChannel(DmxChannel *t_dmxChannel,
+                  dmx t_storedLevel);
+  void addChannelList(QList<DmxChannel *> t_L_controledChannel,
+                      QList<dmx> t_L_storedLevel);
+  bool removeChannel(const id t_index);
+  bool removeChannelList(const QList<id> t_L_index);
+  void clearControledChannel();
+
+
+private :
+
+  QList<DmxChannel *> m_L_controledChannel;
+  QList<dmx> m_L_storedLevel;
+
+};
+
+
+//  // enum for signals
+//  enum SignalSenderType
+//  {
+//    SubmasterSliderSender,
+//    ChannelGroupSender,
+//    DirectChannelEditSender,
+//    SelectedSceneSender,
+//    NextSceneSender,
+//    IndependantSender,
+//    ChannelToOutputSender,
+//    OutputToUniverseSender,
+//    UnknownSender
+//  };
+//  Q_ENUM(SignalSenderType)
+
+
 
 #endif // DMXVALUE_H
