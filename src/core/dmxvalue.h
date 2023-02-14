@@ -195,6 +195,11 @@ public :
   dmx getMaxLevel() const{ return m_maxLevel; }
   bool getIsParked() const{ return m_isParked; }
 
+signals :
+
+  void outputRequestUpdate(id t_id,
+                           dmx t_level);
+
 public slots :
 
   void setMaxLevel(dmx t_maxLevel){ m_maxLevel = t_maxLevel; }
@@ -303,13 +308,15 @@ public :
   // setters
   void setL_controledChannel(QList<DmxChannel *> &t_L_controledChannel)
   { m_L_controledChannel = t_L_controledChannel; }
+  void setL_storedLevel(QList<dmx> t_L_storedLevel)
+  { m_L_storedLevel = t_L_storedLevel; }
 
   void addChannel(DmxChannel *t_dmxChannel,
                   dmx t_storedLevel);
   void addChannelList(QList<DmxChannel *> t_L_controledChannel,
                       QList<dmx> t_L_storedLevel);
-  bool removeChannel(const id t_index);
-  bool removeChannelList(const QList<id> t_L_index);
+  void removeChannel(const id t_index);
+  void removeChannelList(const QList<id> t_L_index);
   void clearControledChannel();
 
 
@@ -319,7 +326,6 @@ private :
   QList<dmx> m_L_storedLevel;
 
 };
-
 
 //  // enum for signals
 //  enum SignalSenderType
@@ -335,7 +341,5 @@ private :
 //    UnknownSender
 //  };
 //  Q_ENUM(SignalSenderType)
-
-
 
 #endif // DMXVALUE_H

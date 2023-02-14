@@ -56,23 +56,22 @@ public :
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
-  int getGroupCount() const
-  { return m_rootChannelGroup->getL_ChildValueSize(); }
-  int getSequenceCount() const{ return m_L_rootScene.size(); }
-  DmxValue * getRootChannel(uid t_ID) const
-  { return m_L_universe.at(t_ID)->getRootChannel(); }
+//  int getSequenceCount() const{ return m_L_rootScene.size(); }
+  DmxValue *getRootChannel() const{ return m_rootChannel; }
+  int getChannelCount() const{ return m_rootChannel->getL_ChildValueSize(); }
   DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
+  int getChannelGroupCount() const{ return m_rootChannelGroup->getL_ChildValueSize(); }
 
   // create everything we need
   bool createUniverse(uid t_universeID);
-  bool createSequence();
-  DmxValue *createChannelGroup(QList<DmxValue *> t_L_channel);
+//  bool createSequence();
+  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
 
-  // connect values with widget
-  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
-                            int t_widgetID,
-                            DmxValue::ValueType t_valueType,
-                            id t_valueID);
+  // connect values to widget
+//  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
+//                            int t_widgetID,
+//                            DmxValue::ValueType t_valueType,
+//                            id t_valueID);
 
   // hardware connection
   bool hwConnect(DmxManager::HwPortType t_type,
@@ -98,22 +97,23 @@ signals :
 
 public slots :
 
-  void updateSubmasters();
+//  void updateSubmasters();
 //  void onSubmasterWidgetRequest();
 
 private slots :
 
-  void onUniverseRequest(uid t_uid,
-                         id t_id,
-                         dmx t_level);
+  void onUniverseRequestUpdate(uid t_uid,
+                               id t_id,
+                               dmx t_level);
 
 private :
 
   QDmxManager *m_hwManager;
 
   QList<DmxUniverse *> m_L_universe;
-  QList<DmxScene *> m_L_rootScene;
-  DmxValue *m_rootChannelGroup;
+  RootValue *m_rootChannel;
+  RootValue *m_rootChannelGroup;
+//  QList<DmxScene *> m_L_rootScene;
 
 };
 

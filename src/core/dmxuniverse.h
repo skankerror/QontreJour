@@ -41,8 +41,7 @@ public :
   uid getID() const { return m_ID; }
   int getOutputCount() const { return m_outputCount; }
   bool isConnected() const { return m_isConnected; }
-  DmxValue *getRootChannel() const{ return m_rootChannel; }
-  DmxValue *getRootOutput() const{ return m_rootOutput; }
+  RootValue *getRootOutput() const{ return m_rootOutput; }
 
   // setters
   void setID(uid t_ID) { m_ID = t_ID; }
@@ -52,9 +51,9 @@ public :
 
 signals :
 
-  void dmxOutputUpdateRequired(uid t_universeID,
-                               id t_outputID,
-                               dmx t_level);
+  void universeRequireUpdate(uid t_universeID,
+                             id t_outputID,
+                             dmx t_level);
 
 public slots :
 
@@ -63,9 +62,8 @@ public slots :
 
 private slots :
 
-  void onRequestDmxUpdate(uid t_universeId,
-                          id t_ID,
-                          dmx t_level);
+  void onOutputRequestUpdate(id t_ID,
+                             dmx t_level);
 
 private :
 
@@ -74,9 +72,7 @@ private :
 
   bool m_isConnected;
 
-  // root values, parents of all values created for this universe
-  DmxValue *m_rootChannel;
-  DmxValue *m_rootOutput;
+  RootValue *m_rootOutput;
 
 };
 

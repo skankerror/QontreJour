@@ -24,7 +24,8 @@
 
 DmxValue::DmxValue(ValueType t_type,
                    DmxValue *t_parent):
-  QObject(t_parent)
+  QObject(t_parent),
+  m_type(t_type)
 {}
 
 DmxValue::~DmxValue()
@@ -37,7 +38,22 @@ RootValue::RootValue(DmxValue::ValueType t_type,
                      DmxValue *t_parent)
   : DmxValue(t_type,
              t_parent)
-{}
+{
+  switch(t_type)
+  {
+  case DmxValue::RootOutput :
+    setName("Root Output");
+    break;
+  case DmxValue::RootChannel :
+    setName("Root Channel");
+    break;
+  case DmxValue::RootChannelGroup :
+    setName("Root Channel Group");
+    break;
+  default :
+    break;
+  }
+}
 
 RootValue::~RootValue()
 {
@@ -64,7 +80,8 @@ void RootValue::addChildValue(LeveledValue *t_value)
   // we check if the pointer isn't null and if the value is not in the list.
   if(t_value && !m_L_childValue.contains(t_value))
   {
-    m_L_childValue.append(t_dmxValue);
+    m_L_childValue.append(t_value);
+    t_value->setParentValue(this);
   }
   else
     qWarning() << "cant add child value";
@@ -84,6 +101,8 @@ void RootValue::removeChildValue(id t_index)
   if (t_index < 0
       || t_index >= m_L_childValue.size())
   {
+    auto value = m_L_childValue.at(t_index);
+    value->setParentValue(nullptr);
     m_L_childValue.removeAt(t_index);
   }
   else
@@ -283,11 +302,11 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
   if(t_dmxChannel
      && !m_L_controledChannel.contains(t_dmxChannel))
   {
-    m_L_channelOutput.append(t_dmxOutput);
+    m_L_controledChannel.append(t_dmxChannel);
     m_L_storedLevel.append((t_storedLevel));
   }
   else
-    qWarning() << "cant add output";
+    qWarning() << "cant add channel";
 
 }
 
@@ -304,7 +323,7 @@ void DmxChannelGroup::addChannelList(QList<DmxChannel *> t_L_controledChannel,
   }
 }
 
-bool DmxChannelGroup::removeChannel(const id t_index)
+void DmxChannelGroup::removeChannel(const id t_index)
 {
   if ((t_index > -1)
       && (t_index < m_L_controledChannel.size())
@@ -319,12 +338,12 @@ bool DmxChannelGroup::removeChannel(const id t_index)
   }
 }
 
-bool DmxChannelGroup::removeChannelList(const QList<id> t_L_index)
+void DmxChannelGroup::removeChannelList(const QList<id> t_L_index)
 {
   for (const auto item
        : std::as_const(t_L_index))
   {
-    removechannel(item);
+    removeChannel(item);
   }
 }
 

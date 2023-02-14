@@ -25,63 +25,43 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     m_ID(t_universeID), // first universe will have id 0
     m_outputCount(t_outputCount),
     m_isConnected(false),
-    m_rootChannel(new DmxValue(DmxValue::RootChannel)),
-    m_rootOutput(new DmxValue(DmxValue::RootOutput))
+    m_rootOutput(new RootValue(DmxValue::RootOutput))
 {
-  m_rootChannel->setUniverseID(m_ID);
   m_rootOutput->setUniverseID(m_ID);
 
   for (int i = 0;
        i < m_outputCount;
        i++)
   {
-    // create output and channel
-    auto dmxOutput = new DmxValue(DmxValue::Output,
-                                  m_rootOutput);
+    // create output
+    auto dmxOutput = new DmxOutput(DmxValue::Output,
+                                   m_rootOutput);
     dmxOutput->setUniverseID(m_ID);
     dmxOutput->setID(i);
 
-    auto dmxChannel = new DmxValue(DmxValue::Channel,
-                                   m_rootChannel);
-    dmxChannel->setUniverseID(m_ID);
-    dmxChannel->setID(i);
-
-    // we start with straight patch
-    dmxChannel->addControledChild(dmxOutput);
-
-    m_rootChannel->addChildValue(dmxChannel);
     m_rootOutput->addChildValue(dmxOutput);
 
-    connect(dmxChannel,
-            SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
-            dmxOutput,
-            SLOT(setLevel(DmxValue::SignalSenderType,dmx)));
-
     connect(dmxOutput,
-            SIGNAL(requestDmxUpdate(uid,id,dmx)),
+            SIGNAL(outputRequestUpdate(id,dmx)),
             this,
-            SLOT(onRequestDmxUpdate(uid,id,dmx)));
-
-
+            SLOT(onOutputRequestUpdate(id,dmx)));
   }
 }
 
 DmxUniverse::~DmxUniverse()
 {
-  // détruire output et channel !
-  m_rootChannel->deleteLater();
+  // détruire output
   m_rootOutput->deleteLater();
 }
 
-void DmxUniverse::onRequestDmxUpdate(uid t_universeId,
-                                     id t_ID,
-                                     dmx t_level)
+void DmxUniverse::onOutputRequestUpdate(id t_ID,
+                                        dmx t_level)
 {
   if (!m_isConnected)
     return;
 
-  emit dmxOutputUpdateRequired(t_universeId,
-                               t_ID,
-                               t_level);
+  emit universeRequireUpdate(m_ID,
+                             t_ID,
+                             t_level);
 }
 

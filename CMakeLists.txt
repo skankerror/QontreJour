@@ -44,24 +44,24 @@ set(PROJECT_SOURCES
         src/core/dmxuniverse.cpp
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-        src/core/dmxscene.h
-        src/core/dmxscene.cpp
+#        src/core/dmxscene.h
+#        src/core/dmxscene.cpp
         src/core/dmxmanager.h
         src/core/dmxmanager.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
-        src/gui/universewidget.h
-        src/gui/universewidget.cpp
-        src/gui/sequencerwidget.h
-        src/gui/sequencerwidget.cpp
-        src/gui/valuetablewidget.h
-        src/gui/valuetablewidget.cpp
-        src/gui/valuesliderswidget.h
-        src/gui/valuesliderswidget.cpp
-        src/gui/playbackwidget.h
-        src/gui/playbackwidget.cpp
-        src/gui/valueeditwidget.h
-        src/gui/valueeditwidget.cpp
+#        src/gui/universewidget.h
+#        src/gui/universewidget.cpp
+#        src/gui/sequencerwidget.h
+#        src/gui/sequencerwidget.cpp
+#        src/gui/valuetablewidget.h
+#        src/gui/valuetablewidget.cpp
+#        src/gui/valuesliderswidget.h
+#        src/gui/valuesliderswidget.cpp
+#        src/gui/playbackwidget.h
+#        src/gui/playbackwidget.cpp
+#        src/gui/valueeditwidget.h
+#        src/gui/valueeditwidget.cpp
         ${TS_FILES}
         ${DATA_FILES}
 )

@@ -28,6 +28,15 @@ DmxManager *DmxManager::instance()
 DmxManager::~DmxManager()
 {
   m_hwManager->teardown();
+  m_rootChannel->deleteLater();
+  m_rootChannelGroup->deleteLater();
+  for (const auto &item
+       : std::as_const(m_L_universe))
+  {
+    item->deleteLater();
+  }
+  m_L_universe.clear();
+  m_L_universe.squeeze();
 }
 
 QStringList DmxManager::getAvailableDriversNames() const
@@ -60,9 +69,9 @@ bool DmxManager::createUniverse(uid t_universeID)
     m_L_universe.append(universe);
 
     connect(universe,
-            SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+            SIGNAL(universeRequireUpdate(uid,id,dmx)),
             this,
-            SLOT(onUniverseRequest(uid,id,dmx)));
+            SLOT(onUniverseRequestUpdate(uid,id,dmx)));
 
     return true;
   }
@@ -77,53 +86,54 @@ bool DmxManager::createUniverse(uid t_universeID)
     m_L_universe.append(universe);
 
     connect(universe,
-            SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+            SIGNAL(universeRequireUpdate(uid,id,dmx)),
             this,
-            SLOT(onUniverseRequest(uid,id,dmx)));
+            SLOT(onUniverseRequestUpdate(uid,id,dmx)));
 
     return true;
   }
   return false;
 }
 
-bool DmxManager::createSequence()
-{
-  auto rootScene = new DmxScene(DmxValue::RootScene);
-  m_L_rootScene.append(rootScene);
-  return true;
-}
+//bool DmxManager::createSequence()
+//{
+//  auto rootScene = new DmxScene(DmxValue::RootScene);
+//  m_L_rootScene.append(rootScene);
+//  return true;
+//}
 
-DmxValue *DmxManager::createChannelGroup(QList<DmxValue *> t_L_channel)
+DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
 {
-  auto newGroup = new DmxValue(DmxValue::ChannelGroup);
-  newGroup->setID(getGroupCount());
-  newGroup->setL_controledValue(t_L_channel);
-  auto L_storedLevels = QList<dmx>();
-  for (const auto item : std::as_const(t_L_channel))
+  auto newGroup = new DmxChannelGroup(DmxValue::ChannelGroup);
+  newGroup->setID(getChannelGroupCount());
+  newGroup->setL_controledChannel(t_L_channel);
+  auto L_storedLevel = QList<dmx>();
+  for (const auto item
+       : std::as_const(t_L_channel))
   {
     auto level = item->getLevel();
-    L_storedLevels.append(level);
+    L_storedLevel.append(level);
   }
-  newGroup->setL_storedLevels(L_storedLevels);
+  newGroup->setL_storedLevel(L_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);
 
   return newGroup;
 }
 
-void DmxManager::connectValueToWidget(WidgetType t_widgetType,
-                                      int t_widgetID,
-                                      DmxValue::ValueType t_valueType,
-                                      id t_valueID)
-{
-  if (t_widgetType == DmxSlider)
-  {
-    if (t_valueType == DmxValue::ChannelGroup)
-    {
-      emit connectGroupToSubmasterSlider(t_widgetID,
-                                         t_valueID);
-    }
-  }
-}
+//void DmxManager::connectValueToWidget(WidgetType t_widgetType,
+//                                      int t_widgetID,
+//                                      DmxValue::ValueType t_valueType,
+//                                      id t_valueID)
+//{
+////  if (t_widgetType == DmxSlider)
+//  {
+//    if (t_valueType == DmxValue::ChannelGroup)
+//    {
+//      emit connectGroupToSubmasterSlider(t_widgetID,
+//                                         t_valueID);
+//    }
+//  }
+//}
 
 bool DmxManager::hwConnect(HwPortType t_type,
                            QString &t_driver,
@@ -168,19 +178,19 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
-void DmxManager::updateSubmasters()
-{
-  auto L_channelGroup = m_rootChannelGroup->getL_childValue();
-  for (const auto &item : std::as_const(L_channelGroup))
-  {
-    item->setLevel(DmxValue::SubmasterSliderSender,
-                   item->getLevel());
-  }
-}
+//void DmxManager::updateSubmasters()
+//{
+//  auto L_channelGroup = m_rootChannelGroup->getL_childValue();
+//  for (const auto &item : std::as_const(L_channelGroup))
+//  {
+//    item->setLevel(DmxValue::SubmasterSliderSender,
+//                   item->getLevel());
+//  }
+//}
 
-void DmxManager::onUniverseRequest(uid t_uid,
-                                   id t_id,
-                                   dmx t_level)
+void DmxManager::onUniverseRequestUpdate(uid t_uid,
+                                         id t_id,
+                                         dmx t_level)
 {
   m_hwManager->writeData(t_uid,
                          t_id,
@@ -195,19 +205,36 @@ void DmxManager::onUniverseRequest(uid t_uid,
 DmxManager::DmxManager(QObject *parent)
   : QObject(parent),
     m_hwManager(QDmxManager::instance()),
-    m_rootChannelGroup(new DmxValue(DmxValue::RootChannelGroup))
+    m_rootChannel(new RootValue(DmxValue::RootChannel)),
+    m_rootChannelGroup(new RootValue(DmxValue::RootChannelGroup))
 {
+  // init hardware manager
   m_hwManager->init();
+
   // we create first universe
   auto universe = new DmxUniverse(0);
   m_L_universe.append(universe);
+
+  // create default number of channels
+  for (int i = 0;
+       i < DEFAULT_CHANNEL_COUNT;
+       i++)
+  {
+    auto channel = new DmxChannel();
+    channel->setID(i);
+    m_rootChannel->addChildValue(channel);
+  }
+
   // and the main sequence :
-  auto rootScene = new DmxScene(DmxValue::RootScene);
-  m_L_rootScene.append(rootScene);
+//  auto rootScene = new DmxScene(DmxValue::RootScene);
+//  m_L_rootScene.append(rootScene);
 
 
   connect(universe,
-          SIGNAL(dmxOutputUpdateRequired(uid,id,dmx)),
+          SIGNAL(universeRequireUpdate(uid,id,dmx)),
           this,
-          SLOT(onUniverseRequest(uid,id,dmx)));
+          SLOT(onUniverseRequestUpdate(uid,id,dmx)));
+
+  //test
+
 }
