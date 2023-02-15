@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef DMXENGINE_H
 #define DMXENGINE_H
 
@@ -22,6 +23,8 @@
 #include "dmxvalue.h"
 
 #define ENGINE DmxEngine::instance()
+
+class DmxPatch;
 
 class DmxEngine
     : public QObject
@@ -50,6 +53,7 @@ private :
 
 private :
 
+  DmxPatch *m_dmxPatch;
 
 };
 
@@ -83,7 +87,7 @@ public :
         .arg(m_outputID);
   }
 
-  static QString toString(Uid_Id t_uid_id)
+  static QString UidtoString(Uid_Id t_uid_id)
   {
     return QString("%1.%2")
         .arg(t_uid_id.getUniverseID())
@@ -97,5 +101,36 @@ private :
 
 };
 
+ /****************************** DmxPatch ******************************/
+
+class DmxPatch
+{
+
+public :
+
+  explicit DmxPatch(){}
+
+  ~DmxPatch(){}
+
+  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
+
+  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch){ m_MM_patch = t_MM_patch; }
+
+  void clearPatch();
+  void clearChannel(id t_channelID);
+  void addOutputToChannel(id t_channelID,
+                          Uid_Id t_outputUid_Id);
+  void addOutputListToChannel(id t_channelId,
+                              QList<Uid_Id> t_L_outputUid_Id);
+  void removeOutputFromChannel(id t_channelID,
+                               Uid_Id t_outputUid_Id);
+  void removeOutputListFromChannel(id t_channelID,
+                                   QList<Uid_Id> t_L_outputUid_Id);
+
+private :
+
+  QMultiMap<id, Uid_Id> m_MM_patch;
+
+};
 
 #endif // DMXENGINE_H

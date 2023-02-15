@@ -156,7 +156,7 @@ public slots :
 
   void setLevel(dmx t_level);
   // TODO: Adapt
-  void resetLevel(){ setLevel({}); }
+  void resetLevel(){ setLevel(0); }
   void setParentValue(RootValue *t_parentValue)
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)

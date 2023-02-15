@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "dmxengine.h"
 #include <QChar>
 
@@ -24,7 +25,10 @@ DmxEngine *DmxEngine::instance()
 }
 
 DmxEngine::~DmxEngine()
-{}
+{
+  delete m_dmxPatch;
+  m_dmxPatch = nullptr;
+}
 
 void DmxEngine::straightPatch(RootValue *t_rootChannel,
                               RootValue *t_rootOutput)
@@ -40,11 +44,13 @@ void DmxEngine::straightPatch(RootValue *t_rootChannel,
 
 void DmxEngine::clearPatch(RootValue *t_rootChannel)
 {
-
+  m_dmxPatch->clearPatch();
+  // TODO : clear connections with root channel
 }
 
 DmxEngine::DmxEngine(QObject *parent)
-  : QObject(parent)
+  : QObject(parent),
+    m_dmxPatch(new DmxPatch())
 {}
 
 /*************************** Uid_Id /************************************/
@@ -54,13 +60,49 @@ Uid_Id::Uid_Id(QString &t_string)
   if (t_string.size() > 3
       && t_string.at(0).isDigit())
   {
-    for (qsizetype i = 0;
-         i < t_string.size();
-         i++)
-    {
-      auto value = t_string.at(i);
-      if (value.isDigit())
+    auto tempFloat = t_string.toFloat();
+    m_universeID = (uid)tempFloat;
+    // TODO : implement this fucking string method
+//    for (qsizetype i = 0;
+//         i < t_string.size();
+//         i++)
+//    {
+//      auto value = t_string.at(i);
+//      if (value.isDigit())
 
-    }
   }
 }
+
+/******************************** DmxPatch *******************************/
+
+void DmxPatch::clearPatch()
+{
+  m_MM_patch.clear();
+}
+
+void DmxPatch::clearChannel(id t_channelID)
+{
+
+}
+
+void DmxPatch::addOutputToChannel(id t_channelID, Uid_Id t_outputUid_Id)
+{
+
+}
+
+void DmxPatch::addOutputListToChannel(id t_channelId, QList<Uid_Id> t_L_outputUid_Id)
+{
+
+}
+
+void DmxPatch::removeOutputFromChannel(id t_channelID, Uid_Id t_outputUid_Id)
+{
+
+}
+
+void DmxPatch::removeOutputListFromChannel(id t_channelID, QList<Uid_Id> t_L_outputUid_Id)
+{
+
+}
+
+

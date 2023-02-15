@@ -345,7 +345,7 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
   {
     m_L_controledChannel.append(t_dmxChannel);
     m_L_storedLevel.append((t_storedLevel));
-    t_dmxChannel->addChannelGroupControler(m_id);
+    t_dmxChannel->addChannelGroupControler(m_ID);
   }
   else
     qWarning() << "cant add channel";
@@ -374,7 +374,7 @@ void DmxChannelGroup::removeChannel(const id t_index)
       && (t_index < m_L_storedLevel.size()))
   {
     auto channel = m_L_controledChannel.at(t_index);
-    channel->removeChannelGroupControler(m_id);
+    channel->removeChannelGroupControler(m_ID);
     m_L_controledChannel.removeAt(t_index);
     m_L_storedLevel.removeAt(t_index);
   }
