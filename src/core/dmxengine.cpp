@@ -60,10 +60,13 @@ void DmxEngine::straightPatch(RootValue *t_rootChannel,
   clearPatch(t_rootChannel);
 
   int totalOutputSize = 0;
+  // for agregate all outputs and patch in the order
+  QList<LeveledValue *> L_output;
   for (const auto &item
        : std::as_const(t_L_rootOutput))
   {
     totalOutputSize += item->getL_ChildValueSize();
+    L_output += item->getL_childValue();
   }
   auto biggerSize = t_rootChannel->getL_ChildValueSize()
       < totalOutputSize
@@ -76,7 +79,7 @@ void DmxEngine::straightPatch(RootValue *t_rootChannel,
   {
     auto channel = t_rootChannel->getChildValue(i);
     auto channelCast = static_cast<DmxChannel *>(channel);
-    auto output = t_rootOutput->getChildValue(i); // TODO : y a t_L_output...
+    auto output = L_output.at(i);
     auto outputCast = static_cast<DmxOutput *>(output);
     patchOutputToChannel(channelCast,
                          outputCast);
@@ -92,6 +95,12 @@ void DmxEngine::clearPatch(RootValue *t_rootChannel)
        : std::as_const(L_Channel))
   {
     auto channel = static_cast<DmxChannel *>(item);
+    auto L_output = channel->getL_controledOutput();
+    for (const auto &it
+         : std::as_const(L_output))
+    {
+      it->setChannelControler(nullptr);
+    }
     channel->clearControledOutput();
   }
 }
@@ -106,6 +115,10 @@ void DmxEngine::patchOutputToChannel(DmxChannel *t_channel,
   {
     t_channel->addOutput(t_output);
     t_output->setChannelControler(t_channel);
+  }
+  else
+  {
+    qWarning() << "can't DmxEngine::patchOutputToChannel";
   }
 }
 
@@ -123,33 +136,80 @@ void DmxEngine::patchOutputListToChannel(DmxChannel *t_channel,
 void DmxEngine::unpatchOutputFromChannel(DmxChannel *t_channel,
                                          DmxOutput *t_output)
 {
-
+  auto channelID = t_channel->getID();
+  auto outputUid_Id = Uid_Id(t_output);
+  if (m_dmxPatch->removeOutputFromChannel(channelID,
+                                          outputUid_Id))
+  {
+    t_channel->removeOutput(t_output);
+    t_output->setChannelControler(nullptr);
+  }
+  else
+  {
+    qWarning () << "can't DmxEngine::unpatchOutputFromChannel";
+  }
 }
 
 void DmxEngine::unpatchOutputListFromChannel(DmxChannel *t_channel,
                                              QList<DmxOutput *> t_L_output)
 {
-
+  for (const auto &item
+       : std::as_const(t_L_output))
+  {
+    unpatchOutputFromChannel(t_channel,
+                             item);
+  }
 }
 
 void DmxEngine::unpatchOutput(DmxOutput *t_output)
 {
-
+  auto outputUid_Id = Uid_Id(t_output);
+  if (m_dmxPatch->removeOutput(outputUid_Id))
+  {
+    auto channel = t_output->getChannelControler();
+    channel->removeOutput(t_output);
+    t_output->setChannelControler(nullptr);
+  }
+  else
+  {
+    qWarning () << "can't DmxEngine::unpatchOutput";
+  }
 }
 
 void DmxEngine::unpatchOutputList(QList<DmxOutput *> t_L_output)
 {
-
+  for (const auto &item
+       : std::as_const(t_L_output))
+  {
+    unpatchOutput(item);
+  }
 }
 
-void DmxEngine::unpatchChannel(DmxChannel *t_channel)
+void DmxEngine::clearChannelPatch(DmxChannel *t_channel)
 {
-
+  if (m_dmxPatch->clearChannel(t_channel->getID()))
+  {
+    auto L_output = t_channel->getL_controledOutput();
+    for (const auto &item
+         : std::as_const(L_output))
+    {
+      item->setChannelControler(nullptr);
+    }
+    t_channel->clearControledOutput();
+  }
+  else
+  {
+    qWarning () << "can't DmxEngine::clearChannelPatch";
+  }
 }
 
-void DmxEngine::unpatchChannelList(QList<DmxChannel *> t_L_channel)
+void DmxEngine::clearChannelListPatch(QList<DmxChannel *> t_L_channel)
 {
-
+  for (const auto &item
+       : std::as_const(t_L_channel))
+  {
+    clearChannelPatch(item);
+  }
 }
 
 DmxEngine::DmxEngine(QObject *parent)
@@ -195,9 +255,9 @@ void DmxPatch::clearPatch()
   m_MM_patch.clear();
 }
 
-void DmxPatch::clearChannel(id t_channelID)
+bool DmxPatch::clearChannel(id t_channelID)
 {
-  m_MM_patch.remove(t_channelID);
+  return m_MM_patch.remove(t_channelID);
 }
 
 bool DmxPatch::addOutputToChannel(const id t_channelID,
@@ -222,8 +282,8 @@ bool DmxPatch::addOutputToChannel(const id t_channelID,
   return true;
 }
 
-void DmxPatch::addOutputListToChannel(id t_channelId,
-                                      QList<Uid_Id> t_L_outputUid_Id)
+void DmxPatch::addOutputListToChannel(const id t_channelId,
+                                      const QList<Uid_Id> t_L_outputUid_Id)
 {
   for (const auto &item
        : std::as_const(t_L_outputUid_Id))
@@ -233,7 +293,7 @@ void DmxPatch::addOutputListToChannel(id t_channelId,
   }
 }
 
-void DmxPatch::removeOutput(Uid_Id t_outputUid_Id)
+bool DmxPatch::removeOutput(Uid_Id t_outputUid_Id)
 {
   // check if it's in the map
   auto L_Uid_Id = m_MM_patch.values();
@@ -249,10 +309,10 @@ void DmxPatch::removeOutput(Uid_Id t_outputUid_Id)
       }
       ++i;
     }
-    return;
+    return true;
   }
   qWarning () << "can't remove output from channel";
-
+  return false;
 }
 
 void DmxPatch::removeOutputList(QList<Uid_Id> t_L_outputUid_Id)
@@ -265,7 +325,7 @@ void DmxPatch::removeOutputList(QList<Uid_Id> t_L_outputUid_Id)
 
 }
 
-void DmxPatch::removeOutputFromChannel(id t_channelID,
+bool DmxPatch::removeOutputFromChannel(id t_channelID,
                                        Uid_Id t_outputUid_Id)
 {
   // choper les values de la key, vérifier et remove
@@ -274,9 +334,10 @@ void DmxPatch::removeOutputFromChannel(id t_channelID,
   {
     m_MM_patch.remove(t_channelID,
                       t_outputUid_Id);
-    return;
+    return true;
   }
   qWarning () << "can't remove output from channel";
+  return false;
 }
 
 void DmxPatch::removeOutputListFromChannel(id t_channelID,

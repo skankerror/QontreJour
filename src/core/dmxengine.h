@@ -38,15 +38,12 @@ public :
 
   ~DmxEngine();
 
-  // for one universe
+  // patch interface
   void straightPatch(RootValue *t_rootChannel,
-                     RootValue * t_rootOutput);
-  // for several universes
+                     RootValue * t_rootOutput); // one universe
   void straightPatch(RootValue *t_rootChannel,
-                     QList<RootValue *> t_L_rootOutput);
-
+                     QList<RootValue *> t_L_rootOutput); // several universes
   void clearPatch(RootValue *t_rootChannel);
-
   void patchOutputToChannel(DmxChannel *t_channel,
                             DmxOutput *t_output);
   void patchOutputListToChannel(DmxChannel *t_channel,
@@ -57,8 +54,8 @@ public :
                                     QList<DmxOutput *> t_L_output);
   void unpatchOutput(DmxOutput *t_output);
   void unpatchOutputList(QList<DmxOutput *> t_L_output);
-  void unpatchChannel(DmxChannel *t_channel);
-  void unpatchChannelList(QList<DmxChannel *> t_L_channel);
+  void clearChannelPatch(DmxChannel *t_channel);
+  void clearChannelListPatch(QList<DmxChannel *> t_L_channel);
 
 private :
 
@@ -139,14 +136,14 @@ public :
   { m_MM_patch = t_MM_patch; }
 
   void clearPatch();
-  void clearChannel(id t_channelID);
+  bool clearChannel(id t_channelID);
   bool addOutputToChannel(const id t_channelID,
                           const Uid_Id t_outputUid_Id);
-  void addOutputListToChannel(id t_channelId,
-                              QList<Uid_Id> t_L_outputUid_Id);
-  void removeOutput(Uid_Id t_outputUid_Id);
+  void addOutputListToChannel(const id t_channelId,
+                              const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutput(Uid_Id t_outputUid_Id);
   void removeOutputList(QList<Uid_Id> t_L_outputUid_Id);
-  void removeOutputFromChannel(id t_channelID,
+  bool removeOutputFromChannel(id t_channelID,
                                Uid_Id t_outputUid_Id);
   void removeOutputListFromChannel(id t_channelID,
                                    QList<Uid_Id> t_L_outputUid_Id);

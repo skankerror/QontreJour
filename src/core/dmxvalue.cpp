@@ -213,23 +213,23 @@ void DmxChannel::addOutputList(const QList<DmxOutput *> t_L_controledOutput)
   }
 }
 
-void DmxChannel::removeOutput(const id t_index)
+void DmxChannel::removeOutput(const DmxOutput *t_output)
 {
-  if ((t_index > -1)
-      && (t_index < m_L_controledOutput.size()))
+  auto index = m_L_controledOutput.indexOf(t_output);
+  if (index != -1)
   {
-    m_L_controledOutput.removeAt(t_index);
+    m_L_controledOutput.removeAt(index);
   }
   else
   {
-    qWarning() << "can't remove output";
+    qWarning() << "can't DmxChannel::removeOutput";
   }
 }
 
-void DmxChannel::removeOutputList(const QList<id> t_L_index)
+void DmxChannel::removeOutputList(const QList<DmxOutput *> t_L_output)
 {
-  for (const auto item
-       : std::as_const(t_L_index))
+  for (const auto &item
+       : std::as_const(t_L_output))
   {
     removeOutput(item);
   }

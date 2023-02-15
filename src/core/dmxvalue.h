@@ -274,8 +274,10 @@ public :
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutputList(QList<DmxOutput *> t_L_controledOutput);
-  void removeOutput(const id t_index);
-  void removeOutputList(const QList<id> t_L_index);
+//  void removeOutput(const id t_index);
+//  void removeOutputList(const QList<id> t_L_index);
+  void removeOutput(const DmxOutput *t_output);
+  void removeOutputList(const QList<DmxOutput *> t_L_output);
   void clearControledOutput();
 
   void addChannelGroupControler(id t_id);
