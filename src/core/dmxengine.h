@@ -47,6 +47,19 @@ public :
 
   void clearPatch(RootValue *t_rootChannel);
 
+  void patchOutputToChannel(DmxChannel *t_channel,
+                            DmxOutput *t_output);
+  void patchOutputListToChannel(DmxChannel *t_channel,
+                                QList<DmxOutput *> t_L_output);
+  void unpatchOutputFromChannel(DmxChannel *t_channel,
+                                DmxOutput *t_output);
+  void unpatchOutputListFromChannel(DmxChannel *t_channel,
+                                    QList<DmxOutput *> t_L_output);
+  void unpatchOutput(DmxOutput *t_output);
+  void unpatchOutputList(QList<DmxOutput *> t_L_output);
+  void unpatchChannel(DmxChannel *t_channel);
+  void unpatchChannelList(QList<DmxChannel *> t_L_channel);
+
 private :
 
   explicit DmxEngine(QObject *parent = nullptr);
@@ -70,9 +83,17 @@ public :
       m_outputID(t_id)
   {}
 
+  explicit Uid_Id(DmxOutput *t_output);
+
   explicit Uid_Id(QString &t_string);
 
   ~Uid_Id(){}
+
+  bool operator==(const Uid_Id t_Uid_Id) const
+  {
+    return ((t_Uid_Id.getUniverseID() == m_universeID)
+            && (t_Uid_Id.getOutputID() == m_outputID));
+  }
 
   uid getUniverseID() const{ return m_universeID; }
   id getOutputID() const{ return m_outputID; }
@@ -114,14 +135,17 @@ public :
 
   QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
 
-  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch){ m_MM_patch = t_MM_patch; }
+  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
+  { m_MM_patch = t_MM_patch; }
 
   void clearPatch();
   void clearChannel(id t_channelID);
-  void addOutputToChannel(id t_channelID,
-                          Uid_Id t_outputUid_Id);
+  bool addOutputToChannel(const id t_channelID,
+                          const Uid_Id t_outputUid_Id);
   void addOutputListToChannel(id t_channelId,
                               QList<Uid_Id> t_L_outputUid_Id);
+  void removeOutput(Uid_Id t_outputUid_Id);
+  void removeOutputList(QList<Uid_Id> t_L_outputUid_Id);
   void removeOutputFromChannel(id t_channelID,
                                Uid_Id t_outputUid_Id);
   void removeOutputListFromChannel(id t_channelID,

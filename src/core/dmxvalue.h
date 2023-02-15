@@ -180,6 +180,8 @@ protected :
 
 /********************************* DMXOUTPUT *************************************/
 
+class DmxChannel;
+
 class DmxOutput
     : public LeveledValue
 {
@@ -195,6 +197,10 @@ public :
 
   dmx getMaxLevel() const{ return m_maxLevel; }
   bool getIsParked() const{ return m_isParked; }
+  DmxChannel *getChannelControler() const{ return m_channelControler; }
+
+  void setChannelControler(DmxChannel *t_channelControler)
+  { m_channelControler = t_channelControler; }
 
 signals :
 
@@ -210,6 +216,7 @@ private :
 
   dmx m_maxLevel = 255;
   bool m_isParked;
+  DmxChannel *m_channelControler = nullptr;
 
 };
 

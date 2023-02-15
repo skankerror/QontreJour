@@ -198,6 +198,7 @@ void DmxChannel::addOutput(DmxOutput *t_dmxOutput)
      && !m_L_controledOutput.contains(t_dmxOutput))
   {
     m_L_controledOutput.append(t_dmxOutput);
+//    t_dmxOutput->
   }
   else
     qWarning() << "cant add output";
