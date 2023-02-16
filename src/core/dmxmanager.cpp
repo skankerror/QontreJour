@@ -17,8 +17,6 @@
 
 #include "dmxmanager.h"
 #include <QDebug>
-#include "dmxengine.h"
-//#include "../gui/valueeditwidget.h"
 
 DmxManager *DmxManager::instance()
 {
@@ -96,13 +94,6 @@ bool DmxManager::createUniverse(uid t_universeID)
   return false;
 }
 
-//bool DmxManager::createSequence()
-//{
-//  auto rootScene = new DmxScene(DmxValue::RootScene);
-//  m_L_rootScene.append(rootScene);
-//  return true;
-//}
-
 DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
 {
   auto newGroup = new DmxChannelGroup(DmxValue::ChannelGroup);
@@ -121,20 +112,234 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
   return newGroup;
 }
 
-//void DmxManager::connectValueToWidget(WidgetType t_widgetType,
-//                                      int t_widgetID,
-//                                      DmxValue::ValueType t_valueType,
-//                                      id t_valueID)
-//{
-////  if (t_widgetType == DmxSlider)
-//  {
-//    if (t_valueType == DmxValue::ChannelGroup)
-//    {
-//      emit connectGroupToSubmasterSlider(t_widgetID,
-//                                         t_valueID);
-//    }
-//  }
-//}
+RootValue *DmxManager::getRootOutput(const uid t_uid) const
+{
+  if (t_uid < 0
+      || t_uid >= m_L_universe.size())
+  {
+    qWarning () << " can't DmxOutput *DmxManager::getRootOutput(const uid t_uid)";
+    return nullptr;
+  }
+  return m_L_universe.at(t_uid)->getRootOutput();
+}
+
+QList<RootValue *> DmxManager::getL_rootOutput() const
+{
+  QList<RootValue *> L_rootOutput;
+  for (const auto &item
+       : std::as_const(m_L_universe))
+  {
+    L_rootOutput.append(item->getRootOutput());
+  }
+  return L_rootOutput;
+}
+
+void DmxManager::setStraightPatch(const uid t_uid)
+{
+  clearPatch();
+  if (t_uid < 0
+      || t_uid >= m_L_universe.size())
+  {
+    qWarning () << " can't DmxManager::setStraightPatch(const uid)";
+    return;
+  }
+  auto rootOutput = getRootOutput(t_uid);
+  auto biggerSize = m_rootChannel->getL_ChildValueSize()
+      < rootOutput->getL_ChildValueSize()
+      ? m_rootChannel->getL_ChildValueSize()
+      : rootOutput->getL_ChildValueSize();
+  for (int i = 0;
+       i < biggerSize;
+       i++)
+  {
+    auto channel = m_rootChannel->getChildValue(i);
+    auto channelCast = static_cast<DmxChannel *>(channel);
+    auto output = rootOutput->getChildValue(i);
+    auto outputCast = static_cast<DmxOutput *>(output);
+    patchOutputToChannel(channelCast,
+                         outputCast);
+  }
+
+}
+
+
+void DmxManager::setStraightPatch(const QList<uid> t_L_uid)
+{
+  clearPatch();
+
+  // get output list
+  QList<RootValue *> L_rootOutput;
+  for (const auto item
+       : std::as_const(t_L_uid))
+  {
+    if (item < 0
+        || item >= m_L_universe.size())
+    {
+      qWarning () << " can't DmxManager::setStraightPatch(const QList<uid>)";
+      return;
+    }
+    L_rootOutput.append(getRootOutput(item));
+  }
+  int totalOutputSize = 0;
+  // for agregate all outputs and patch in the order
+  QList<LeveledValue *> L_output;
+  for (const auto &item
+       : std::as_const(L_rootOutput))
+  {
+    totalOutputSize += item->getL_ChildValueSize();
+    L_output += item->getL_childValue();
+  }
+  auto biggerSize = m_rootChannel->getL_ChildValueSize()
+      < totalOutputSize
+      ? m_rootChannel->getL_ChildValueSize()
+      : totalOutputSize;
+
+  for (int i = 0;
+       i < biggerSize;
+       i++)
+  {
+    auto channel = m_rootChannel->getChildValue(i);
+    auto channelCast = static_cast<DmxChannel *>(channel);
+    auto output = L_output.at(i);
+    auto outputCast = static_cast<DmxOutput *>(output);
+    patchOutputToChannel(channelCast,
+                         outputCast);
+  }
+}
+
+void DmxManager::setStraightPatch()
+{
+
+}
+
+void DmxManager::clearPatch()
+{
+  m_dmxPatch->clearPatch();
+
+  auto L_Channel = m_rootChannel->getL_childValue();
+  for (const auto &item
+       : std::as_const(L_Channel))
+  {
+    auto channel = static_cast<DmxChannel *>(item);
+    auto L_output = channel->getL_controledOutput();
+    for (const auto &it
+         : std::as_const(L_output))
+    {
+      it->setChannelControler(nullptr);
+    }
+    channel->clearControledOutput();
+  }
+
+}
+
+void DmxManager::patchOutputToChannel(DmxChannel *t_channel,
+                                      DmxOutput *t_output)
+{
+  auto channelID = t_channel->getID();
+  auto outputUid_Id = Uid_Id(t_output);
+  if (m_dmxPatch->addOutputToChannel(channelID,
+                                     outputUid_Id))
+  {
+    t_channel->addOutput(t_output);
+    t_output->setChannelControler(t_channel);
+  }
+  else
+  {
+    qWarning() << "can't DmxManager::patchOutputToChannel";
+  }
+
+}
+
+void DmxManager::patchOutputListToChannel(DmxChannel *t_channel,
+                                          QList<DmxOutput *> t_L_output)
+{
+  for (const auto &item
+       : std::as_const(t_L_output))
+  {
+    patchOutputToChannel(t_channel,
+                         item);
+  }
+}
+
+void DmxManager::unpatchOutputFromChannel(DmxChannel *t_channel,
+                                          DmxOutput *t_output)
+{
+  auto channelID = t_channel->getID();
+  auto outputUid_Id = Uid_Id(t_output);
+  if (m_dmxPatch->removeOutputFromChannel(channelID,
+                                          outputUid_Id))
+  {
+    t_channel->removeOutput(t_output);
+    t_output->setChannelControler(nullptr);
+  }
+  else
+  {
+    qWarning () << "can't DmxManager::unpatchOutputFromChannel";
+  }
+}
+
+void DmxManager::unpatchOutputListFromChannel(DmxChannel *t_channel,
+                                              QList<DmxOutput *> t_L_output)
+{
+  for (const auto &item
+       : std::as_const(t_L_output))
+  {
+    unpatchOutputFromChannel(t_channel,
+                             item);
+  }
+}
+
+void DmxManager::unpatchOutput(DmxOutput *t_output)
+{
+  auto outputUid_Id = Uid_Id(t_output);
+  if (m_dmxPatch->removeOutput(outputUid_Id))
+  {
+    auto channel = t_output->getChannelControler();
+    channel->removeOutput(t_output);
+    t_output->setChannelControler(nullptr);
+  }
+  else
+  {
+    qWarning () << "can't DmxManager::unpatchOutput";
+  }
+}
+
+void DmxManager::unpatchOutputList(QList<DmxOutput *> t_L_output)
+{
+  for (const auto &item
+       : std::as_const(t_L_output))
+  {
+    unpatchOutput(item);
+  }
+}
+
+void DmxManager::clearChannelPatch(DmxChannel *t_channel)
+{
+  if (m_dmxPatch->clearChannel(t_channel->getID()))
+  {
+    auto L_output = t_channel->getL_controledOutput();
+    for (const auto &item
+         : std::as_const(L_output))
+    {
+      item->setChannelControler(nullptr);
+    }
+    t_channel->clearControledOutput();
+  }
+  else
+  {
+    qWarning () << "can't DmxManager::clearChannelPatch";
+  }
+
+}
+
+void DmxManager::clearChannelListPatch(QList<DmxChannel *> t_L_channel)
+{
+  for (const auto &item
+       : std::as_const(t_L_channel))
+  {
+    clearChannelPatch(item);
+  }
+}
 
 bool DmxManager::hwConnect(HwPortType t_type,
                            QString &t_driver,
@@ -179,33 +384,24 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
-//void DmxManager::updateSubmasters()
+//void DmxManager::onUniverseRequestUpdate(uid t_uid,
+//                                         id t_id,
+//                                         dmx t_level)
 //{
-//  auto L_channelGroup = m_rootChannelGroup->getL_childValue();
-//  for (const auto &item : std::as_const(L_channelGroup))
-//  {
-//    item->setLevel(DmxValue::SubmasterSliderSender,
-//                   item->getLevel());
-//  }
+//  m_hwManager->writeData(t_uid,
+//                         t_id,
+//                         t_level);
+
+//  qDebug() << "write uid :"  << t_uid
+//           << "id :" << t_id
+//           << "level :" << t_level;
+
 //}
-
-void DmxManager::onUniverseRequestUpdate(uid t_uid,
-                                         id t_id,
-                                         dmx t_level)
-{
-  m_hwManager->writeData(t_uid,
-                         t_id,
-                         t_level);
-
-  qDebug() << "write uid :"  << t_uid
-           << "id :" << t_id
-           << "level :" << t_level;
-
-}
 
 DmxManager::DmxManager(QObject *parent)
   : QObject(parent),
     m_hwManager(QDmxManager::instance()),
+    m_dmxPatch(new DmxPatch()),
     m_rootChannel(new RootValue(DmxValue::RootChannel)),
     m_rootChannelGroup(new RootValue(DmxValue::RootChannelGroup))
 {
@@ -228,19 +424,140 @@ DmxManager::DmxManager(QObject *parent)
 
   // start with straight patch between our channels
   // and outputs from 1st universe
-  ENGINE->straightPatch(m_rootChannel,
-                        universe->getRootOutput());
 
-  // and the main sequence :
-//  auto rootScene = new DmxScene(DmxValue::RootScene);
-//  m_L_rootScene.append(rootScene);
-
-
-  connect(universe,
-          SIGNAL(universeRequireUpdate(uid,id,dmx)),
-          this,
-          SLOT(onUniverseRequestUpdate(uid,id,dmx)));
-
-  //test
+  setStraightPatch(0); // patch first universe
 
 }
+
+/*************************** Uid_Id /************************************/
+
+Uid_Id::Uid_Id(const DmxOutput *t_output)
+{
+  if (t_output)
+  {
+    m_universeID = t_output->getUniverseID();
+    m_outputID = t_output->getID();
+  }
+}
+
+Uid_Id::Uid_Id(const QString &t_string)
+{
+  if (t_string.size() > 3
+      && t_string.at(0).isDigit())
+  {
+    auto tempFloat = t_string.toFloat();
+    m_universeID = (uid)tempFloat;
+    // TODO : implement this fucking string method
+//    for (qsizetype i = 0;
+//         i < t_string.size();
+//         i++)
+//    {
+//      auto value = t_string.at(i);
+//      if (value.isDigit())
+
+  }
+}
+
+/******************************** DmxPatch *******************************/
+
+void DmxPatch::clearPatch()
+{
+  m_MM_patch.clear();
+}
+
+bool DmxPatch::clearChannel(const id t_channelID)
+{
+  return m_MM_patch.remove(t_channelID);
+}
+
+bool DmxPatch::addOutputToChannel(const id t_channelID,
+                                  const Uid_Id t_outputUid_Id)
+{
+  // check if it's not yet in the key
+  auto L_Uid_Id = m_MM_patch.values(t_channelID);
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    qWarning () << "output already in the patch map";
+    return false;
+  }
+
+  // chack if it's not in another key
+  L_Uid_Id = m_MM_patch.values();
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    removeOutput(t_outputUid_Id);
+  }
+  m_MM_patch.insert(t_channelID,
+                    t_outputUid_Id);
+  return true;
+}
+
+void DmxPatch::addOutputListToChannel(const id t_channelId,
+                                      const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    addOutputToChannel(t_channelId,
+                       item);
+  }
+}
+
+bool DmxPatch::removeOutput(const Uid_Id t_outputUid_Id)
+{
+  // check if it's in the map
+  auto L_Uid_Id = m_MM_patch.values();
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    auto i = m_MM_patch.constBegin();
+    while (i != m_MM_patch.constEnd())
+    {
+      if (i.value() == t_outputUid_Id)
+      {
+        m_MM_patch.remove(i.key(), i.value());
+        break;
+      }
+      ++i;
+    }
+    return true;
+  }
+  qWarning () << "can't remove output from channel";
+  return false;
+}
+
+void DmxPatch::removeOutputList(const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    removeOutput(item);
+  }
+
+}
+
+bool DmxPatch::removeOutputFromChannel(const id t_channelID,
+                                       const Uid_Id t_outputUid_Id)
+{
+  // choper les values de la key, vérifier et remove
+  auto L_Uid_Id = m_MM_patch.values(t_channelID);
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    m_MM_patch.remove(t_channelID,
+                      t_outputUid_Id);
+    return true;
+  }
+  qWarning () << "can't remove output from channel";
+  return false;
+}
+
+void DmxPatch::removeOutputListFromChannel(const id t_channelID,
+                                           const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    removeOutputFromChannel(t_channelID,
+                            item);
+  }
+}
+

@@ -19,12 +19,16 @@
 #define DMXMANAGER_H
 
 #include <QObject>
+#include <QString>
 #include "qdmxlib/QDmxManager"
 #include "dmxvalue.h"
 //#include "dmxscene.h"
 #include "dmxuniverse.h"
 
 #define MANAGER DmxManager::instance()
+#define Null_Uid_Id Uid_Id(NO_UID,NO_ID)
+
+class DmxPatch;
 
 class DmxManager
     : public QObject
@@ -56,7 +60,6 @@ public :
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
-//  int getSequenceCount() const{ return m_L_rootScene.size(); }
   DmxValue *getRootChannel() const{ return m_rootChannel; }
   int getChannelCount() const{ return m_rootChannel->getL_ChildValueSize(); }
   DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
@@ -64,14 +67,25 @@ public :
 
   // create everything we need
   bool createUniverse(uid t_universeID);
-//  bool createSequence();
   DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
 
-  // connect values to widget
-//  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
-//                            int t_widgetID,
-//                            DmxValue::ValueType t_valueType,
-//                            id t_valueID);
+  // patch interface
+  void setStraightPatch(const uid t_uid); // one universe
+  void setStraightPatch(const QList<uid> t_L_uid); // several universes
+  void setStraightPatch(); // all universes
+  void clearPatch();
+  void patchOutputToChannel(DmxChannel *t_channel,
+                            DmxOutput *t_output);
+  void patchOutputListToChannel(DmxChannel *t_channel,
+                                QList<DmxOutput *> t_L_output);
+  void unpatchOutputFromChannel(DmxChannel *t_channel,
+                                DmxOutput *t_output);
+  void unpatchOutputListFromChannel(DmxChannel *t_channel,
+                                    QList<DmxOutput *> t_L_output);
+  void unpatchOutput(DmxOutput *t_output);
+  void unpatchOutputList(QList<DmxOutput *> t_L_output);
+  void clearChannelPatch(DmxChannel *t_channel);
+  void clearChannelListPatch(QList<DmxChannel *> t_L_channel);
 
   // hardware connection
   bool hwConnect(DmxManager::HwPortType t_type,
@@ -88,32 +102,111 @@ private :
   explicit DmxManager(QObject *parent = nullptr);
   QList<QDmxDriver *> getAvailableDrivers() const;
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
+  RootValue *getRootOutput(const uid t_uid) const;
+  QList<RootValue *> getL_rootOutput() const;
 
 signals :
 
-  void connectGroupToSubmasterSlider(int t_sliderID,
-                                     id valueID);
-  void disconnectGroupFromSubmasterSlider(int t_sliderID);
-
 public slots :
 
-//  void updateSubmasters();
-//  void onSubmasterWidgetRequest();
-
 private slots :
-
-  void onUniverseRequestUpdate(uid t_uid,
-                               id t_id,
-                               dmx t_level);
 
 private :
 
   QDmxManager *m_hwManager;
 
+  DmxPatch *m_dmxPatch;
+
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
-//  QList<DmxScene *> m_L_rootScene;
+
+};
+
+/******************************** Uid_Id *************************************/
+
+class Uid_Id
+{
+
+public :
+
+  explicit Uid_Id(const uid t_uid = NO_UID,
+                  const id t_id = NO_ID)
+    : m_universeID(t_uid),
+      m_outputID(t_id)
+  {}
+
+  explicit Uid_Id(const DmxOutput *t_output);
+
+  explicit Uid_Id(const QString &t_string);
+
+  ~Uid_Id(){}
+
+  bool operator==(const Uid_Id t_Uid_Id) const
+  {
+    return ((t_Uid_Id.getUniverseID() == m_universeID)
+            && (t_Uid_Id.getOutputID() == m_outputID));
+  }
+
+  uid getUniverseID() const{ return m_universeID; }
+  id getOutputID() const{ return m_outputID; }
+
+  void setUniverseID(const uid t_universeID){ m_universeID = t_universeID; }
+  void setOutputID(const id t_outputID){ m_outputID = t_outputID; }
+
+  QString toString() const
+  {
+    return QString("%1.%2")
+        .arg(m_universeID)
+        .arg(m_outputID);
+  }
+
+  static QString UidtoString(const Uid_Id t_uid_id)
+  {
+    return QString("%1.%2")
+        .arg(t_uid_id.getUniverseID())
+        .arg(t_uid_id.getOutputID());
+  }
+
+private :
+
+  uid m_universeID = NO_UID;
+  id m_outputID = NO_ID;
+
+};
+
+ /****************************** DmxPatch ******************************/
+
+class DmxPatch
+{
+
+public :
+
+  explicit DmxPatch(){}
+
+  ~DmxPatch(){}
+
+  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
+
+  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
+  { m_MM_patch = t_MM_patch; }
+
+  void clearPatch();
+  bool clearChannel(const id t_channelID);
+  bool addOutputToChannel(const id t_channelID,
+                          const Uid_Id t_outputUid_Id);
+  void addOutputListToChannel(const id t_channelId,
+                              const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutput(const Uid_Id t_outputUid_Id);
+  void removeOutputList(const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutputFromChannel(const id t_channelID,
+                               const Uid_Id t_outputUid_Id);
+  void removeOutputListFromChannel(const id t_channelID,
+                                   const QList<Uid_Id> t_L_outputUid_Id);
+
+private :
+
+  QMultiMap<id, Uid_Id> m_MM_patch;
 
 };
 
