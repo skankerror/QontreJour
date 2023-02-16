@@ -78,10 +78,10 @@ public :
   QString getName() const{ return m_name; }
   ValueType getType() const{ return m_type; }
 
-  void setID(id t_ID){ m_ID = t_ID; }
-  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
+  void setID(const id t_ID){ m_ID = t_ID; }
+  void setUniverseID(const uid t_universeID) { m_universeID = t_universeID; }
   void setName(const QString &t_name) { m_name = t_name; }
-  void setType(ValueType t_type){ m_type = t_type; }
+  void setType(const ValueType t_type){ m_type = t_type; }
 
 protected :
 
@@ -111,7 +111,7 @@ public :
   ~RootValue();
 
   // child values
-  int getL_ChildValueSize() const{ return m_L_childValue.size(); }
+  int getL_childValueSize() const{ return m_L_childValue.size(); }
   QList<LeveledValue *> getL_childValue() const{ return m_L_childValue; }
   LeveledValue *getChildValue(id t_id) const;
 
@@ -119,9 +119,9 @@ public :
   { m_L_childValue = t_L_childValue; }
 
   void addChildValue(LeveledValue *t_value);
-  void addChlidList(QList<LeveledValue *> t_L_value);
-  void removeChildValue(id t_index);
-  void removeChildValueList(QList<id> t_L_index);
+  void addChlidList(const QList<LeveledValue *> t_L_value);
+  void removeChildValue(const id t_index);
+  void removeChildValueList(const QList<id> t_L_index);
 
 private :
 
@@ -260,30 +260,30 @@ public :
   QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
   DmxOutput *getControledOutput(const id t_index);
   dmx getControledOutputLevel(const id t_index);
-  int getL_ControledOutputSize() const{ return m_L_controledOutput.size(); }
+  int getL_controledOutputSize() const{ return m_L_controledOutput.size(); }
 
   // setters
-  void setL_controledOutput(QList<DmxOutput *> &t_L_controledOutput)
+  void setL_controledOutput(const QList<DmxOutput *> &t_L_controledOutput)
   { m_L_controledOutput = t_L_controledOutput; }
-  void setChannelFlag(DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
-  void setIsDirectChannelEdited(bool t_isDirectChannelEdited)
+  void setChannelFlag(const DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
+  void setIsDirectChannelEdited(const bool t_isDirectChannelEdited)
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
-  void setOverOffset(overdmx t_overOffset){ m_overOffset = t_overOffset; }
+  void setOverOffset(const overdmx t_overOffset){ m_overOffset = t_overOffset; }
   void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
   { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
 
   void addOutput(DmxOutput *t_dmxOutput);
-  void addOutputList(QList<DmxOutput *> t_L_controledOutput);
+  void addOutputList(const QList<DmxOutput *> t_L_controledOutput);
 //  void removeOutput(const id t_index);
 //  void removeOutputList(const QList<id> t_L_index);
   void removeOutput(const DmxOutput *t_output);
   void removeOutputList(const QList<DmxOutput *> t_L_output);
   void clearControledOutput();
 
-  void addChannelGroupControler(id t_id);
-  void addChannelGroupControlerList(QList<id> t_L_id);
-  void removeChannelGroupControler(id t_id);
-  void removeChannelGroupControlerList(QList<id> t_L_id);
+  void addChannelGroupControler(const id t_id);
+  void addChannelGroupControlerList(const QList<id> t_L_id);
+  void removeChannelGroupControler(const id t_id);
+  void removeChannelGroupControlerList(const QList<id> t_L_id);
 
 private :
 
@@ -321,7 +321,8 @@ public :
   DmxChannel *getControledChannel(const id t_index);
   dmx getControledChannelLevel(const id t_index);
   dmx getControledChannelStoredLevel(const id t_index);
-  int getL_ControledChannelSize() const{ return m_L_controledChannel.size(); }
+  int getL_controledChannelSize() const{ return m_L_controledChannel.size(); }
+  QList<dmx> getL_storedLevel() const{ return m_L_storedLevel; }
 
   // setters
   void setL_controledChannel(QList<DmxChannel *> &t_L_controledChannel)
@@ -336,6 +337,7 @@ public :
   void removeChannel(const id t_index);
   void removeChannelList(const QList<id> t_L_index);
   void clearControledChannel();
+
 
 
 private :

@@ -87,7 +87,7 @@ void RootValue::addChildValue(LeveledValue *t_value)
     qWarning() << "cant add child value";
 }
 
-void RootValue::addChlidList(QList<LeveledValue *> t_L_value)
+void RootValue::addChlidList(const QList<LeveledValue *> t_L_value)
 {
   for (const auto &item:
        std::as_const(t_L_value))
@@ -96,7 +96,7 @@ void RootValue::addChlidList(QList<LeveledValue *> t_L_value)
   }
 }
 
-void RootValue::removeChildValue(id t_index)
+void RootValue::removeChildValue(const id t_index)
 {
   if (t_index < 0
       || t_index >= m_L_childValue.size())
@@ -111,7 +111,7 @@ void RootValue::removeChildValue(id t_index)
   }
 }
 
-void RootValue::removeChildValueList(QList<id> t_L_index)
+void RootValue::removeChildValueList(const QList<id> t_L_index)
 {
   for (const auto item :
        std::as_const(t_L_index))
@@ -198,10 +198,11 @@ void DmxChannel::addOutput(DmxOutput *t_dmxOutput)
      && !m_L_controledOutput.contains(t_dmxOutput))
   {
     m_L_controledOutput.append(t_dmxOutput);
-//    t_dmxOutput->
   }
   else
+  {
     qWarning() << "cant add output";
+  }
 }
 
 void DmxChannel::addOutputList(const QList<DmxOutput *> t_L_controledOutput)
@@ -241,7 +242,7 @@ void DmxChannel::clearControledOutput()
   m_L_controledOutput.squeeze();
 }
 
-void DmxChannel::addChannelGroupControler(id t_id)
+void DmxChannel::addChannelGroupControler(const id t_id)
 {
   if (m_M_channelGroup_Id_Level.contains(t_id))
   {
@@ -253,7 +254,7 @@ void DmxChannel::addChannelGroupControler(id t_id)
                                    0);
 }
 
-void DmxChannel::addChannelGroupControlerList(QList<id> t_L_id)
+void DmxChannel::addChannelGroupControlerList(const QList<id> t_L_id)
 {
   for (const auto item
        : std::as_const(t_L_id))
@@ -262,7 +263,7 @@ void DmxChannel::addChannelGroupControlerList(QList<id> t_L_id)
   }
 }
 
-void DmxChannel::removeChannelGroupControler(id t_id)
+void DmxChannel::removeChannelGroupControler(const id t_id)
 {
   if (m_M_channelGroup_Id_Level.contains(t_id))
   {
@@ -273,7 +274,7 @@ void DmxChannel::removeChannelGroupControler(id t_id)
              << "id yet in the map";
 }
 
-void DmxChannel::removeChannelGroupControlerList(QList<id> t_L_id)
+void DmxChannel::removeChannelGroupControlerList(const QList<id> t_L_id)
 {
   for (const auto item
        : std::as_const(t_L_id))
@@ -366,7 +367,7 @@ void DmxChannelGroup::addChannelList(QList<DmxChannel *> t_L_controledChannel,
   }
 }
 
-// NOTE : warning this id represent the number in the list and the
+// WARNING : warning this id represent the number in the list and the
 // channel id.
 void DmxChannelGroup::removeChannel(const id t_index)
 {

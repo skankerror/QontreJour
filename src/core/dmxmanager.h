@@ -61,9 +61,9 @@ public :
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
   DmxValue *getRootChannel() const{ return m_rootChannel; }
-  int getChannelCount() const{ return m_rootChannel->getL_ChildValueSize(); }
+  int getChannelCount() const{ return m_rootChannel->getL_childValueSize(); }
   DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
-  int getChannelGroupCount() const{ return m_rootChannelGroup->getL_ChildValueSize(); }
+  int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
 
   // create everything we need
   bool createUniverse(uid t_universeID);

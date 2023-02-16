@@ -16,6 +16,7 @@
  */
 
 #include "dmxmanager.h"
+#include "dmxengine.h"
 #include <QDebug>
 
 DmxManager *DmxManager::instance()
@@ -109,6 +110,8 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
   newGroup->setL_storedLevel(L_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);
 
+  GROUP_ENGINE->newGroupCreated(newGroup);
+
   return newGroup;
 }
 
@@ -144,10 +147,10 @@ void DmxManager::setStraightPatch(const uid t_uid)
     return;
   }
   auto rootOutput = getRootOutput(t_uid);
-  auto biggerSize = m_rootChannel->getL_ChildValueSize()
-      < rootOutput->getL_ChildValueSize()
-      ? m_rootChannel->getL_ChildValueSize()
-      : rootOutput->getL_ChildValueSize();
+  auto biggerSize = m_rootChannel->getL_childValueSize()
+      < rootOutput->getL_childValueSize()
+      ? m_rootChannel->getL_childValueSize()
+      : rootOutput->getL_childValueSize();
   for (int i = 0;
        i < biggerSize;
        i++)
@@ -175,7 +178,7 @@ void DmxManager::setStraightPatch(const QList<uid> t_L_uid)
     if (item < 0
         || item >= m_L_universe.size())
     {
-      qWarning () << " can't DmxManager::setStraightPatch(const QList<uid>)";
+      qWarning() << " can't DmxManager::setStraightPatch(const QList<uid>)";
       return;
     }
     L_rootOutput.append(getRootOutput(item));
@@ -186,12 +189,12 @@ void DmxManager::setStraightPatch(const QList<uid> t_L_uid)
   for (const auto &item
        : std::as_const(L_rootOutput))
   {
-    totalOutputSize += item->getL_ChildValueSize();
+    totalOutputSize += item->getL_childValueSize();
     L_output += item->getL_childValue();
   }
-  auto biggerSize = m_rootChannel->getL_ChildValueSize()
+  auto biggerSize = m_rootChannel->getL_childValueSize()
       < totalOutputSize
-      ? m_rootChannel->getL_ChildValueSize()
+      ? m_rootChannel->getL_childValueSize()
       : totalOutputSize;
 
   for (int i = 0;
@@ -274,7 +277,7 @@ void DmxManager::unpatchOutputFromChannel(DmxChannel *t_channel,
   }
   else
   {
-    qWarning () << "can't DmxManager::unpatchOutputFromChannel";
+    qWarning() << "can't DmxManager::unpatchOutputFromChannel";
   }
 }
 
@@ -300,7 +303,7 @@ void DmxManager::unpatchOutput(DmxOutput *t_output)
   }
   else
   {
-    qWarning () << "can't DmxManager::unpatchOutput";
+    qWarning() << "can't DmxManager::unpatchOutput";
   }
 }
 
@@ -327,7 +330,7 @@ void DmxManager::clearChannelPatch(DmxChannel *t_channel)
   }
   else
   {
-    qWarning () << "can't DmxManager::clearChannelPatch";
+    qWarning() << "can't DmxManager::clearChannelPatch";
   }
 
 }
@@ -477,7 +480,7 @@ bool DmxPatch::addOutputToChannel(const id t_channelID,
   auto L_Uid_Id = m_MM_patch.values(t_channelID);
   if (L_Uid_Id.contains(t_outputUid_Id))
   {
-    qWarning () << "output already in the patch map";
+    qWarning() << "output already in the patch map";
     return false;
   }
 
@@ -521,7 +524,7 @@ bool DmxPatch::removeOutput(const Uid_Id t_outputUid_Id)
     }
     return true;
   }
-  qWarning () << "can't remove output from channel";
+  qWarning() << "can't remove output from channel";
   return false;
 }
 
@@ -546,7 +549,7 @@ bool DmxPatch::removeOutputFromChannel(const id t_channelID,
                       t_outputUid_Id);
     return true;
   }
-  qWarning () << "can't remove output from channel";
+  qWarning() << "can't remove output from channel";
   return false;
 }
 
