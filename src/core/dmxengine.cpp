@@ -16,6 +16,7 @@
  */
 
 #include "dmxengine.h"
+#include "dmxmanager.h"
 #include <QDebug>
 
 DmxEngine *DmxEngine::instance()
@@ -37,43 +38,81 @@ DmxEngine::DmxEngine(QObject *parent)
 ChannelGroupEngine::ChannelGroupEngine(QObject *parent):
   QObject(parent),
   m_globalGroup(new GlobalChannelGroup())
-{
-
-}
+{}
 
 ChannelGroupEngine::~ChannelGroupEngine()
 {
   delete m_globalGroup;
 }
 
-void ChannelGroupEngine::newGroupCreated(DmxChannelGroup *t_newGroup)
+bool ChannelGroupEngine::addNewGroup(const DmxChannelGroup *t_newGroup)
 {
-
+  auto L_channel = t_newGroup->getL_controledChannel();
+  auto L_level = t_newGroup->getL_storedLevel();
+  if (L_channel.size() != L_level.size())
+  {
+    qWarning() << "problem in ChannelGroupEngine::addNewGroupd";
+    return false;
+  }
+  for (int i = 0;
+       i < L_channel.size();
+       i++)
+  {
+    m_globalGroup->addChannel(t_newGroup->getID(),
+                              Id_Dmx(L_channel.at(i)->getID(),
+                                     L_level.at(i)));
+  }
+  connect(t_newGroup,
+          SIGNAL(levelChanged(id,dmx)),
+          this,
+          SLOT(onGroupLevelChanged(id,dmx)));
+  return true;
 }
 
-void ChannelGroupEngine::groupLevelEvent(dmx t_level)
+bool ChannelGroupEngine::addNewGroup(const id t_groupID)
 {
-//  // determine sender
-//  auto groupSender = qobject_cast<DmxChannelGroup *>(QObject::sender());
+  auto channelGroup = GET_CHANNEL_GROUP(t_groupID);
+  return addNewGroup(channelGroup);
+}
 
-//  // find it in the list
+bool ChannelGroupEngine::removeGroup(const DmxChannelGroup *t_group)
+{
+  return m_globalGroup->removeChannelGroup(t_group->getID());
+  disconnect(t_group,
+             SIGNAL(levelChanged(id,dmx)),
+             this,
+             SLOT(onGroupLevelChanged(id,dmx)));
+}
 
-//  // update total group
+bool ChannelGroupEngine::removeGroup(const id t_groupId)
+{
+  return m_globalGroup->removeChannelGroup(t_groupId);
+}
 
+bool ChannelGroupEngine::modifyGroup(const DmxChannelGroup *t_group)
+{
+  return (removeGroup(t_group) && addNewGroup(t_group));
+}
 
+bool ChannelGroupEngine::modifyGroup(const id t_groupId)
+{
+  return (removeGroup(t_groupId) && addNewGroup(t_groupId));
+}
+
+void ChannelGroupEngine::onGroupLevelChanged(id t_id,
+                                             dmx t_level)
+{
+  m_globalGroup->groupLevelChanged(t_id,
+                                   t_level);
 }
 
 /***************************** Global Channel Group *************************/
 
 GlobalChannelGroup::GlobalChannelGroup()
-{
-
-}
+{}
 
 GlobalChannelGroup::~GlobalChannelGroup()
-{
-
-}
+{}
 
 void GlobalChannelGroup::addChannelGroup(id t_groupID,
                                          QList<Id_Dmx> t_L_id_dmx)
@@ -121,8 +160,7 @@ bool GlobalChannelGroup::addChannel(const id t_groupID,
   if (!(m_M_channelLevel.contains(t_id_dmx.getID())))
   {
     m_M_channelLevel.insert(t_id_dmx.getID(),
-                            Id_Dmx(NO_ID,
-                                   Null_Dmx));
+                            NULL_ID_DMX);
   }
   return true;
 }
@@ -142,7 +180,7 @@ void GlobalChannelGroup::groupLevelChanged(const id t_groupID,
     if (newLevel > actualId_Dmx.getLevel()
         || t_groupID == actualId_Dmx.getID())
     {
-        m_M_channelLevel.insert(actualId_Dmx.getID(),
+        m_M_channelLevel.insert(item.getID(),
                                 Id_Dmx(t_groupID,
                                        newLevel));
       // emit something ?

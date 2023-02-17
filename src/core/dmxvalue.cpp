@@ -68,7 +68,7 @@ RootValue::~RootValue()
 
 LeveledValue *RootValue::getChildValue(id t_id) const
 {
-  if ((t_id > -1)
+  if ((t_id > NO_ID)
       && (t_id < m_L_childValue.size()))
     return m_L_childValue.at(t_id);
   else
@@ -136,7 +136,8 @@ void LeveledValue::setLevel(dmx t_level)
   if (m_level == t_level)
     return;
   m_level = t_level;
-  emit levelChanged(m_level);
+  emit levelChanged(m_ID,
+                    m_level);
 }
 
 /********************************* DMXOUTPUT *************************************/
@@ -187,7 +188,7 @@ dmx DmxChannel::getControledOutputLevel(const id t_index)
   else
   {
     qWarning() << "Problem in DmxChannel::getControledOutputLevel";
-    return 0;
+    return NULL_DMX;
   }
 }
 
@@ -251,7 +252,7 @@ void DmxChannel::addChannelGroupControler(const id t_id)
     return;
   }
   m_M_channelGroup_Id_Level.insert(t_id,
-                                   0);
+                                   NULL_DMX);
 }
 
 void DmxChannel::addChannelGroupControlerList(const QList<id> t_L_id)

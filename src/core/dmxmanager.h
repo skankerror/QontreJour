@@ -26,9 +26,13 @@
 #include "dmxuniverse.h"
 
 #define MANAGER DmxManager::instance()
-#define Null_Uid_Id Uid_Id(NO_UID,NO_ID)
+#define GET_CHANNEL_GROUP(x) MANAGER->getChannelGroup(x)
+#define GET_CHANNEL(x) MANAGER->getChannel(X)
+#define GET_OUTPUT(x,y) MANAGER->getOutput(Uid_Id(x,y))
+#define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
 
 class DmxPatch;
+class Uid_Id;
 
 class DmxManager
     : public QObject
@@ -60,9 +64,12 @@ public :
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
-  DmxValue *getRootChannel() const{ return m_rootChannel; }
+  DmxOutput *getOutput(Uid_Id t_output_Uid_Id);
+  RootValue *getRootChannel() const{ return m_rootChannel; }
+  DmxChannel *getChannel(id t_channelId);
   int getChannelCount() const{ return m_rootChannel->getL_childValueSize(); }
-  DmxValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
+  RootValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
+  DmxChannelGroup *getChannelGroup(id t_groupId);
   int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
 
   // create everything we need
@@ -93,7 +100,6 @@ public :
                  QString &t_device,
                  quint8 t_port,
                  uid t_ID);
-
   bool hwDisconnect(uid t_ID);
 
 
@@ -114,9 +120,7 @@ private slots :
 private :
 
   QDmxManager *m_hwManager;
-
   DmxPatch *m_dmxPatch;
-
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;

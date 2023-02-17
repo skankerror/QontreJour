@@ -61,6 +61,48 @@ QStringList DmxManager::getAvailableDevicesNames(const QString &t_driverString)
   return retList;
 }
 
+DmxOutput *DmxManager::getOutput(Uid_Id t_output_Uid_Id)
+{
+  auto universeID = t_output_Uid_Id.getUniverseID();
+  if (universeID < 0
+      || universeID >= getUniverseCount())
+  {
+    qWarning() <<"problem in DmxManager::getOutput";
+    return nullptr;
+  }
+  auto rootOutput = getRootOutput(universeID);
+  auto outputID = t_output_Uid_Id.getOutputID();
+  if (outputID < 0
+      || outputID >= rootOutput->getL_childValueSize())
+  {
+    qWarning() <<"problem in DmxManager::getOutput";
+    return nullptr;
+  }
+  return static_cast<DmxOutput *>(rootOutput->getChildValue(outputID));
+}
+
+DmxChannel *DmxManager::getChannel(id t_channelId)
+{
+  if (t_channelId < 0
+      || t_channelId >= getChannelCount())
+  {
+    qWarning() <<"problem in DmxManager::getChannel";
+    return nullptr;
+  }
+  return static_cast<DmxChannel *>(m_rootChannel->getChildValue(t_channelId));
+}
+
+DmxChannelGroup *DmxManager::getChannelGroup(id t_groupId)
+{
+  if (t_groupId < 0
+      || t_groupId >= getChannelGroupCount())
+  {
+    qWarning() <<"problem in DmxManager::getChannelGroup";
+    return nullptr;
+  }
+  return static_cast<DmxChannelGroup *>(m_rootChannelGroup->getChildValue(t_groupId));
+}
+
 bool DmxManager::createUniverse(uid t_universeID)
 {
   if (t_universeID == getUniverseCount())
@@ -110,7 +152,7 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
   newGroup->setL_storedLevel(L_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);
 
-  GROUP_ENGINE->newGroupCreated(newGroup);
+  GROUP_ENGINE->addNewGroup(newGroup);
 
   return newGroup;
 }
@@ -162,7 +204,6 @@ void DmxManager::setStraightPatch(const uid t_uid)
     patchOutputToChannel(channelCast,
                          outputCast);
   }
-
 }
 
 
@@ -212,7 +253,7 @@ void DmxManager::setStraightPatch(const QList<uid> t_L_uid)
 
 void DmxManager::setStraightPatch()
 {
-
+  // TODO : patch all universes
 }
 
 void DmxManager::clearPatch()
@@ -250,7 +291,6 @@ void DmxManager::patchOutputToChannel(DmxChannel *t_channel,
   {
     qWarning() << "can't DmxManager::patchOutputToChannel";
   }
-
 }
 
 void DmxManager::patchOutputListToChannel(DmxChannel *t_channel,
@@ -332,7 +372,6 @@ void DmxManager::clearChannelPatch(DmxChannel *t_channel)
   {
     qWarning() << "can't DmxManager::clearChannelPatch";
   }
-
 }
 
 void DmxManager::clearChannelListPatch(QList<DmxChannel *> t_L_channel)

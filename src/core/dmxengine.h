@@ -24,7 +24,7 @@
 
 #define ENGINE DmxEngine::instance()
 #define GROUP_ENGINE ENGINE->getGroupEngine()
-#define Null_Id_Dmx Id_Dmx(NO_ID,0)
+#define NULL_ID_DMX Id_Dmx(NO_ID,NULL_DMX)
 
 /******************************* DmxEngine ***************************/
 
@@ -70,11 +70,17 @@ public :
 
   ~ChannelGroupEngine();
 
-  void newGroupCreated(DmxChannelGroup *t_newGroup);
+  bool addNewGroup(const DmxChannelGroup *t_newGroup);
+  bool addNewGroup(const id t_groupId);
+  bool removeGroup(const DmxChannelGroup *t_group);
+  bool removeGroup(const id t_groupId);
+  bool modifyGroup(const DmxChannelGroup *t_group);
+  bool modifyGroup(const id t_groupId);
 
 public slots :
 
-  void groupLevelEvent(dmx t_level);
+  void onGroupLevelChanged(id t_id,
+                           dmx t_level);
 
 private :
 
@@ -89,7 +95,7 @@ class Id_Dmx
 public :
 
   explicit Id_Dmx(const id t_ID = NO_ID,
-                  const dmx t_level = Null_Dmx)
+                  const dmx t_level = NULL_DMX)
     : m_ID(t_ID),
       m_level(t_level)
   {}
@@ -124,7 +130,8 @@ public :
 private :
 
   id m_ID = NO_ID;
-  dmx m_level = Null_Dmx;
+  dmx m_level = NULL_DMX;
+
 };
 
 /******************************* GlobalChannelGroup ********************/
@@ -141,12 +148,10 @@ public :
   void addChannelGroup(id t_groupID,
                        QList<Id_Dmx> t_L_id_dmx);
 
-  bool removeChannelGroup(id t_groupID);
-
-private :
-
   bool addChannel(const id t_groupID,
                   const Id_Dmx t_id_dmx);
+
+  bool removeChannelGroup(id t_groupID);
 
   void groupLevelChanged(const id t_groupID,
                          const dmx t_level);

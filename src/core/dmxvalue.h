@@ -39,6 +39,7 @@ typedef qint16 uid;
 
 #define NO_ID -1
 #define NO_UID -1
+#define NULL_DMX 0
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_CHANNEL_NAME "CH"
@@ -65,8 +66,6 @@ public :
     UnknownValueType
   };
   Q_ENUM(ValueType)
-
-
 
   explicit DmxValue(ValueType t_type = UnknownValueType,
                     DmxValue *t_parent = nullptr);
@@ -150,7 +149,8 @@ public :
 
 signals :
 
-  void levelChanged(dmx level);
+  void levelChanged(id t_id,
+                    dmx t_level);
 
 public slots :
 
@@ -171,11 +171,11 @@ protected :
   // rotate button...
   QWidget *m_assignedWidget = nullptr;
 
-  Q_PROPERTY(dmx level
-             READ getLevel
-             WRITE setLevel
-             RESET resetLevel
-             NOTIFY levelChanged)
+//  Q_PROPERTY(dmx level
+//             READ getLevel
+//             WRITE setLevel
+//             RESET resetLevel
+//             NOTIFY levelChanged)
 };
 
 /********************************* DMXOUTPUT *************************************/
@@ -346,20 +346,5 @@ private :
   QList<dmx> m_L_storedLevel;
 
 };
-
-//  // enum for signals
-//  enum SignalSenderType
-//  {
-//    SubmasterSliderSender,
-//    ChannelGroupSender,
-//    DirectChannelEditSender,
-//    SelectedSceneSender,
-//    NextSceneSender,
-//    IndependantSender,
-//    ChannelToOutputSender,
-//    OutputToUniverseSender,
-//    UnknownSender
-//  };
-//  Q_ENUM(SignalSenderType)
 
 #endif // DMXVALUE_H
