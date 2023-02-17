@@ -20,15 +20,17 @@
 
 #include <QObject>
 #include "dmxvalue.h"
-#include "../qontrejour.h"
 
 #define ENGINE DmxEngine::instance()
 #define GROUP_ENGINE ENGINE->getGroupEngine()
-#define NULL_ID_DMX Id_Dmx(NO_ID,NULL_DMX)
+#define CHANNEL_ENGINE ENGINE->getChannelEngine()
+#define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
+#define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
 /******************************* DmxEngine ***************************/
 
 class ChannelGroupEngine;
+class ChannelEngine;
 
 class DmxEngine
     : public QObject
@@ -43,6 +45,7 @@ public :
   ~DmxEngine();
 
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
+  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
 
 private :
 
@@ -51,12 +54,14 @@ private :
 private :
 
   ChannelGroupEngine *m_groupEngine;
+  ChannelEngine *m_channelEngine;
 
 };
 
 /****************************** ChannelGroupEngine ***********************/
 
-class GlobalChannelGroup;
+class Ch_Id_Dmx;
+class Gr_Id_Dmx;
 
 class ChannelGroupEngine :
     public QObject
@@ -77,45 +82,84 @@ public :
   bool modifyGroup(const DmxChannelGroup *t_group);
   bool modifyGroup(const id t_groupId);
 
+private :
+
+  void addChannelGroup(id t_groupID,
+                       QList<Ch_Id_Dmx> t_L_id_dmx);
+  bool addChannel(const id t_groupID,
+                  const Ch_Id_Dmx t_id_dmx);
+  bool removeChannelGroup(id t_groupID);
+
+signals :
+
+  void channelLevelChangedFromGroup(id t_channelID,
+                                    dmx t_level);
+
 public slots :
 
-  void onGroupLevelChanged(id t_id,
-                           dmx t_level);
+  void groupLevelChanged(const id t_groupID,
+                         const dmx t_level);
 
 private :
 
-  GlobalChannelGroup *m_globalGroup;
+  // id : group id , Ch_Id_Dmx : channelId _ stored level
+  QMultiMap<id, Ch_Id_Dmx> m_MM_totalGroup;
+  // channel Id , Gr_Id_Dmx : higher Group Id _ actual htp level
+  QMap<id, Gr_Id_Dmx> m_M_channelLevel;
 };
 
-/****************************** Id_Dmx ********************************/
+/******************************* ChannelEngine ***********************/
 
-class Id_Dmx
+class ChannelEngine
+    : public QObject
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit ChannelEngine(QObject *parent = nullptr);
+
+  ~ChannelEngine();
+
+
+
+public slots :
+
+  void onChannelLevelChangedFromGroup(id t_id,
+                                      dmx t_level);
+
+};
+
+/****************************** Ch_Id_Dmx ********************************/
+
+class Ch_Id_Dmx
 {
 
 public :
 
-  explicit Id_Dmx(const id t_ID = NO_ID,
-                  const dmx t_level = NULL_DMX)
+  explicit Ch_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
     : m_ID(t_ID),
       m_level(t_level)
   {}
 
-  ~Id_Dmx(){}
+  virtual ~Ch_Id_Dmx(){}
 
-  bool operator==(const Id_Dmx t_id_dmx) const
+  bool operator==(const Ch_Id_Dmx t_id_dmx) const
   { return ((t_id_dmx.getID() == m_ID)
             && (t_id_dmx.getLevel() == m_level)); }
-  bool isBrother(const Id_Dmx t_id_dmx) const
+  virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
   { return (m_ID == t_id_dmx.getID()); }
 
   // WARNING : use isBrother() before these operators
-  bool operator<(const Id_Dmx t_id_dmx) const
+  bool operator<(const Ch_Id_Dmx t_id_dmx) const
   { return (m_level < t_id_dmx.getLevel()); }
-  bool operator>(const Id_Dmx t_id_dmx) const
+  bool operator>(const Ch_Id_Dmx t_id_dmx) const
   { return (m_level > t_id_dmx.getLevel()); }
-  bool operator<=(const Id_Dmx t_id_dmx) const
+  bool operator<=(const Ch_Id_Dmx t_id_dmx) const
   { return (m_level <= t_id_dmx.getLevel()); }
-  bool operator>=(const Id_Dmx t_id_dmx) const
+  bool operator>=(const Ch_Id_Dmx t_id_dmx) const
   { return (m_level >= t_id_dmx.getLevel()); }
 
 
@@ -134,34 +178,25 @@ private :
 
 };
 
-/******************************* GlobalChannelGroup ********************/
+/****************************** Gr_Id_Dmx ********************************/
 
-class GlobalChannelGroup
+class Gr_Id_Dmx
+    : public Ch_Id_Dmx
 {
 
 public :
 
-  explicit GlobalChannelGroup();
+  explicit Gr_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
+    : Ch_Id_Dmx(t_ID,
+                t_level)
+  {}
 
-  ~GlobalChannelGroup();
+  ~Gr_Id_Dmx(){}
 
-  void addChannelGroup(id t_groupID,
-                       QList<Id_Dmx> t_L_id_dmx);
-
-  bool addChannel(const id t_groupID,
-                  const Id_Dmx t_id_dmx);
-
-  bool removeChannelGroup(id t_groupID);
-
-  void groupLevelChanged(const id t_groupID,
-                         const dmx t_level);
-
-private :
-
-  // id : group id , Id_Dmx : channelId _ level
-  QMultiMap<id, Id_Dmx> m_MM_totalGroup;
-  // channel Id , higher Group Id _ level
-  QMap<id, Id_Dmx> m_M_channelLevel;
+  bool isBrother(const Ch_Id_Dmx t_id_dmx) const override
+  { return false; }
 };
 
 #endif // DMXENGINE_H
+

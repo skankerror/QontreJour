@@ -29,6 +29,7 @@
 #define GET_CHANNEL_GROUP(x) MANAGER->getChannelGroup(x)
 #define GET_CHANNEL(x) MANAGER->getChannel(X)
 #define GET_OUTPUT(x,y) MANAGER->getOutput(Uid_Id(x,y))
+#define GET_UNIVERSE_COUNT MANAGER->getUniverseCount()
 #define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
 
 class DmxPatch;
