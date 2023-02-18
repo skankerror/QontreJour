@@ -141,15 +141,19 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
 {
   auto newGroup = new DmxChannelGroup(DmxValue::ChannelGroup);
   newGroup->setID(getChannelGroupCount());
-  newGroup->setL_controledChannel(t_L_channel);
-  auto L_storedLevel = QList<dmx>();
+//  newGroup->setL_controledChannel(t_L_channel);
+//  auto L_storedLevel = QList<dmx>();
+  auto H_controledChannel_storedLevel = QHash<DmxChannel *,dmx>();
   for (const auto item
        : std::as_const(t_L_channel))
   {
-    auto level = item->getLevel();
-    L_storedLevel.append(level);
+//    auto level = item->getLevel();
+//    L_storedLevel.append(level);
+    H_controledChannel_storedLevel.insert(item,
+                                          item->getLevel());
   }
-  newGroup->setL_storedLevel(L_storedLevel);
+//  newGroup->setL_storedLevel(L_storedLevel);
+  newGroup->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);
 
   GROUP_ENGINE->addNewGroup(newGroup);

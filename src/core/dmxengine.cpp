@@ -53,21 +53,19 @@ ChannelGroupEngine::~ChannelGroupEngine()
 
 bool ChannelGroupEngine::addNewGroup(const DmxChannelGroup *t_newGroup)
 {
-  auto L_channel = t_newGroup->getL_controledChannel();
-  auto L_level = t_newGroup->getL_storedLevel();
-  if (L_channel.size() != L_level.size())
-  {
-    qWarning() << "problem in ChannelGroupEngine::addNewGroupd";
-    return false;
-  }
-  for (int i = 0;
-       i < L_channel.size();
-       i++)
+  auto H_controledChannel_storedLevel
+      = t_newGroup->getH_controledChannel_storedLevel();
+
+  QHash<DmxChannel *, dmx>::const_iterator i
+      = H_controledChannel_storedLevel.constBegin();
+
+  while (i != H_controledChannel_storedLevel.constEnd())
   {
     addChannel(t_newGroup->getID(),
-                              Ch_Id_Dmx(L_channel.at(i)->getID(),
-                                     L_level.at(i)));
+               Ch_Id_Dmx(i.key()->getID(),
+                         i.value()));
   }
+
   connect(t_newGroup,
           SIGNAL(levelChanged(id,dmx)),
           this,
@@ -191,7 +189,8 @@ ChannelEngine::ChannelEngine(QObject *parent)
 ChannelEngine::~ChannelEngine()
 {}
 
-void ChannelEngine::onChannelLevelChanged(id t_id, dmx t_level)
+void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
+                                                   dmx t_level)
 {
 
 }

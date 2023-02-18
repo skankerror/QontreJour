@@ -17,6 +17,7 @@
 
 
 #include "dmxvalue.h"
+#include "dmxmanager.h"
 #include <QDebug>
 
 /******************************** DMXVALUE **************************************/
@@ -300,97 +301,88 @@ DmxChannelGroup::~DmxChannelGroup()
   clearControledChannel();
 }
 
-DmxChannel *DmxChannelGroup::getControledChannel(const id t_index)
+dmx DmxChannelGroup::getControledChannelStoredLevel(const id t_id)
 {
-  if ((t_index > -1)
-      && (t_index < m_L_controledChannel.size()))
-    return m_L_controledChannel.at(t_index);
-  else
-    return nullptr;
-
+  return getControledChannelStoredLevel(GET_CHANNEL(t_id));
 }
 
-dmx DmxChannelGroup::getControledChannelLevel(const id t_index)
+dmx DmxChannelGroup::getControledChannelStoredLevel(/*const */DmxChannel *m_channel)
 {
-  if ((t_index > -1)
-      && (t_index < m_L_controledChannel.size()))
+  if (m_channel == nullptr
+      || !m_H_controledChannel_storedLevel.contains(m_channel))
   {
-    return m_L_controledChannel.at(t_index)->getLevel();
+    qWarning() << " problem in DmxChannelGroup::getControledChannelStoredLeve";
+    return NULL_DMX;
   }
-  else
-  {
-    qWarning() << "Problem in DmxChannelGroup::getControledChannelLevel";
-    return 0;
-  }
+  return m_H_controledChannel_storedLevel.value(m_channel);
 }
 
-dmx DmxChannelGroup::getControledChannelStoredLevel(const id t_index)
-{
-  if ((t_index > -1)
-      && (t_index < m_L_controledChannel.size())
-      && (t_index < m_L_storedLevel.size()))
-  {
-    return m_L_storedLevel.at(t_index);
-  }
-  else
-  {
-    qWarning() << "Problem in DmxChannelGroup::getControledChannelStoredLevel";
-    return 0;
-  }
-}
-
+// NOTE : this method modifies level if channel was already in group
 void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
-                                 dmx t_storedLevel)
+                                 const dmx t_storedLevel)
 {
-  // we check if the pointer isn't null and if the value is not in the list.
-  if(t_dmxChannel
-     && !m_L_controledChannel.contains(t_dmxChannel))
+  // we check if the pointer isn't null.
+  if(t_dmxChannel)
   {
-    m_L_controledChannel.append(t_dmxChannel);
-    m_L_storedLevel.append((t_storedLevel));
+    m_H_controledChannel_storedLevel.insert(t_dmxChannel,
+                                            t_storedLevel);
     t_dmxChannel->addChannelGroupControler(m_ID);
   }
   else
-    qWarning() << "cant add channel";
+    qWarning() << "cant DmxChannelGroup::addChannel";
 
 }
 
-void DmxChannelGroup::addChannelList(QList<DmxChannel *> t_L_controledChannel,
-                                     QList<dmx> t_L_storedLevel)
+void DmxChannelGroup::addChannel(const id t_id,
+                                 const dmx t_storedLevel)
 {
-  for (int i = 0;
-       i < t_L_controledChannel.size()
-       || i < t_L_storedLevel.size();
-       i++)
-  {
-    addChannel(t_L_controledChannel.at(i),
-               t_L_storedLevel.at(i));
-  }
+  auto channel = GET_CHANNEL(t_id);
+  addChannel(channel,
+             t_storedLevel);
 }
 
-// WARNING : warning this id represent the number in the list and the
-// channel id.
-void DmxChannelGroup::removeChannel(const id t_index)
+//void DmxChannelGroup::addChannelList(QList<DmxChannel *> t_L_controledChannel,
+//                                     QList<dmx> t_L_storedLevel)
+//{
+//  for (int i = 0;
+//       i < t_L_controledChannel.size()
+//       || i < t_L_storedLevel.size();
+//       i++)
+//  {
+//    addChannel(t_L_controledChannel.at(i),
+//               t_L_storedLevel.at(i));
+//  }
+//}
+
+void DmxChannelGroup::removeChannel(DmxChannel *t_channel)
 {
-  if ((t_index > -1)
-      && (t_index < m_L_controledChannel.size())
-      && (t_index < m_L_storedLevel.size()))
+  if (!m_H_controledChannel_storedLevel.contains(t_channel))
   {
-    auto channel = m_L_controledChannel.at(t_index);
-    channel->removeChannelGroupControler(m_ID);
-    m_L_controledChannel.removeAt(t_index);
-    m_L_storedLevel.removeAt(t_index);
+    qWarning() << "can't DmxChannelGroup::removeChannel";
+    return;
   }
-  else
+  m_H_controledChannel_storedLevel.remove(t_channel);
+  t_channel->removeChannelGroupControler(m_ID);
+}
+
+void DmxChannelGroup::removeChannel(const id t_id)
+{
+  removeChannel(GET_CHANNEL(t_id));
+}
+
+void DmxChannelGroup::removeChannelList(const QList<DmxChannel *> t_L_channel)
+{
+  for (const auto &item
+       : std::as_const(t_L_channel))
   {
-    qWarning() << "can't remove channel";
+    removeChannel(item);
   }
 }
 
-void DmxChannelGroup::removeChannelList(const QList<id> t_L_index)
+void DmxChannelGroup::removeChannelList(const QList<id> t_L_id)
 {
   for (const auto item
-       : std::as_const(t_L_index))
+       : std::as_const(t_L_id))
   {
     removeChannel(item);
   }
@@ -398,10 +390,7 @@ void DmxChannelGroup::removeChannelList(const QList<id> t_L_index)
 
 void DmxChannelGroup::clearControledChannel()
 {
-  m_L_controledChannel.clear();
-  m_L_controledChannel.squeeze();
-  m_L_storedLevel.clear();
-  m_L_storedLevel.squeeze();
+  m_H_controledChannel_storedLevel.clear();
 }
 
 

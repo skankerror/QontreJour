@@ -156,7 +156,7 @@ public slots :
 
   void setLevel(dmx t_level);
   // TODO: Adapt
-  void resetLevel(){ setLevel(0); }
+//  void resetLevel(){ setLevel(0); }
   void setParentValue(RootValue *t_parentValue)
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)
@@ -316,34 +316,32 @@ public :
 
   ~DmxChannelGroup();
 
-  // controled values
-  QList<DmxChannel *> getL_controledChannel() const{ return m_L_controledChannel; }
-  DmxChannel *getControledChannel(const id t_index);
-  dmx getControledChannelLevel(const id t_index);
-  dmx getControledChannelStoredLevel(const id t_index);
-  int getL_controledChannelSize() const{ return m_L_controledChannel.size(); }
-  QList<dmx> getL_storedLevel() const{ return m_L_storedLevel; }
+  dmx getControledChannelStoredLevel(const id t_id);
+  dmx getControledChannelStoredLevel(DmxChannel *m_channel);
+  int getL_controledChannelSize() const
+  { return m_H_controledChannel_storedLevel.size(); }
+  QHash<DmxChannel *, dmx> getH_controledChannel_storedLevel() const
+  { return m_H_controledChannel_storedLevel; }
 
   // setters
-  void setL_controledChannel(QList<DmxChannel *> &t_L_controledChannel)
-  { m_L_controledChannel = t_L_controledChannel; }
-  void setL_storedLevel(QList<dmx> t_L_storedLevel)
-  { m_L_storedLevel = t_L_storedLevel; }
+  void setH_controledChannel_storedLevel(const QHash<DmxChannel *, dmx> &t_H_controledChannel_storedLevel)
+  { m_H_controledChannel_storedLevel = t_H_controledChannel_storedLevel; }
 
   void addChannel(DmxChannel *t_dmxChannel,
-                  dmx t_storedLevel);
-  void addChannelList(QList<DmxChannel *> t_L_controledChannel,
-                      QList<dmx> t_L_storedLevel);
-  void removeChannel(const id t_index);
-  void removeChannelList(const QList<id> t_L_index);
+                  const dmx t_storedLevel);
+  void addChannel(const id t_id,
+                  const dmx t_storedLevel);
+//  void addChannelList(const QMap<id ,dmx> t_M_controledChannelId_storedLevel);
+//  void addChannelList(const QHash<DmxChannel *,dmx> t_M_controledChannel_storedLevel);
+  void removeChannel(DmxChannel * t_channel);
+  void removeChannel(const id t_id);
+  void removeChannelList(const QList<DmxChannel *> t_L_channel);
+  void removeChannelList(const QList<id> t_L_id);
   void clearControledChannel();
-
-
 
 private :
 
-  QList<DmxChannel *> m_L_controledChannel;
-  QList<dmx> m_L_storedLevel;
+  QHash<DmxChannel *,dmx> m_H_controledChannel_storedLevel;
 
 };
 
