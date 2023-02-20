@@ -16,8 +16,54 @@
  */
 
 #include "dmxmanager.h"
-#include "dmxengine.h"
+//#include "dmxengine.h"
 #include <QDebug>
+
+DmxManager::DmxManager(QObject *parent)
+  : QObject(parent),
+    m_hwManager(QDmxManager::instance()),
+    m_dmxPatch(new DmxPatch()),
+    m_rootChannel(new RootValue(DmxValue::RootChannel)),
+    m_rootChannelGroup(new RootValue(DmxValue::RootChannelGroup))
+{
+  // init hardware manager
+  m_hwManager->init();
+
+  // we create first universe
+  auto universe = new DmxUniverse(0);
+  m_L_universe.append(universe);
+
+  // create default number of channels
+  for (int i = 0;
+       i < DEFAULT_CHANNEL_COUNT;
+       i++)
+  {
+    auto channel = new DmxChannel();
+    channel->setID(i);
+    m_rootChannel->addChildValue(channel);
+  }
+
+  // start with straight patch between our channels
+  // and outputs from 1st universe
+
+  setStraightPatch(0); // patch first universe
+  m_dmxEngine = new DmxEngine(this);
+//  qDebug() << getChannelCount();
+
+  //test
+  auto channel1 = getChannel(0);
+  auto channel2 = getChannel(1);
+  channel1->setLevel(100);
+  channel2->setLevel(147);
+
+  auto L_channel = QList<DmxChannel *>();
+  L_channel.append(channel1);
+  L_channel.append(channel2);
+  createChannelGroup(L_channel);
+
+  getChannelGroup(0)->setLevel(100);
+
+}
 
 DmxManager *DmxManager::instance()
 {
@@ -37,6 +83,7 @@ DmxManager::~DmxManager()
   }
   m_L_universe.clear();
   m_L_universe.squeeze();
+  delete m_dmxPatch;
 }
 
 QStringList DmxManager::getAvailableDriversNames() const
@@ -110,11 +157,6 @@ bool DmxManager::createUniverse(uid t_universeID)
     auto universe = new DmxUniverse(t_universeID);
     m_L_universe.append(universe);
 
-    connect(universe,
-            SIGNAL(universeRequireUpdate(uid,id,dmx)),
-            this,
-            SLOT(onUniverseRequestUpdate(uid,id,dmx)));
-
     return true;
   }
   else if (t_universeID < getUniverseCount())
@@ -127,11 +169,6 @@ bool DmxManager::createUniverse(uid t_universeID)
     qDebug() << "universe id asked is too much high";
     m_L_universe.append(universe);
 
-    connect(universe,
-            SIGNAL(universeRequireUpdate(uid,id,dmx)),
-            this,
-            SLOT(onUniverseRequestUpdate(uid,id,dmx)));
-
     return true;
   }
   return false;
@@ -141,22 +178,18 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
 {
   auto newGroup = new DmxChannelGroup(DmxValue::ChannelGroup);
   newGroup->setID(getChannelGroupCount());
-//  newGroup->setL_controledChannel(t_L_channel);
-//  auto L_storedLevel = QList<dmx>();
   auto H_controledChannel_storedLevel = QHash<DmxChannel *,dmx>();
   for (const auto item
        : std::as_const(t_L_channel))
   {
-//    auto level = item->getLevel();
-//    L_storedLevel.append(level);
     H_controledChannel_storedLevel.insert(item,
                                           item->getLevel());
+//    item->addChannelGroupControler(newGroup->getID());
   }
-//  newGroup->setL_storedLevel(L_storedLevel);
   newGroup->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);
 
-  GROUP_ENGINE->addNewGroup(newGroup);
+  m_dmxEngine->getGroupEngine()->addNewGroup(newGroup);
 
   return newGroup;
 }
@@ -428,80 +461,6 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   auto driver = m_hwManager->driver(t_driverString);
   driver->setEnabled(true);
   return driver->availableDevices();
-}
-
-//void DmxManager::onUniverseRequestUpdate(uid t_uid,
-//                                         id t_id,
-//                                         dmx t_level)
-//{
-//  m_hwManager->writeData(t_uid,
-//                         t_id,
-//                         t_level);
-
-//  qDebug() << "write uid :"  << t_uid
-//           << "id :" << t_id
-//           << "level :" << t_level;
-
-//}
-
-DmxManager::DmxManager(QObject *parent)
-  : QObject(parent),
-    m_hwManager(QDmxManager::instance()),
-    m_dmxPatch(new DmxPatch()),
-    m_rootChannel(new RootValue(DmxValue::RootChannel)),
-    m_rootChannelGroup(new RootValue(DmxValue::RootChannelGroup))
-{
-  // init hardware manager
-  m_hwManager->init();
-
-  // we create first universe
-  auto universe = new DmxUniverse(0);
-  m_L_universe.append(universe);
-
-  // create default number of channels
-  for (int i = 0;
-       i < DEFAULT_CHANNEL_COUNT;
-       i++)
-  {
-    auto channel = new DmxChannel();
-    channel->setID(i);
-    m_rootChannel->addChildValue(channel);
-  }
-
-  // start with straight patch between our channels
-  // and outputs from 1st universe
-
-  setStraightPatch(0); // patch first universe
-
-}
-
-/*************************** Uid_Id /************************************/
-
-Uid_Id::Uid_Id(const DmxOutput *t_output)
-{
-  if (t_output)
-  {
-    m_universeID = t_output->getUniverseID();
-    m_outputID = t_output->getID();
-  }
-}
-
-Uid_Id::Uid_Id(const QString &t_string)
-{
-  if (t_string.size() > 3
-      && t_string.at(0).isDigit())
-  {
-    auto tempFloat = t_string.toFloat();
-    m_universeID = (uid)tempFloat;
-    // TODO : implement this fucking string method
-//    for (qsizetype i = 0;
-//         i < t_string.size();
-//         i++)
-//    {
-//      auto value = t_string.at(i);
-//      if (value.isDigit())
-
-  }
 }
 
 /******************************** DmxPatch *******************************/

@@ -24,16 +24,16 @@
 #include "dmxvalue.h"
 //#include "dmxscene.h"
 #include "dmxuniverse.h"
+#include "dmxengine.h"
 
 #define MANAGER DmxManager::instance()
-#define GET_CHANNEL_GROUP(x) MANAGER->getChannelGroup(x)
-#define GET_CHANNEL(x) MANAGER->getChannel(x)
-#define GET_OUTPUT(x,y) MANAGER->getOutput(Uid_Id(x,y))
-#define GET_UNIVERSE_COUNT MANAGER->getUniverseCount()
-#define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
+#define GET_CHANNEL_GROUP(x) DmxManager::instance()->getChannelGroup(x)
+#define GET_CHANNEL(x) DmxManager::instance()->getChannel(x)
+#define GET_CHANNEL_COUNT DmxManager::instance()->getChannelCount()
+#define GET_OUTPUT(x,y) DmxManager::instance()->getOutput(Uid_Id(x,y))
+#define GET_UNIVERSE_COUNT DmxManager::instance()->getUniverseCount()
 
 class DmxPatch;
-class Uid_Id;
 
 class DmxManager
     : public QObject
@@ -122,61 +122,10 @@ private :
 
   QDmxManager *m_hwManager;
   DmxPatch *m_dmxPatch;
+  DmxEngine *m_dmxEngine;
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
-
-};
-
-/******************************** Uid_Id *************************************/
-
-class Uid_Id
-{
-
-public :
-
-  explicit Uid_Id(const uid t_uid = NO_UID,
-                  const id t_id = NO_ID)
-    : m_universeID(t_uid),
-      m_outputID(t_id)
-  {}
-
-  explicit Uid_Id(const DmxOutput *t_output);
-
-  explicit Uid_Id(const QString &t_string);
-
-  ~Uid_Id(){}
-
-  bool operator==(const Uid_Id t_Uid_Id) const
-  {
-    return ((t_Uid_Id.getUniverseID() == m_universeID)
-            && (t_Uid_Id.getOutputID() == m_outputID));
-  }
-
-  uid getUniverseID() const{ return m_universeID; }
-  id getOutputID() const{ return m_outputID; }
-
-  void setUniverseID(const uid t_universeID){ m_universeID = t_universeID; }
-  void setOutputID(const id t_outputID){ m_outputID = t_outputID; }
-
-  QString toString() const
-  {
-    return QString("%1.%2")
-        .arg(m_universeID)
-        .arg(m_outputID);
-  }
-
-  static QString UidtoString(const Uid_Id t_uid_id)
-  {
-    return QString("%1.%2")
-        .arg(t_uid_id.getUniverseID())
-        .arg(t_uid_id.getOutputID());
-  }
-
-private :
-
-  uid m_universeID = NO_UID;
-  id m_outputID = NO_ID;
 
 };
 

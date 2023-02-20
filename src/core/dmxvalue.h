@@ -40,10 +40,66 @@ typedef qint16 uid;
 #define NO_ID -1
 #define NO_UID -1
 #define NULL_DMX 0
+#define NULL_DMX_OFFSET 0
+#define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_CHANNEL_NAME "CH"
 #define DEFAULT_GROUP_NAME "GROUP"
+
+/******************************** Uid_Id *************************************/
+
+class DmxOutput;
+
+class Uid_Id
+{
+
+public :
+
+  explicit Uid_Id(const uid t_uid = NO_UID,
+                  const id t_id = NO_ID)
+    : m_universeID(t_uid),
+      m_outputID(t_id)
+  {}
+
+  explicit Uid_Id(const DmxOutput *t_output);
+
+  explicit Uid_Id(const QString &t_string);
+
+  ~Uid_Id(){}
+
+  bool operator==(const Uid_Id t_Uid_Id) const
+  {
+    return ((t_Uid_Id.getUniverseID() == m_universeID)
+            && (t_Uid_Id.getOutputID() == m_outputID));
+  }
+
+  uid getUniverseID() const{ return m_universeID; }
+  id getOutputID() const{ return m_outputID; }
+
+  void setUniverseID(const uid t_universeID){ m_universeID = t_universeID; }
+  void setOutputID(const id t_outputID){ m_outputID = t_outputID; }
+
+  QString toString() const
+  {
+    return QString("%1.%2")
+        .arg(m_universeID)
+        .arg(m_outputID);
+  }
+
+  static QString UidtoString(const Uid_Id t_uid_id)
+  {
+    return QString("%1.%2")
+        .arg(t_uid_id.getUniverseID())
+        .arg(t_uid_id.getOutputID());
+  }
+
+private :
+
+  uid m_universeID = NO_UID;
+  id m_outputID = NO_ID;
+
+};
 
 /******************************** DMXVALUE **************************************/
 
@@ -155,8 +211,6 @@ signals :
 public slots :
 
   void setLevel(dmx t_level);
-  // TODO: Adapt
-//  void resetLevel(){ setLevel(0); }
   void setParentValue(RootValue *t_parentValue)
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)
@@ -171,11 +225,6 @@ protected :
   // rotate button...
   QWidget *m_assignedWidget = nullptr;
 
-//  Q_PROPERTY(dmx level
-//             READ getLevel
-//             WRITE setLevel
-//             RESET resetLevel
-//             NOTIFY levelChanged)
 };
 
 /********************************* DMXOUTPUT *************************************/
@@ -248,8 +297,8 @@ public :
 
   dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
-  QMap<id, dmx> getM_channelGroup_Id_Level() const
-  { return m_M_channelGroup_Id_Level; }
+//  QMap<id, dmx> getM_channelGroup_Id_Level() const
+//  { return m_M_channelGroup_Id_Level; }
   dmx getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   dmx getnextSceneLevel() const{ return m_nextSceneLevel; }
   overdmx getOverOffset() const{ return m_overOffset; }
@@ -269,21 +318,25 @@ public :
   void setIsDirectChannelEdited(const bool t_isDirectChannelEdited)
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
   void setOverOffset(const overdmx t_overOffset){ m_overOffset = t_overOffset; }
-  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
-  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
+//  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
+//  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
+  void setChannelGroupLevel(dmx t_channelGroupLevel)
+  { m_channelGroupLevel = t_channelGroupLevel; }
 
   void addOutput(DmxOutput *t_dmxOutput);
+  void addOutput(Uid_Id t_Uid_Id);
   void addOutputList(const QList<DmxOutput *> t_L_controledOutput);
-//  void removeOutput(const id t_index);
-//  void removeOutputList(const QList<id> t_L_index);
   void removeOutput(const DmxOutput *t_output);
+  void removeOutput(const Uid_Id t_Uid_Id);
   void removeOutputList(const QList<DmxOutput *> t_L_output);
+  void removeOutputList(const QList<Uid_Id> t_L_Uid_Id);
   void clearControledOutput();
 
-  void addChannelGroupControler(const id t_id);
-  void addChannelGroupControlerList(const QList<id> t_L_id);
-  void removeChannelGroupControler(const id t_id);
-  void removeChannelGroupControlerList(const QList<id> t_L_id);
+//  void addChannelGroupControler(const id t_id);
+//  void addChannelGroupControlerList(const QList<id> t_L_id);
+//  void removeChannelGroupControler(const id t_id);
+//  void removeChannelGroupControlerList(const QList<id> t_L_id);
+
 
 private :
 
@@ -291,7 +344,7 @@ private :
 
   dmx m_directChannelEditLevel = 0;
   dmx m_channelGroupLevel = 0;
-  QMap<id, dmx> m_M_channelGroup_Id_Level;
+//  QMap<id, dmx> m_M_channelGroup_Id_Level;
   dmx m_selectedSceneLevel = 0;
   dmx m_nextSceneLevel = 0;
   overdmx m_overOffset = 0;
@@ -331,6 +384,7 @@ public :
                   const dmx t_storedLevel);
   void addChannel(const id t_id,
                   const dmx t_storedLevel);
+  // TODO :
 //  void addChannelList(const QMap<id ,dmx> t_M_controledChannelId_storedLevel);
 //  void addChannelList(const QHash<DmxChannel *,dmx> t_M_controledChannel_storedLevel);
   void removeChannel(DmxChannel * t_channel);

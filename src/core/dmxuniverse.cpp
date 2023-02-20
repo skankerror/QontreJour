@@ -40,28 +40,10 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     dmxOutput->setID(i);
 
     m_rootOutput->addChildValue(dmxOutput);
-
-    connect(dmxOutput,
-            SIGNAL(outputRequestUpdate(id,dmx)),
-            this,
-            SLOT(onOutputRequestUpdate(id,dmx)));
   }
 }
 
 DmxUniverse::~DmxUniverse()
 {
-  // détruire output
   m_rootOutput->deleteLater();
 }
-
-void DmxUniverse::onOutputRequestUpdate(id t_ID,
-                                        dmx t_level)
-{
-  if (!m_isConnected)
-    return;
-
-  emit universeRequireUpdate(m_ID,
-                             t_ID,
-                             t_level);
-}
-

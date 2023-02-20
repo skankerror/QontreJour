@@ -46,24 +46,7 @@ public :
   // setters
   void setID(uid t_ID) { m_ID = t_ID; }
   void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
-
-
-
-signals :
-
-  void universeRequireUpdate(uid t_universeID,
-                             id t_outputID,
-                             dmx t_level);
-
-public slots :
-
   void setOutputCount(int t_outputCount){ m_outputCount = t_outputCount; }
-
-
-private slots :
-
-  void onOutputRequestUpdate(id t_ID,
-                             dmx t_level);
 
 private :
 

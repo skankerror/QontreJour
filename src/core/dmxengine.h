@@ -21,9 +21,9 @@
 #include <QObject>
 #include "dmxvalue.h"
 
-#define ENGINE DmxEngine::instance()
-#define GROUP_ENGINE ENGINE->getGroupEngine()
-#define CHANNEL_ENGINE ENGINE->getChannelEngine()
+//#define ENGINE DmxEngine::instance()
+//#define GROUP_ENGINE ENGINE->getGroupEngine()
+//#define CHANNEL_ENGINE ENGINE->getChannelEngine()
 #define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
 #define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
@@ -40,14 +40,14 @@ class DmxEngine
 
 public :
 
-  static DmxEngine *instance();
+//  static DmxEngine *instance();
 
   ~DmxEngine();
 
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
-  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
+//  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
 
-private :
+//private :
 
   explicit DmxEngine(QObject *parent = nullptr);
 
@@ -76,11 +76,11 @@ public :
   ~ChannelGroupEngine();
 
   bool addNewGroup(const DmxChannelGroup *t_newGroup);
-  bool addNewGroup(const id t_groupId);
+//  bool addNewGroup(const id t_groupId);
   bool removeGroup(const DmxChannelGroup *t_group);
   bool removeGroup(const id t_groupId);
   bool modifyGroup(const DmxChannelGroup *t_group);
-  bool modifyGroup(const id t_groupId);
+//  bool modifyGroup(const id t_groupId);
 
 private :
 
@@ -110,6 +110,8 @@ private :
 
 /******************************* ChannelEngine ***********************/
 
+class ChannelData;
+
 class ChannelEngine
     : public QObject
 {
@@ -122,13 +124,79 @@ public :
 
   ~ChannelEngine();
 
+private :
 
+  void createDatas(int t_channelCount);
 
 public slots :
 
   void onChannelLevelChangedFromGroup(id t_id,
                                       dmx t_level);
+  void onChannelLevelChangedFromDirectChannel(id t_id,
+                                              dmx t_level,
+                                              overdmx t_offset = NULL_DMX);
+  void onChannelLevelChangedFromScene(id t_id,
+                                      dmx t_level);
+  void onChannelLevelChangedFromNextScene(id t_id,
+                                          dmx t_level);
 
+
+private :
+
+  QList<ChannelData *> m_L_channelData;
+
+};
+
+/******************************* ChannelData ***********************/
+
+class ChannelData
+{
+
+public :
+
+  explicit ChannelData(id t_id = NO_ID,
+                       dmx t_channelGroupLevel = NULL_DMX,
+                       dmx t_directChannelLevel = NULL_DMX,
+                       overdmx t_directChannelOffset = NULL_DMX_OFFSET,
+                       dmx t_sceneLevel = NULL_DMX,
+                       dmx t_nextSceneLevel = NULL_DMX)
+    : m_channelID(t_id),
+      m_channelGroupLevel(t_channelGroupLevel),
+      m_directChannelLevel(t_directChannelLevel),
+      m_directChannelOffset(t_directChannelOffset),
+      m_sceneLevel(t_sceneLevel),
+      m_nextSceneLevel(t_nextSceneLevel)
+  {}
+
+  ~ChannelData(){}
+
+  dmx getChannelGroupLevel() const{ return m_channelGroupLevel; }
+  dmx getDirectChannelLevel() const{ return m_directChannelLevel; }
+  overdmx getDirectChannelOffset() const{ return m_directChannelOffset; }
+  dmx getSceneLevel() const{ return m_sceneLevel; }
+  dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
+
+  void setChannelGroupLevel(dmx t_channelGroupLevel)
+  { m_channelGroupLevel = t_channelGroupLevel; }
+  void setDirectChannelLevel(dmx t_directChannelLevel)
+  { m_directChannelLevel = t_directChannelLevel; }
+  void setDirectChannelOffset(overdmx t_directChannelOffset)
+  { m_directChannelOffset = t_directChannelOffset; }
+  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
+  void setNextSceneLevel(dmx t_nextSceneLevel)
+  { m_nextSceneLevel = t_nextSceneLevel; }
+
+  id getChannelID() const{ return m_channelID; }
+  void setChannelID(id t_channelID){ m_channelID = t_channelID; }
+
+private :
+
+  id m_channelID = NO_ID;
+  dmx m_channelGroupLevel = NULL_DMX;
+  dmx m_directChannelLevel = NULL_DMX;
+  overdmx m_directChannelOffset = NULL_DMX_OFFSET;
+  dmx m_sceneLevel = NULL_DMX;
+  dmx m_nextSceneLevel = NULL_DMX;
 };
 
 /****************************** Ch_Id_Dmx ********************************/

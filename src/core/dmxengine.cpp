@@ -16,14 +16,8 @@
  */
 
 #include "dmxengine.h"
-#include "dmxmanager.h"
 #include <QDebug>
 
-DmxEngine *DmxEngine::instance()
-{
-  static DmxEngine inst;
-  return &inst;
-}
 
 DmxEngine::~DmxEngine()
 {
@@ -64,19 +58,15 @@ bool ChannelGroupEngine::addNewGroup(const DmxChannelGroup *t_newGroup)
     addChannel(t_newGroup->getID(),
                Ch_Id_Dmx(i.key()->getID(),
                          i.value()));
+    ++i;
   }
 
   connect(t_newGroup,
           SIGNAL(levelChanged(id,dmx)),
           this,
           SLOT(groupLevelChanged(id,dmx)));
-  return true;
-}
 
-bool ChannelGroupEngine::addNewGroup(const id t_groupID)
-{
-  auto channelGroup = GET_CHANNEL_GROUP(t_groupID);
-  return addNewGroup(channelGroup);
+  return true;
 }
 
 bool ChannelGroupEngine::removeGroup(const DmxChannelGroup *t_group)
@@ -96,11 +86,6 @@ bool ChannelGroupEngine::removeGroup(const id t_groupId)
 bool ChannelGroupEngine::modifyGroup(const DmxChannelGroup *t_group)
 {
   return (removeGroup(t_group) && addNewGroup(t_group));
-}
-
-bool ChannelGroupEngine::modifyGroup(const id t_groupId)
-{
-  return (removeGroup(t_groupId) && addNewGroup(t_groupId));
 }
 
 void ChannelGroupEngine::addChannelGroup(id t_groupID,
@@ -184,13 +169,48 @@ void ChannelGroupEngine::groupLevelChanged(const id t_groupID,
 
 ChannelEngine::ChannelEngine(QObject *parent)
   : QObject(parent)
-{}
+{
+  createDatas(512); // TODO : get the number
+}
 
 ChannelEngine::~ChannelEngine()
 {}
 
+void ChannelEngine::createDatas(int t_channelCount)
+{
+  for (int i = 0;
+       i < t_channelCount;
+       i++)
+  {
+    auto channelData = new ChannelData(i);
+    m_L_channelData.append(channelData);
+  }
+}
+
 void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
                                                    dmx t_level)
+{
+  auto channelData = m_L_channelData.at(t_id);
+  channelData->setChannelGroupLevel(t_level);
+//  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
+  // TODO :
+}
+
+void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
+                                                           dmx t_level,
+                                                           overdmx t_offset)
+{
+
+}
+
+void ChannelEngine::onChannelLevelChangedFromScene(id t_id,
+                                                   dmx t_level)
+{
+
+}
+
+void ChannelEngine::onChannelLevelChangedFromNextScene(id t_id,
+                                                       dmx t_level)
 {
 
 }

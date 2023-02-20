@@ -20,6 +20,35 @@
 #include "dmxmanager.h"
 #include <QDebug>
 
+/*************************** Uid_Id /************************************/
+
+Uid_Id::Uid_Id(const DmxOutput *t_output)
+{
+  if (t_output)
+  {
+    m_universeID = t_output->getUniverseID();
+    m_outputID = t_output->getID();
+  }
+}
+
+Uid_Id::Uid_Id(const QString &t_string)
+{
+  if (t_string.size() > 3
+      && t_string.at(0).isDigit())
+  {
+    auto tempFloat = t_string.toFloat();
+    m_universeID = (uid)tempFloat;
+    // TODO : implement this fucking string method
+//    for (qsizetype i = 0;
+//         i < t_string.size();
+//         i++)
+//    {
+//      auto value = t_string.at(i);
+//      if (value.isDigit())
+
+  }
+}
+
 /******************************** DMXVALUE **************************************/
 
 
@@ -207,6 +236,12 @@ void DmxChannel::addOutput(DmxOutput *t_dmxOutput)
   }
 }
 
+void DmxChannel::addOutput(Uid_Id t_Uid_Id)
+{
+  addOutput(GET_OUTPUT(t_Uid_Id.getUniverseID(),
+                       t_Uid_Id.getOutputID()));
+}
+
 void DmxChannel::addOutputList(const QList<DmxOutput *> t_L_controledOutput)
 {
   for (const auto &item :
@@ -229,10 +264,25 @@ void DmxChannel::removeOutput(const DmxOutput *t_output)
   }
 }
 
+void DmxChannel::removeOutput(const Uid_Id t_Uid_Id)
+{
+  removeOutput(GET_OUTPUT(t_Uid_Id.getUniverseID(),
+                          t_Uid_Id.getOutputID()));
+}
+
 void DmxChannel::removeOutputList(const QList<DmxOutput *> t_L_output)
 {
   for (const auto &item
        : std::as_const(t_L_output))
+  {
+    removeOutput(item);
+  }
+}
+
+void DmxChannel::removeOutputList(const QList<Uid_Id> t_L_Uid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_Uid_Id))
   {
     removeOutput(item);
   }
@@ -244,46 +294,46 @@ void DmxChannel::clearControledOutput()
   m_L_controledOutput.squeeze();
 }
 
-void DmxChannel::addChannelGroupControler(const id t_id)
-{
-  if (m_M_channelGroup_Id_Level.contains(t_id))
-  {
-    qWarning() << "DmxChannel::addChannelGroupControler"
-               << "id yet in the map";
-    return;
-  }
-  m_M_channelGroup_Id_Level.insert(t_id,
-                                   NULL_DMX);
-}
+//void DmxChannel::addChannelGroupControler(const id t_id)
+//{
+//  if (m_M_channelGroup_Id_Level.contains(t_id))
+//  {
+//    qWarning() << "DmxChannel::addChannelGroupControler"
+//               << "id yet in the map";
+//    return;
+//  }
+//  m_M_channelGroup_Id_Level.insert(t_id,
+//                                   NULL_DMX);
+//}
 
-void DmxChannel::addChannelGroupControlerList(const QList<id> t_L_id)
-{
-  for (const auto item
-       : std::as_const(t_L_id))
-  {
-    addChannelGroupControler(item);
-  }
-}
+//void DmxChannel::addChannelGroupControlerList(const QList<id> t_L_id)
+//{
+//  for (const auto item
+//       : std::as_const(t_L_id))
+//  {
+//    addChannelGroupControler(item);
+//  }
+//}
 
-void DmxChannel::removeChannelGroupControler(const id t_id)
-{
-  if (m_M_channelGroup_Id_Level.contains(t_id))
-  {
-    m_M_channelGroup_Id_Level.remove(t_id);
-    return;
-  }
-  qWarning() << "DmxChannel::addChannelGroupControler"
-             << "id yet in the map";
-}
+//void DmxChannel::removeChannelGroupControler(const id t_id)
+//{
+//  if (m_M_channelGroup_Id_Level.contains(t_id))
+//  {
+//    m_M_channelGroup_Id_Level.remove(t_id);
+//    return;
+//  }
+//  qWarning() << "DmxChannel::addChannelGroupControler"
+//             << "id yet in the map";
+//}
 
-void DmxChannel::removeChannelGroupControlerList(const QList<id> t_L_id)
-{
-  for (const auto item
-       : std::as_const(t_L_id))
-  {
-    removeChannelGroupControler(item);
-  }
-}
+//void DmxChannel::removeChannelGroupControlerList(const QList<id> t_L_id)
+//{
+//  for (const auto item
+//       : std::as_const(t_L_id))
+//  {
+//    removeChannelGroupControler(item);
+//  }
+//}
 
 
 /********************************** DMXCHANNELGROUP ************************************/
@@ -326,7 +376,7 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
   {
     m_H_controledChannel_storedLevel.insert(t_dmxChannel,
                                             t_storedLevel);
-    t_dmxChannel->addChannelGroupControler(m_ID);
+//    t_dmxChannel->addChannelGroupControler(m_ID);
   }
   else
     qWarning() << "cant DmxChannelGroup::addChannel";
@@ -362,7 +412,7 @@ void DmxChannelGroup::removeChannel(DmxChannel *t_channel)
     return;
   }
   m_H_controledChannel_storedLevel.remove(t_channel);
-  t_channel->removeChannelGroupControler(m_ID);
+//  t_channel->removeChannelGroupControler(m_ID);
 }
 
 void DmxChannelGroup::removeChannel(const id t_id)
