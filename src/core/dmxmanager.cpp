@@ -47,8 +47,9 @@ DmxManager::DmxManager(QObject *parent)
   // and outputs from 1st universe
 
   setStraightPatch(0); // patch first universe
-  m_dmxEngine = new DmxEngine(this);
-//  qDebug() << getChannelCount();
+  m_dmxEngine = new DmxEngine(m_rootChannelGroup,
+                              m_rootChannel,
+                              this);
 
   //test
   auto channel1 = getChannel(0);

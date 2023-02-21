@@ -19,16 +19,14 @@
 #include <QDebug>
 
 
-DmxEngine::~DmxEngine()
-{
-  m_groupEngine->deleteLater();
-  m_channelEngine->deleteLater();
-}
-
-DmxEngine::DmxEngine(QObject *parent)
+DmxEngine::DmxEngine(RootValue *t_rootGroup,
+                     RootValue *t_rootChannel,
+                     QObject *parent)
   : QObject(parent),
-    m_groupEngine(new ChannelGroupEngine(this)),
-    m_channelEngine(new ChannelEngine(this))
+    m_groupEngine(new ChannelGroupEngine(t_rootGroup,
+                                         this)),
+    m_channelEngine(new ChannelEngine(t_rootChannel,
+                                      this))
 {
   connect(m_groupEngine,
           SIGNAL(channelLevelChangedFromGroup(id,dmx)),
@@ -36,10 +34,20 @@ DmxEngine::DmxEngine(QObject *parent)
           SLOT(onChannelLevelChangedFromGroup(id,dmx)));
 }
 
+DmxEngine::~DmxEngine()
+{
+  m_groupEngine->deleteLater();
+  m_channelEngine->deleteLater();
+}
+
 /****************************** ChannelGroupEngine ***********************/
 
-ChannelGroupEngine::ChannelGroupEngine(QObject *parent):
-  QObject(parent)
+#define GET_CHANNEL_GROUP(x) static_cast<DmxChannelGroup*>(m_rootChannelGroup->getChildValue(x))
+
+ChannelGroupEngine::ChannelGroupEngine(RootValue *t_rootGroup,
+                                       QObject *parent):
+  QObject(parent),
+  m_rootChannelGroup(t_rootGroup)
 {}
 
 ChannelGroupEngine::~ChannelGroupEngine()
@@ -69,6 +77,11 @@ bool ChannelGroupEngine::addNewGroup(const DmxChannelGroup *t_newGroup)
   return true;
 }
 
+bool ChannelGroupEngine::addNewGroup(const id t_groupId)
+{
+  return addNewGroup(GET_CHANNEL_GROUP(t_groupId));
+}
+
 bool ChannelGroupEngine::removeGroup(const DmxChannelGroup *t_group)
 {
   return removeChannelGroup(t_group->getID());
@@ -86,6 +99,11 @@ bool ChannelGroupEngine::removeGroup(const id t_groupId)
 bool ChannelGroupEngine::modifyGroup(const DmxChannelGroup *t_group)
 {
   return (removeGroup(t_group) && addNewGroup(t_group));
+}
+
+bool ChannelGroupEngine::modifyGroup(const id t_groupID)
+{
+  return modifyGroup(GET_CHANNEL_GROUP(t_groupID));
 }
 
 void ChannelGroupEngine::addChannelGroup(id t_groupID,
@@ -154,27 +172,37 @@ void ChannelGroupEngine::groupLevelChanged(const id t_groupID,
     if (newLevel > actualCh_Id_Dmx.getLevel()
         || t_groupID == actualCh_Id_Dmx.getID())
     {
-        m_M_channelLevel.insert(item.getID(),
-                                Gr_Id_Dmx(t_groupID,
-                                          newLevel));
+      m_M_channelLevel.insert(item.getID(),
+                              Gr_Id_Dmx(t_groupID,
+                                        newLevel));
       // emit to channel engine
-        emit channelLevelChangedFromGroup(item.getID(),
-                                          newLevel);
+      emit channelLevelChangedFromGroup(item.getID(),
+                                        newLevel);
     }
   }
 }
 
 /******************************* ChannelEngine ***********************/
 
+#define GET_CHANNEL(x) static_cast<DmxChannel*>(m_rootChannel->getChildValue(x))
 
-ChannelEngine::ChannelEngine(QObject *parent)
-  : QObject(parent)
+ChannelEngine::ChannelEngine(RootValue *t_rootChannel,
+                             QObject *parent)
+  : QObject(parent),
+    m_rootChannel(t_rootChannel)
 {
-  createDatas(512); // TODO : get the number
+  createDatas(m_rootChannel->getL_childValueSize());
 }
 
 ChannelEngine::~ChannelEngine()
-{}
+{
+  for (const auto &item
+       : std::as_const(m_L_channelData))
+  {
+    delete item;
+  }
+  m_L_channelData.clear();
+}
 
 void ChannelEngine::createDatas(int t_channelCount)
 {
@@ -187,13 +215,22 @@ void ChannelEngine::createDatas(int t_channelCount)
   }
 }
 
+void ChannelEngine::update(id t_id)
+{
+  auto channelData = m_L_channelData.at(t_id);
+  auto flag = channelData->getFlag_updateLevel();
+  auto channel = GET_CHANNEL(t_id);
+  channel->setChannelFlag(flag);
+  channel->setLevel(channelData->getActual_Level());
+}
+
 void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
                                                    dmx t_level)
 {
   auto channelData = m_L_channelData.at(t_id);
   channelData->setChannelGroupLevel(t_level);
-//  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
-  // TODO :
+  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
+  update(t_id);
 }
 
 void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
@@ -213,4 +250,40 @@ void ChannelEngine::onChannelLevelChangedFromNextScene(id t_id,
                                                        dmx t_level)
 {
 
+}
+
+/******************************** ChannelData *****************************/
+
+DmxChannel::ChannelFlag ChannelData::getFlag_updateLevel()
+{
+  if (m_isDirectChannelEdited)
+  {
+    if (m_channelGroupLevel >= m_directChannelLevel)
+    {
+      if (m_channelGroupLevel > m_actual_Level)
+          m_actual_Level = m_channelGroupLevel;
+      return DmxChannel::ChannelGroupFlag;
+    }
+    else
+    {
+      if (m_directChannelLevel > m_actual_Level)
+        m_actual_Level = m_directChannelLevel;
+      return DmxChannel::DirectChannelFlag;
+    }
+  }
+  else
+  {
+    if (m_channelGroupLevel >= m_sceneLevel)
+    {
+      if (m_channelGroupLevel > m_actual_Level)
+        m_actual_Level = m_channelGroupLevel;
+      return DmxChannel::ChannelGroupFlag;
+    }
+    else
+    {
+      if (m_sceneLevel > m_actual_Level)
+        m_actual_Level = m_sceneLevel;
+      return DmxChannel::SelectedSceneFlag;
+    }
+  }
 }

@@ -126,6 +126,8 @@ public :
   explicit DmxValue(ValueType t_type = UnknownValueType,
                     DmxValue *t_parent = nullptr);
 
+  DmxValue(const DmxValue &t_value);
+
   virtual ~DmxValue();
 
   id getID() const{ return m_ID; }
@@ -196,6 +198,8 @@ public :
 
   LeveledValue(ValueType t_type = UnknownValueType,
                RootValue *t_parent = nullptr);
+
+  LeveledValue(const LeveledValue &t_value);
 
   virtual ~LeveledValue();
 
@@ -293,7 +297,9 @@ public :
   DmxChannel(ValueType t_type = Channel,
              RootValue *t_parent = nullptr);
 
-  virtual ~DmxChannel();
+  DmxChannel(const DmxChannel &t_channel);
+
+  ~DmxChannel();
 
   dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
@@ -352,6 +358,7 @@ private :
   bool m_isDirectChannelEdited = false;
 
 };
+Q_DECLARE_METATYPE(DmxChannel)
 
 /********************************** DMXCHANNELGROUP ************************************/
 

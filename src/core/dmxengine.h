@@ -21,9 +21,6 @@
 #include <QObject>
 #include "dmxvalue.h"
 
-//#define ENGINE DmxEngine::instance()
-//#define GROUP_ENGINE ENGINE->getGroupEngine()
-//#define CHANNEL_ENGINE ENGINE->getChannelEngine()
 #define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
 #define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
@@ -40,16 +37,14 @@ class DmxEngine
 
 public :
 
-//  static DmxEngine *instance();
+  explicit DmxEngine(RootValue *t_rootGroup,
+                     RootValue *t_rootChannel,
+                     QObject *parent = nullptr);
 
   ~DmxEngine();
 
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
-//  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
-
-//private :
-
-  explicit DmxEngine(QObject *parent = nullptr);
+  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
 
 private :
 
@@ -71,16 +66,17 @@ class ChannelGroupEngine :
 
 public :
 
-  explicit ChannelGroupEngine(QObject *parent = nullptr);
+  explicit ChannelGroupEngine(RootValue *t_rootGroup,
+                              QObject *parent = nullptr);
 
   ~ChannelGroupEngine();
 
   bool addNewGroup(const DmxChannelGroup *t_newGroup);
-//  bool addNewGroup(const id t_groupId);
+  bool addNewGroup(const id t_groupId);
   bool removeGroup(const DmxChannelGroup *t_group);
   bool removeGroup(const id t_groupId);
   bool modifyGroup(const DmxChannelGroup *t_group);
-//  bool modifyGroup(const id t_groupId);
+  bool modifyGroup(const id t_groupId);
 
 private :
 
@@ -102,6 +98,8 @@ public slots :
 
 private :
 
+  RootValue *m_rootChannelGroup;
+
   // id : group id , Ch_Id_Dmx : channelId _ stored level
   QMultiMap<id, Ch_Id_Dmx> m_MM_totalGroup;
   // channel Id , Gr_Id_Dmx : higher Group Id _ actual htp level
@@ -120,13 +118,15 @@ class ChannelEngine
 
 public :
 
-  explicit ChannelEngine(QObject *parent = nullptr);
+  explicit ChannelEngine(RootValue *t_rootChannel,
+                         QObject *parent = nullptr);
 
   ~ChannelEngine();
 
 private :
 
   void createDatas(int t_channelCount);
+  void update(id t_id);
 
 public slots :
 
@@ -142,6 +142,8 @@ public slots :
 
 
 private :
+
+  RootValue *m_rootChannel;
 
   QList<ChannelData *> m_L_channelData;
 
@@ -159,13 +161,15 @@ public :
                        dmx t_directChannelLevel = NULL_DMX,
                        overdmx t_directChannelOffset = NULL_DMX_OFFSET,
                        dmx t_sceneLevel = NULL_DMX,
-                       dmx t_nextSceneLevel = NULL_DMX)
+                       dmx t_nextSceneLevel = NULL_DMX,
+                       bool t_isDirectChannelEdited = false)
     : m_channelID(t_id),
       m_channelGroupLevel(t_channelGroupLevel),
       m_directChannelLevel(t_directChannelLevel),
       m_directChannelOffset(t_directChannelOffset),
       m_sceneLevel(t_sceneLevel),
-      m_nextSceneLevel(t_nextSceneLevel)
+      m_nextSceneLevel(t_nextSceneLevel),
+      m_isDirectChannelEdited(t_isDirectChannelEdited)
   {}
 
   ~ChannelData(){}
@@ -175,6 +179,7 @@ public :
   overdmx getDirectChannelOffset() const{ return m_directChannelOffset; }
   dmx getSceneLevel() const{ return m_sceneLevel; }
   dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
+  dmx getActual_Level() const{ return m_actual_Level; }
 
   void setChannelGroupLevel(dmx t_channelGroupLevel)
   { m_channelGroupLevel = t_channelGroupLevel; }
@@ -189,6 +194,9 @@ public :
   id getChannelID() const{ return m_channelID; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
 
+  DmxChannel::ChannelFlag getFlag_updateLevel();
+  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
+
 private :
 
   id m_channelID = NO_ID;
@@ -197,6 +205,10 @@ private :
   overdmx m_directChannelOffset = NULL_DMX_OFFSET;
   dmx m_sceneLevel = NULL_DMX;
   dmx m_nextSceneLevel = NULL_DMX;
+  bool m_isDirectChannelEdited = false;
+
+  dmx m_actual_Level = NULL_DMX;
+
 };
 
 /****************************** Ch_Id_Dmx ********************************/

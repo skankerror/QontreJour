@@ -53,9 +53,17 @@ Uid_Id::Uid_Id(const QString &t_string)
 
 
 DmxValue::DmxValue(ValueType t_type,
-                   DmxValue *t_parent):
-  QObject(t_parent),
+                   DmxValue *t_parent)
+  : QObject(t_parent),
   m_type(t_type)
+{}
+
+DmxValue::DmxValue(const DmxValue &t_value)
+  : QObject(t_value.parent()),
+    m_type(t_value.m_type),
+    m_ID(t_value.m_ID),
+    m_universeID(t_value.m_universeID),
+    m_name(t_value.m_name)
 {}
 
 DmxValue::~DmxValue()
@@ -158,6 +166,13 @@ LeveledValue::LeveledValue(DmxValue::ValueType t_type,
              t_parent)
 {}
 
+LeveledValue::LeveledValue(const LeveledValue &t_value)
+  : DmxValue(t_value),
+    m_level(t_value.m_level),
+    m_parentValue(t_value.m_parentValue),
+    m_assignedWidget(t_value.m_assignedWidget)
+{}
+
 LeveledValue::~LeveledValue()
 {}
 
@@ -193,6 +208,18 @@ DmxChannel::DmxChannel(DmxValue::ValueType t_type,
 {
   setName(DEFAULT_CHANNEL_NAME);
 }
+
+DmxChannel::DmxChannel(const DmxChannel &t_channel)
+  : LeveledValue(t_channel),
+    m_L_controledOutput(t_channel.m_L_controledOutput),
+    m_directChannelEditLevel(t_channel.m_directChannelEditLevel),
+    m_channelGroupLevel(t_channel.m_channelGroupLevel),
+    m_selectedSceneLevel(t_channel.m_selectedSceneLevel),
+    m_nextSceneLevel(t_channel.m_nextSceneLevel),
+    m_overOffset(t_channel.m_overOffset),
+    m_flag(t_channel.m_flag),
+    m_isDirectChannelEdited(t_channel.m_isDirectChannelEdited)
+{}
 
 DmxChannel::~DmxChannel()
 {
