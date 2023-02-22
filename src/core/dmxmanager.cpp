@@ -16,7 +16,6 @@
  */
 
 #include "dmxmanager.h"
-//#include "dmxengine.h"
 #include <QDebug>
 
 DmxManager::DmxManager(QObject *parent)
@@ -33,6 +32,9 @@ DmxManager::DmxManager(QObject *parent)
   auto universe = new DmxUniverse(0);
   m_L_universe.append(universe);
 
+  // connection to hardware output
+  connectOutputs();
+
   // create default number of channels
   for (int i = 0;
        i < DEFAULT_CHANNEL_COUNT;
@@ -47,8 +49,11 @@ DmxManager::DmxManager(QObject *parent)
   // and outputs from 1st universe
 
   setStraightPatch(0); // patch first universe
+
   m_dmxEngine = new DmxEngine(m_rootChannelGroup,
                               m_rootChannel,
+                              getL_rootOutput(),
+                              m_dmxPatch,
                               this);
 
   //test
@@ -215,6 +220,39 @@ QList<RootValue *> DmxManager::getL_rootOutput() const
     L_rootOutput.append(item->getRootOutput());
   }
   return L_rootOutput;
+}
+
+void DmxManager::connectOutputs()
+{
+  auto L_rootOutput = getL_rootOutput();
+  for (const auto &i
+       : std::as_const(L_rootOutput))
+  {
+    auto L_output = i->getL_childValue();
+    for (const auto &j
+         : std::as_const(L_output))
+    {
+      auto output = static_cast<DmxOutput *>(j);
+      connect(output,
+              SIGNAL(outputRequestUpdate(uid,id,dmx)),
+              this,
+              SLOT(onOutputRequest(uid,id,dmx)));
+    }
+  }
+}
+
+void DmxManager::onOutputRequest(uid t_uid,
+                                 id t_id,
+                                 dmx t_level)
+{
+  m_hwManager->writeData(t_uid,
+                         t_id,
+                         t_level);
+
+  qDebug() << "write uid :"  << t_uid
+           << "id :" << t_id
+           << "level :" << t_level;
+
 }
 
 void DmxManager::setStraightPatch(const uid t_uid)
@@ -464,106 +502,4 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
-/******************************** DmxPatch *******************************/
-
-void DmxPatch::clearPatch()
-{
-  m_MM_patch.clear();
-}
-
-bool DmxPatch::clearChannel(const id t_channelID)
-{
-  return m_MM_patch.remove(t_channelID);
-}
-
-bool DmxPatch::addOutputToChannel(const id t_channelID,
-                                  const Uid_Id t_outputUid_Id)
-{
-  // check if it's not yet in the key
-  auto L_Uid_Id = m_MM_patch.values(t_channelID);
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    qWarning() << "output already in the patch map";
-    return false;
-  }
-
-  // chack if it's not in another key
-  L_Uid_Id = m_MM_patch.values();
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    removeOutput(t_outputUid_Id);
-  }
-  m_MM_patch.insert(t_channelID,
-                    t_outputUid_Id);
-  return true;
-}
-
-void DmxPatch::addOutputListToChannel(const id t_channelId,
-                                      const QList<Uid_Id> t_L_outputUid_Id)
-{
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
-  {
-    addOutputToChannel(t_channelId,
-                       item);
-  }
-}
-
-bool DmxPatch::removeOutput(const Uid_Id t_outputUid_Id)
-{
-  // check if it's in the map
-  auto L_Uid_Id = m_MM_patch.values();
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    auto i = m_MM_patch.constBegin();
-    while (i != m_MM_patch.constEnd())
-    {
-      if (i.value() == t_outputUid_Id)
-      {
-        m_MM_patch.remove(i.key(), i.value());
-        break;
-      }
-      ++i;
-    }
-    return true;
-  }
-  qWarning() << "can't remove output from channel";
-  return false;
-}
-
-void DmxPatch::removeOutputList(const QList<Uid_Id> t_L_outputUid_Id)
-{
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
-  {
-    removeOutput(item);
-  }
-
-}
-
-bool DmxPatch::removeOutputFromChannel(const id t_channelID,
-                                       const Uid_Id t_outputUid_Id)
-{
-  // choper les values de la key, vérifier et remove
-  auto L_Uid_Id = m_MM_patch.values(t_channelID);
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    m_MM_patch.remove(t_channelID,
-                      t_outputUid_Id);
-    return true;
-  }
-  qWarning() << "can't remove output from channel";
-  return false;
-}
-
-void DmxPatch::removeOutputListFromChannel(const id t_channelID,
-                                           const QList<Uid_Id> t_L_outputUid_Id)
-{
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
-  {
-    removeOutputFromChannel(t_channelID,
-                            item);
-  }
-}
 

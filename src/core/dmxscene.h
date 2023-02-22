@@ -20,6 +20,33 @@
 
 #include "dmxvalue.h"
 
+typedef float sceneID_f;
+typedef float time_f;
+
+/****************************** RootScene ****************************/
+
+class DmxScene;
+
+class RootScene :
+    public DmxValue
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit RootScene(DmxValue::ValueType t_type = Sequence,
+                     DmxValue *t_parent = nullptr);
+
+  ~RootScene();
+
+private :
+
+  QList<DmxScene *> m_L_childScene;
+
+};
+
+/****************************** DmxScene *****************************/
 
 class DmxScene :
     public DmxValue
@@ -29,39 +56,46 @@ class DmxScene :
 
 public :
 
-  explicit DmxScene(DmxValue::ValueType t_type /*= Scene*/,
-                    DmxScene *t_parent = nullptr);
+  explicit DmxScene(DmxValue::ValueType t_type = MainScene,
+                    RootScene *t_parent = nullptr);
 
   virtual ~DmxScene();
 
   // getters
   QString getNotes() const{ return m_notes; }
-  float getTimeIn() const{ return m_timeIn; }
-  float getTimeOut() const{ return m_timeOut; }
-  float getDelayIn() const{ return m_delayIn; }
-  float getDelayOut() const{ return m_delayOut; }
-  int getStepNumber() const;
+  time_f getTimeIn() const{ return m_timeIn; }
+  time_f getTimeOut() const{ return m_timeOut; }
+  time_f getDelayIn() const{ return m_delayIn; }
+  time_f getDelayOut() const{ return m_delayOut; }
+  id getStepNumber() const{ return m_ID; }
+  sceneID_f getSceneID() const{ return m_sceneID; }
+  RootScene *getSequence() const{ return m_sequence; }
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
-  void setTimeIn(float t_timeIn){ m_timeIn = t_timeIn; }
-  void setTimeOut(float t_timeOut){ m_timeOut = t_timeOut; }
-  void setDelayIn(float t_delayIn){ m_delayIn = t_delayIn; }
-  void setDelayOut(float t_delayOut){ m_delayOut = t_delayOut; }
-
-public slots :
-
-  void setStepNumber(int t_stepNumber){ m_stepNumber = t_stepNumber; }
+  void setTimeIn(time_f t_timeIn){ m_timeIn = t_timeIn; }
+  void setTimeOut(time_f t_timeOut){ m_timeOut = t_timeOut; }
+  void setDelayIn(time_f t_delayIn){ m_delayIn = t_delayIn; }
+  void setDelayOut(time_f t_delayOut){ m_delayOut = t_delayOut; }
+  void setSceneID(sceneID_f t_sceneID){ m_sceneID = t_sceneID; }
+  void setStepNumber(id t_stepNumber){ m_ID = t_stepNumber; }
+  void setSequence(RootScene *t_sequence){ m_sequence = t_sequence; }
 
 protected :
 
+  sceneID_f m_sceneID;
   QString m_notes;
-  float m_timeIn;
-  float m_timeOut;
-  float m_delayIn;
-  float m_delayOut;
-  int m_stepNumber;
+  time_f m_timeIn;
+  time_f m_timeOut;
+  time_f m_delayIn;
+  time_f m_delayOut;
+
+  RootScene *m_sequence;
 
 };
+
+/*************************** DmxSubScene *******************************/
+
+
 
 #endif // DMXSCENE_H

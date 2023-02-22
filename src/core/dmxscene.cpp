@@ -18,20 +18,31 @@
 #include "dmxscene.h"
 #include <QDebug>
 
+/****************************** RootScene ****************************/
 
-DmxScene::DmxScene(ValueType t_type,
-                   DmxScene *t_parent)
+RootScene::RootScene(ValueType t_type,
+                     DmxValue *t_parent)
   : DmxValue(t_type,
              t_parent)
+{}
+
+RootScene::~RootScene()
+{
+  m_L_childScene.clear();
+  m_L_childScene.squeeze();
+}
+
+/****************************** DmxScene *****************************/
+
+DmxScene::DmxScene(ValueType t_type,
+                   RootScene *t_parent)
+  : DmxValue(t_type,
+             t_parent),
+    m_sequence(t_parent)
 {}
 
 DmxScene::~DmxScene()
 {}
 
-int DmxScene::getStepNumber() const
-{
-  if(m_parentValue)
-    return m_parentValue->getL_childValue().indexOf(const_cast<DmxScene *>(this));
-  return 0;
-}
+
 

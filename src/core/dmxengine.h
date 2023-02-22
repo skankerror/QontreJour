@@ -28,6 +28,7 @@
 
 class ChannelGroupEngine;
 class ChannelEngine;
+class OutputEngine;
 
 class DmxEngine
     : public QObject
@@ -39,17 +40,21 @@ public :
 
   explicit DmxEngine(RootValue *t_rootGroup,
                      RootValue *t_rootChannel,
+                     QList<RootValue *> t_L_rootOutput,
+                     DmxPatch *t_patch,
                      QObject *parent = nullptr);
 
   ~DmxEngine();
 
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
   ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
+  OutputEngine *getOutputEngine() const{ return m_outputEngine; }
 
 private :
 
   ChannelGroupEngine *m_groupEngine;
   ChannelEngine *m_channelEngine;
+  OutputEngine *m_outputEngine;
 
 };
 
@@ -208,6 +213,33 @@ private :
   bool m_isDirectChannelEdited = false;
 
   dmx m_actual_Level = NULL_DMX;
+
+};
+
+/****************************** OutputEngine *****************************/
+
+class OutputEngine
+    : public QObject
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit OutputEngine(QList<RootValue *> t_L_rootOutput,
+                        DmxPatch *t_patch,
+                        QObject *parent = nullptr);
+
+  ~OutputEngine();
+
+public slots :
+
+  void onChannelLevelChanged(id t_channelId,
+                             dmx t_level);
+private :
+
+  QList<RootValue *> m_L_rootOutput;
+  DmxPatch *m_patch;
 
 };
 

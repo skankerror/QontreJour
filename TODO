@@ -9,3 +9,14 @@ ce doit être un double.
 caler par défaut 10 après le dernier chiffre des dizaines sauf en cas de *9.99
 
 - voir à mettre des Shared Data ? Mutex ?
+
+
+
+
+
+connections :
+engine : group (setlevel)-> groupengine
+         groupengine -> channelengine (puis envoie channel->setlevel)
+         channel (setlevel)-> outputengine (puis envoie output->setlevel)
+
+manager : output (setlevel)-> manager -> hwmanager

@@ -44,8 +44,8 @@ set(PROJECT_SOURCES
         src/core/dmxuniverse.cpp
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-#        src/core/dmxscene.h
-#        src/core/dmxscene.cpp
+        src/core/dmxscene.h
+        src/core/dmxscene.cpp
         src/core/dmxmanager.h
         src/core/dmxmanager.cpp
         src/core/dmxengine.h

@@ -21,23 +21,41 @@
 
 DmxEngine::DmxEngine(RootValue *t_rootGroup,
                      RootValue *t_rootChannel,
+                     QList<RootValue *> t_L_rootOutput,
+                     DmxPatch *t_patch,
                      QObject *parent)
   : QObject(parent),
     m_groupEngine(new ChannelGroupEngine(t_rootGroup,
                                          this)),
     m_channelEngine(new ChannelEngine(t_rootChannel,
-                                      this))
+                                      this)),
+    m_outputEngine(new OutputEngine(t_L_rootOutput,
+                                    t_patch,
+                                    this))
 {
   connect(m_groupEngine,
           SIGNAL(channelLevelChangedFromGroup(id,dmx)),
           m_channelEngine,
           SLOT(onChannelLevelChangedFromGroup(id,dmx)));
+
+  // connect all channels to OutputEngine
+  auto L_channel = t_rootChannel->getL_childValue();
+  for (const auto &item
+       : std::as_const(L_channel))
+  {
+    connect(item,
+            SIGNAL(levelChanged(id,dmx)),
+            m_outputEngine,
+            SLOT(onChannelLevelChanged(id,dmx)));
+  }
+
 }
 
 DmxEngine::~DmxEngine()
 {
   m_groupEngine->deleteLater();
   m_channelEngine->deleteLater();
+  m_outputEngine->deleteLater();
 }
 
 /****************************** ChannelGroupEngine ***********************/
@@ -218,9 +236,8 @@ void ChannelEngine::createDatas(int t_channelCount)
 void ChannelEngine::update(id t_id)
 {
   auto channelData = m_L_channelData.at(t_id);
-  auto flag = channelData->getFlag_updateLevel();
   auto channel = GET_CHANNEL(t_id);
-  channel->setChannelFlag(flag);
+  channel->setChannelFlag(channelData->getFlag_updateLevel());
   channel->setLevel(channelData->getActual_Level());
 }
 
@@ -285,5 +302,32 @@ DmxChannel::ChannelFlag ChannelData::getFlag_updateLevel()
         m_actual_Level = m_sceneLevel;
       return DmxChannel::SelectedSceneFlag;
     }
+  }
+}
+
+/******************************** OutputEngine *************************/
+
+OutputEngine::OutputEngine(QList<RootValue *> t_L_rootOutput,
+                           DmxPatch *t_patch,
+                           QObject *parent)
+  : QObject(parent),
+    m_L_rootOutput(t_L_rootOutput),
+    m_patch(t_patch)
+{}
+
+OutputEngine::~OutputEngine()
+{}
+
+void OutputEngine::onChannelLevelChanged(id t_channelId,
+                                         dmx t_level)
+{
+  qDebug() << "channel id" << t_channelId << "level" << t_level;
+  auto L_Uid_Id = m_patch->getL_Uid_Id(t_channelId);
+  for (const auto &i
+       : std::as_const(L_Uid_Id))
+  {
+    auto rootOutput = m_L_rootOutput.at(i.getUniverseID());
+    auto output = rootOutput->getChildValue(i.getOutputID());
+    output->setLevel(t_level);
   }
 }

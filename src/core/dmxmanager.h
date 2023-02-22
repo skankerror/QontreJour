@@ -22,7 +22,7 @@
 #include <QString>
 #include "qdmxlib/QDmxManager"
 #include "dmxvalue.h"
-//#include "dmxscene.h"
+#include "dmxscene.h"
 #include "dmxuniverse.h"
 #include "dmxengine.h"
 
@@ -111,12 +111,13 @@ private :
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
   RootValue *getRootOutput(const uid t_uid) const;
   QList<RootValue *> getL_rootOutput() const;
-
-signals :
-
-public slots :
+  void connectOutputs();
 
 private slots :
+
+  void onOutputRequest(uid t_uid,
+                       id t_id,
+                       dmx t_level);
 
 private :
 
@@ -126,41 +127,6 @@ private :
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
-
-};
-
- /****************************** DmxPatch ******************************/
-
-class DmxPatch
-{
-
-public :
-
-  explicit DmxPatch(){}
-
-  ~DmxPatch(){}
-
-  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
-
-  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
-  { m_MM_patch = t_MM_patch; }
-
-  void clearPatch();
-  bool clearChannel(const id t_channelID);
-  bool addOutputToChannel(const id t_channelID,
-                          const Uid_Id t_outputUid_Id);
-  void addOutputListToChannel(const id t_channelId,
-                              const QList<Uid_Id> t_L_outputUid_Id);
-  bool removeOutput(const Uid_Id t_outputUid_Id);
-  void removeOutputList(const QList<Uid_Id> t_L_outputUid_Id);
-  bool removeOutputFromChannel(const id t_channelID,
-                               const Uid_Id t_outputUid_Id);
-  void removeOutputListFromChannel(const id t_channelID,
-                                   const QList<Uid_Id> t_L_outputUid_Id);
-
-private :
-
-  QMultiMap<id, Uid_Id> m_MM_patch;
 
 };
 

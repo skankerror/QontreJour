@@ -119,6 +119,9 @@ public :
     Channel, // stored in root
     RootChannelGroup, // stored in manager
     ChannelGroup, // stored in root
+    Sequence,
+    MainScene,
+    SubScene,
     UnknownValueType
   };
   Q_ENUM(ValueType)
@@ -214,7 +217,7 @@ signals :
 
 public slots :
 
-  void setLevel(dmx t_level);
+  virtual void setLevel(dmx t_level);
   void setParentValue(RootValue *t_parentValue)
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)
@@ -257,11 +260,13 @@ public :
 
 signals :
 
-  void outputRequestUpdate(id t_id,
+  void outputRequestUpdate(uid t_uid,
+                           id t_id,
                            dmx t_level);
 
 public slots :
 
+  void setLevel(dmx t_level) override;
   void setMaxLevel(dmx t_maxLevel){ m_maxLevel = t_maxLevel; }
   void setIsParked(bool t_isParked){ m_isParked = t_isParked; }
 
@@ -303,8 +308,8 @@ public :
 
   dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
   dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
-//  QMap<id, dmx> getM_channelGroup_Id_Level() const
-//  { return m_M_channelGroup_Id_Level; }
+  //  QMap<id, dmx> getM_channelGroup_Id_Level() const
+  //  { return m_M_channelGroup_Id_Level; }
   dmx getselectedSceneLevel() const{ return m_selectedSceneLevel; }
   dmx getnextSceneLevel() const{ return m_nextSceneLevel; }
   overdmx getOverOffset() const{ return m_overOffset; }
@@ -324,8 +329,8 @@ public :
   void setIsDirectChannelEdited(const bool t_isDirectChannelEdited)
   { m_isDirectChannelEdited = t_isDirectChannelEdited; }
   void setOverOffset(const overdmx t_overOffset){ m_overOffset = t_overOffset; }
-//  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
-//  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
+  //  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
+  //  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
   void setChannelGroupLevel(dmx t_channelGroupLevel)
   { m_channelGroupLevel = t_channelGroupLevel; }
 
@@ -338,11 +343,10 @@ public :
   void removeOutputList(const QList<Uid_Id> t_L_Uid_Id);
   void clearControledOutput();
 
-//  void addChannelGroupControler(const id t_id);
-//  void addChannelGroupControlerList(const QList<id> t_L_id);
-//  void removeChannelGroupControler(const id t_id);
-//  void removeChannelGroupControlerList(const QList<id> t_L_id);
-
+  //  void addChannelGroupControler(const id t_id);
+  //  void addChannelGroupControlerList(const QList<id> t_L_id);
+  //  void removeChannelGroupControler(const id t_id);
+  //  void removeChannelGroupControlerList(const QList<id> t_L_id);
 
 private :
 
@@ -350,7 +354,7 @@ private :
 
   dmx m_directChannelEditLevel = 0;
   dmx m_channelGroupLevel = 0;
-//  QMap<id, dmx> m_M_channelGroup_Id_Level;
+  //  QMap<id, dmx> m_M_channelGroup_Id_Level;
   dmx m_selectedSceneLevel = 0;
   dmx m_nextSceneLevel = 0;
   overdmx m_overOffset = 0;
@@ -392,8 +396,8 @@ public :
   void addChannel(const id t_id,
                   const dmx t_storedLevel);
   // TODO :
-//  void addChannelList(const QMap<id ,dmx> t_M_controledChannelId_storedLevel);
-//  void addChannelList(const QHash<DmxChannel *,dmx> t_M_controledChannel_storedLevel);
+  //  void addChannelList(const QMap<id ,dmx> t_M_controledChannelId_storedLevel);
+  //  void addChannelList(const QHash<DmxChannel *,dmx> t_M_controledChannel_storedLevel);
   void removeChannel(DmxChannel * t_channel);
   void removeChannel(const id t_id);
   void removeChannelList(const QList<DmxChannel *> t_L_channel);
@@ -403,6 +407,43 @@ public :
 private :
 
   QHash<DmxChannel *,dmx> m_H_controledChannel_storedLevel;
+
+};
+
+/****************************** DmxPatch ******************************/
+
+class DmxPatch
+{
+
+public :
+
+  explicit DmxPatch(){}
+
+  ~DmxPatch(){}
+
+  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
+  QList<Uid_Id> getL_Uid_Id(id t_channelID)
+  { return m_MM_patch.values(t_channelID); }
+
+  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
+  { m_MM_patch = t_MM_patch; }
+
+  void clearPatch();
+  bool clearChannel(const id t_channelID);
+  bool addOutputToChannel(const id t_channelID,
+                          const Uid_Id t_outputUid_Id);
+  void addOutputListToChannel(const id t_channelId,
+                              const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutput(const Uid_Id t_outputUid_Id);
+  void removeOutputList(const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutputFromChannel(const id t_channelID,
+                               const Uid_Id t_outputUid_Id);
+  void removeOutputListFromChannel(const id t_channelID,
+                                   const QList<Uid_Id> t_L_outputUid_Id);
+
+private :
+
+  QMultiMap<id, Uid_Id> m_MM_patch;
 
 };
 
