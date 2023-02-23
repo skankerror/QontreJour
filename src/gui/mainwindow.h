@@ -21,10 +21,10 @@
 #include <QMainWindow>
 #include <QList>
 #include <QPushButton>
-//#include "universewidget.h"
+#include "universewidget.h"
 //#include "playbackwidget.h"
 //#include "sequencerwidget.h"
-//#include "valuesliderswidget.h"
+#include "valuesliderswidget.h"
 //#include "valuetablewidget.h"
 
 
@@ -40,22 +40,22 @@ public :
 
   ~MainWindow();
 
-//private :
+private :
 
-//  void createCentralWidget();
-//  QWidget *createUniverseContainerWidget();
+  void createCentralWidget();
+  QWidget *createUniverseContainerWidget();
 //  void createDockWidgets();
 
-//private slots :
+private slots :
 
-//  void addUniverseWidget();
-//  void removeUniverseWidget();
+  void addUniverseWidget();
+  void removeUniverseWidget();
 
-//private :
+private :
 
-//  DirectChannelWidget *m_directChannelWidget;
-//  QVBoxLayout *m_universeWidgetContainerLayout;
-//  QList<UniverseWidget *> m_L_universeWidget;
+  DirectChannelWidget *m_directChannelWidget;
+  QVBoxLayout *m_universeWidgetContainerLayout;
+  QList<UniverseWidget *> m_L_universeWidget;
 
 //  ValueTableWidget *m_channelTableWidget;
 

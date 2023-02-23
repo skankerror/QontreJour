@@ -20,6 +20,7 @@
 #include "../core/dmxmanager.h"
 #include <QDebug>
 
+/************************** ValueSlidersWidget ************************/
 
 ValueSlidersWidget::ValueSlidersWidget(QWidget *parent)
   : QWidget(parent),
@@ -39,14 +40,26 @@ ValueSlidersWidget::ValueSlidersWidget(QWidget *parent)
           &QStackedLayout::setCurrentIndex);
 }
 
-void ValueSlidersWidget::setRootValue(DmxValue *t_rootValue)
+void ValueSlidersWidget::setRootValue(RootValue *t_rootValue)
 {
   m_rootValue = t_rootValue;
   populateWidget();
+  connectSliders();
+}
+
+void ValueSlidersWidget::connectSliders()
+{
+  for (int i = 0;
+       i < m_L_sliders.size()
+       && i < m_rootValue->getL_childValueSize();
+       i++)
+  {
+    connectSlider(i,i);
+  }
 }
 
 void ValueSlidersWidget::connectSlider(int t_sliderID,
-                                       DmxValue *t_value)
+                                       LeveledValue *t_value)
 {
   if (t_sliderID < 0
       || t_sliderID >= m_L_sliders.size()
@@ -57,14 +70,14 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
   }
 
   auto slider = m_L_sliders.at(t_sliderID);
-  auto label = m_L_nameLabels.at(t_sliderID);
+//  auto label = m_L_nameLabels.at(t_sliderID);
 
   if (slider->getIsConnected())
   {
     disconnectSlider(t_sliderID);
   }
 
-  label->setText(t_value->getName());
+//  label->setText(t_value->getName());
   slider->setDmxValue(t_value);
 }
 
@@ -88,7 +101,7 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
     return;
   }
   auto slider = m_L_sliders.at(t_sliderID);
-  auto label = m_L_nameLabels.at(t_sliderID);
+//  auto label = m_L_nameLabels.at(t_sliderID);
 
   disconnect(slider,
              SIGNAL(valueChanged(int)),
@@ -98,35 +111,39 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
   auto value = slider->getDmxValue();
 
   disconnect(value,
-             SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+             SIGNAL(levelChanged(id,dmx)),
              slider,
-             SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+             SLOT(onValueLevelChanged(id,dmx)));
 
   slider->setIsConnected(false);
   value->setAssignedWidget(nullptr);
-  label->setText("");
+//  label->setText("");
 
 }
 
-/**********************************************************************/
+/************************** DirectChannelWidget ************************/
 
 DirectChannelWidget::DirectChannelWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
-{}
+{
+  setRootValue(MANAGER->getRootChannel());
+}
 
 void DirectChannelWidget::populateWidget()
 {
   // on crée les sliders
   // TODO : vider avant ?
+
   auto L_dmxChannel = m_rootValue->getL_childValue();
-  for (const auto &item : std::as_const(L_dmxChannel))
+  for (const auto &item
+       : std::as_const(L_dmxChannel))
   {
     auto directChannelSlider = new ValueSlider(item,
                                                this);
-    connect(item,
-            SIGNAL(blockDirectChannelSlider(dmx)),
-            directChannelSlider,
-            SLOT(unMoveSlider(dmx)));
+//    connect(item,
+//            SIGNAL(blockDirectChannelSlider(dmx)),
+//            directChannelSlider,
+//            SLOT(unMoveSlider(dmx)));
 
     m_L_sliders.append(directChannelSlider);
   }
@@ -165,14 +182,8 @@ void DirectChannelWidget::populateWidget()
   }
 }
 
-void DirectChannelWidget::setDirectChannelUniverseID(uid t_uid)
-{
-  setRootValue(MANAGER->getRootChannel(t_uid));
-  //  TODO : changer le spinbox
-}
 
-
-/*************************************************************************/
+/************************** SubmasterWidget ************************/
 
 SubmasterWidget::SubmasterWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
@@ -224,10 +235,11 @@ void SubmasterWidget::populateWidget()
       auto submasterSlider = new ValueSlider(this);
       submasterSlider->setID(i);
       m_L_sliders.append(submasterSlider);
-      connect(submasterSlider,
-              SIGNAL(valueSliderMoved()),
-              MANAGER,
-              SLOT(updateSubmasters()));
+//      connect(submasterSlider,
+//              SIGNAL(valueSliderMoved()),
+//              MANAGER,
+//              SLOT(updateSubmasters()));
+
 
       auto nameLabel = new QLabel("", this);
       nameLabel->setAlignment(Qt::AlignHCenter);
@@ -255,7 +267,7 @@ void SubmasterWidget::populateWidget()
   }
 }
 
-/**********************************************************************/
+/************************** ValueSlider ************************/
 
 ValueSlider::ValueSlider(QWidget *parent)
   :QSlider(parent),
@@ -265,33 +277,20 @@ ValueSlider::ValueSlider(QWidget *parent)
   setMaximum(255);
 }
 
-ValueSlider::ValueSlider(DmxValue *t_dmxValue,
+ValueSlider::ValueSlider(LeveledValue *t_dmxValue,
                          QWidget *parent)
-  : QSlider(parent),
-    m_dmxValue(t_dmxValue)
+  : QSlider(parent)
 {
   setMinimum(0);
   setMaximum(255);
 
-  connect(this,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(updateLevel(int)));
-
-  connect(m_dmxValue,
-          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
-          this,
-          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
-
-  m_dmxValue->setAssignedWidget(this);
-  m_isConnected = true;
-
+  setDmxValue(t_dmxValue);
 }
 
 ValueSlider::~ValueSlider()
 {}
 
-void ValueSlider::setDmxValue(DmxValue *t_dmxValue)
+void ValueSlider::setDmxValue(LeveledValue *t_dmxValue)
 {
   m_dmxValue = t_dmxValue;
   connect(this,
@@ -300,9 +299,9 @@ void ValueSlider::setDmxValue(DmxValue *t_dmxValue)
           SLOT(updateLevel(int)));
 
   connect(m_dmxValue,
-          SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+          SIGNAL(levelChanged(id,dmx)),
           this,
-          SLOT(onValueLevelChanged(DmxValue::SignalSenderType,dmx)));
+          SLOT(onValueLevelChanged(id,dmx)));
 
   m_dmxValue->setAssignedWidget(this);
   m_isConnected = true;
@@ -312,19 +311,9 @@ void ValueSlider::setDmxValue(DmxValue *t_dmxValue)
 
 void ValueSlider::unMoveSlider(dmx t_level)
 {
-  // we disconnect to avoid connecting loop
-  disconnect(this,
-             SIGNAL(valueChanged(int)),
-             this,
-             SLOT(updateLevel(int)));
-
+  blockSignals(true);
   this->setValue(t_level);
-
-  // we reconnect
-  connect(this,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(updateLevel(int)));
+  blockSignals(false);
 }
 
 void ValueSlider::updateLevel(int t_level)
@@ -333,38 +322,16 @@ void ValueSlider::updateLevel(int t_level)
   if (t_level > 255) t_level = 255;
   if (m_dmxValue->getLevel() == t_level) return;
 
-  auto type = m_dmxValue->getType();
+  m_dmxValue->setLevel(t_level);
 
-  if (type == DmxValue::Channel)
-    m_dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-                         t_level);
-
-  if (type == DmxValue::ChannelGroup)
-  {
-    m_dmxValue->setLevel(DmxValue::SubmasterSliderSender,
-                         t_level);
-    emit valueSliderMoved();
-  }
+  emit valueSliderMoved();
 }
 
-void ValueSlider::onValueLevelChanged(DmxValue::SignalSenderType t_type,
+void ValueSlider::onValueLevelChanged(id t_id,
                                       dmx t_level)
 {
-  Q_UNUSED(t_type)
-
-  // we disconnect to avoid connecting loop
-  disconnect(this,
-             SIGNAL(valueChanged(int)),
-             this,
-             SLOT(updateLevel(int)));
-
+  Q_UNUSED(t_id)
+  blockSignals(true);
   this->setValue(t_level);
-
-  // we reconnect
-  connect(this,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(updateLevel(int)));
-
-
+  blockSignals(false);
 }

@@ -24,6 +24,8 @@
 #include <QLabel>
 #include "../core/dmxvalue.h"
 
+/************************** ValueSlidersWidget ************************/
+
 class ValueSlider;
 
 class ValueSlidersWidget
@@ -38,17 +40,19 @@ public :
 
   // getters
   QList<ValueSlider *> getL_sliders() const { return m_L_sliders; }
-  DmxValue *getRootValue() const{ return m_rootValue; }
+  RootValue *getRootValue() const{ return m_rootValue; }
 
-public slots :
+//public slots :
 
   virtual void populateWidget() = 0;
-  void setRootValue(DmxValue *t_rootValue);
+  void setRootValue(RootValue *t_rootValue);
 
 protected slots :
 
+  void connectSliders();
+
   void connectSlider(int t_sliderID,
-                     DmxValue *t_value);
+                     LeveledValue *t_value);
   void connectSlider(int t_sliderID,
                      id valueID);
   void disconnectSlider(int t_sliderID);
@@ -58,13 +62,13 @@ protected :
   QStackedLayout *m_stackedLayout;
   QComboBox *m_changePageComboBox;
 
-  DmxValue *m_rootValue;
+  RootValue *m_rootValue;
   QList<ValueSlider *> m_L_sliders;
   QList<QLabel *> m_L_nameLabels;
 
 };
 
-/**********************************************************************/
+/************************** DirectChannelWidget ************************/
 
 class DirectChannelWidget
     : public ValueSlidersWidget
@@ -78,12 +82,9 @@ public :
 
   void populateWidget() override;
 
-  void setDirectChannelUniverseID(uid t_uid);
-
-
 };
 
-/*************************************************************************/
+/************************** SubmasterWidget ************************/
 
 class SubmasterWidget
     : public ValueSlidersWidget
@@ -108,7 +109,7 @@ public slots:
 
 };
 
-/*************************************************************************/
+/************************** ValueSlider ************************/
 
 class ValueSlider
     : public QSlider
@@ -120,16 +121,18 @@ public :
 
   explicit ValueSlider(QWidget *parent = nullptr);
 
-  ValueSlider(DmxValue *t_dmxValue,
+  ValueSlider(LeveledValue *t_dmxValue,
               QWidget *parent = nullptr);
 
   virtual ~ValueSlider();
 
-  DmxValue *getDmxValue() const{ return m_dmxValue; }
+  LeveledValue *getDmxValue() const{ return m_dmxValue; }
   id getID() const{ return m_ID; }
   bool getIsConnected() const{ return m_isConnected; }
 
-  void setDmxValue(DmxValue *t_dmxValue);
+  void setDmxValue(LeveledValue *t_dmxValue);
+  void setIsConnected(bool t_isConnected){ m_isConnected = t_isConnected; }
+  void setID(id t_ID){ m_ID = t_ID; }
 
 signals :
 
@@ -137,22 +140,19 @@ signals :
 
 public slots :
 
-  void unMoveSlider(dmx t_level);
-  void setIsConnected(bool t_isConnected){ m_isConnected = t_isConnected; }
-  void setID(id t_ID){ m_ID = t_ID; }
+  void unMoveSlider(dmx t_level); // NOTE : same as onvaluelevelchanged...
 
 protected slots :
 
   virtual void updateLevel(int t_level);
-  virtual void onValueLevelChanged(DmxValue::SignalSenderType t_type,
+  virtual void onValueLevelChanged(id t_id,
                                    dmx t_level);
 
 protected :
 
-  DmxValue *m_dmxValue;
+  LeveledValue *m_dmxValue;
   bool m_isConnected;
   id m_ID;
-
 
 };
 

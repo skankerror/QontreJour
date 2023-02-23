@@ -103,6 +103,12 @@ public :
                  uid t_ID);
   bool hwDisconnect(uid t_ID);
 
+  // widget connections
+  // connect values with widget
+  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
+                            int t_widgetID,
+                            DmxValue::ValueType t_valueType,
+                            id t_valueID);
 
 private :
 
@@ -112,6 +118,12 @@ private :
   RootValue *getRootOutput(const uid t_uid) const;
   QList<RootValue *> getL_rootOutput() const;
   void connectOutputs();
+
+signals :
+
+  void connectGroupToSubmasterSlider(int t_sliderID,
+                                     id valueID);
+  void disconnectGroupFromSubmasterSlider(int t_sliderID);
 
 private slots :
 

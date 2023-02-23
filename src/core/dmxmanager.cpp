@@ -67,8 +67,12 @@ DmxManager::DmxManager(QObject *parent)
   L_channel.append(channel2);
   createChannelGroup(L_channel);
 
-  getChannelGroup(0)->setLevel(100);
+//  getChannelGroup(0)->setLevel(100);
 
+  connectValueToWidget(DmxManager::DmxSlider,
+                       0,
+                       DmxValue::ChannelGroup,
+                       0);
 }
 
 DmxManager *DmxManager::instance()
@@ -488,6 +492,21 @@ bool DmxManager::hwDisconnect(uid t_ID)
   }
   else
     return false;
+}
+
+void DmxManager::connectValueToWidget(WidgetType t_widgetType,
+                                      int t_widgetID,
+                                      DmxValue::ValueType t_valueType,
+                                      id t_valueID)
+{
+  if (t_widgetType == DmxSlider)
+  {
+    if (t_valueType == DmxValue::ChannelGroup)
+    {
+      emit connectGroupToSubmasterSlider(t_widgetID,
+                                         t_valueID);
+    }
+  }
 }
 
 QList<QDmxDriver *> DmxManager::getAvailableDrivers() const
