@@ -292,8 +292,7 @@ DmxChannel::ChannelFlag ChannelData::getFlag_updateLevel()
   {
     if (m_channelGroupLevel >= m_sceneLevel)
     {
-      if (m_channelGroupLevel > m_actual_Level)
-        m_actual_Level = m_channelGroupLevel;
+      m_actual_Level = m_channelGroupLevel;
       return DmxChannel::ChannelGroupFlag;
     }
     else

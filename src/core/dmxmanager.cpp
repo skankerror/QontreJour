@@ -57,8 +57,8 @@ DmxManager::DmxManager(QObject *parent)
                               this);
 
   //test
-  auto channel1 = getChannel(0);
-  auto channel2 = getChannel(1);
+  auto channel1 = getChannel(10);
+  auto channel2 = getChannel(11);
   channel1->setLevel(100);
   channel2->setLevel(147);
 
@@ -67,7 +67,8 @@ DmxManager::DmxManager(QObject *parent)
   L_channel.append(channel2);
   createChannelGroup(L_channel);
 
-//  getChannelGroup(0)->setLevel(100);
+  getChannelGroup(0)->setLevel(100);
+  getChannelGroup(0)->setLevel(0);
 
   connectValueToWidget(DmxManager::DmxSlider,
                        0,

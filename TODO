@@ -20,3 +20,10 @@ engine : group (setlevel)-> groupengine
          channel (setlevel)-> outputengine (puis envoie output->setlevel)
 
 manager : output (setlevel)-> manager -> hwmanager
+
+
+widget connections :
+
+valuesliderswidget : manager (connectvaluetowidget)-> this (connectslider)
+valueslider : this (valuechanged)-> this updateLevel -> value->setlevel
+              value (levelChanged)-> this onvaluelevelchanged. update le slider.

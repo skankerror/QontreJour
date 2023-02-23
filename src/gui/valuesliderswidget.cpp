@@ -324,7 +324,7 @@ void ValueSlider::updateLevel(int t_level)
 
   m_dmxValue->setLevel(t_level);
 
-  emit valueSliderMoved();
+//  emit valueSliderMoved();
 }
 
 void ValueSlider::onValueLevelChanged(id t_id,
