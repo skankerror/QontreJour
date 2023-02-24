@@ -110,6 +110,8 @@ public :
                             DmxValue::ValueType t_valueType,
                             id t_valueID);
 
+  void testingMethod();
+
 private :
 
   explicit DmxManager(QObject *parent = nullptr);

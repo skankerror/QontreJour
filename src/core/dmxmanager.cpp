@@ -56,6 +56,10 @@ DmxManager::DmxManager(QObject *parent)
                               m_dmxPatch,
                               this);
 
+}
+
+void DmxManager::testingMethod()
+{
   //test
   auto channel1 = getChannel(10);
   auto channel2 = getChannel(11);
@@ -74,6 +78,7 @@ DmxManager::DmxManager(QObject *parent)
                        0,
                        DmxValue::ChannelGroup,
                        0);
+
 }
 
 DmxManager *DmxManager::instance()

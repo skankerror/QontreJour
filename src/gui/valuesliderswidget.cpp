@@ -70,14 +70,14 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
   }
 
   auto slider = m_L_sliders.at(t_sliderID);
-//  auto label = m_L_nameLabels.at(t_sliderID);
+  auto label = m_L_nameLabels.at(t_sliderID);
 
   if (slider->getIsConnected())
   {
     disconnectSlider(t_sliderID);
   }
 
-//  label->setText(t_value->getName());
+  label->setText(t_value->getName());
   slider->setDmxValue(t_value);
 }
 
@@ -101,7 +101,11 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
     return;
   }
   auto slider = m_L_sliders.at(t_sliderID);
-//  auto label = m_L_nameLabels.at(t_sliderID);
+  if (t_sliderID < m_L_nameLabels.size())
+  {
+    auto label = m_L_nameLabels.at(t_sliderID);
+    label->setText("");
+  }
 
   disconnect(slider,
              SIGNAL(valueChanged(int)),
@@ -117,7 +121,6 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
 
   slider->setIsConnected(false);
   value->setAssignedWidget(nullptr);
-//  label->setText("");
 
 }
 
@@ -161,6 +164,11 @@ void DirectChannelWidget::populateWidget()
 
     for (int j = 0; j < SLIDERS_PER_PAGE; j++) // for each slider
     {
+      auto nameLabel = new QLabel("", this);
+      nameLabel->setAlignment(Qt::AlignHCenter);
+      nameLabel->setWordWrap(true);
+      m_L_nameLabels.append(nameLabel);
+
       auto layout = new QVBoxLayout();
       auto label = new QLabel(QString::number(j + (i * SLIDERS_PER_PAGE) + 1),
                               widget);
@@ -169,6 +177,7 @@ void DirectChannelWidget::populateWidget()
 
       layout->addWidget(slider);
       layout->addWidget(label);
+      layout->addWidget(nameLabel);
       layout->setAlignment(slider,
                            Qt::AlignHCenter);
       pageLayout->addLayout(layout);
@@ -230,7 +239,9 @@ void SubmasterWidget::populateWidget()
     auto widget = new QWidget(this);
     auto pageLayout = new QHBoxLayout();
 
-    for (int j = 0; j < 20; j++) // for each slider
+    for (int j = 0;
+         j < SUBMASTER_SLIDERS_COUNT_PER_PAGE;
+         j++) // for each slider
     {
       auto submasterSlider = new ValueSlider(this);
       submasterSlider->setID(i);

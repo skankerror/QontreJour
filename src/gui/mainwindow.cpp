@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
   createCentralWidget();
 //  createDockWidgets();
 
+  MANAGER->testingMethod();
+
 }
 
 MainWindow::~MainWindow()
