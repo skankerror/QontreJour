@@ -130,7 +130,7 @@ DmxOutput *DmxManager::getOutput(Uid_Id t_output_Uid_Id)
   if (universeID < 0
       || universeID >= getUniverseCount())
   {
-    qWarning() <<"problem in DmxManager::getOutput";
+    qWarning() << "problem in DmxManager::getOutput";
     return nullptr;
   }
   auto rootOutput = getRootOutput(universeID);
@@ -138,7 +138,7 @@ DmxOutput *DmxManager::getOutput(Uid_Id t_output_Uid_Id)
   if (outputID < 0
       || outputID >= rootOutput->getL_childValueSize())
   {
-    qWarning() <<"problem in DmxManager::getOutput";
+    qWarning() << "problem in DmxManager::getOutput";
     return nullptr;
   }
   return static_cast<DmxOutput *>(rootOutput->getChildValue(outputID));
@@ -149,7 +149,7 @@ DmxChannel *DmxManager::getChannel(id t_channelId)
   if (t_channelId < 0
       || t_channelId >= getChannelCount())
   {
-    qWarning() <<"problem in DmxManager::getChannel";
+    qWarning() << "problem in DmxManager::getChannel";
     return nullptr;
   }
   return static_cast<DmxChannel *>(m_rootChannel->getChildValue(t_channelId));
@@ -160,7 +160,7 @@ DmxChannelGroup *DmxManager::getChannelGroup(id t_groupId)
   if (t_groupId < 0
       || t_groupId >= getChannelGroupCount())
   {
-    qWarning() <<"problem in DmxManager::getChannelGroup";
+    qWarning() << "problem in DmxManager::getChannelGroup";
     return nullptr;
   }
   return static_cast<DmxChannelGroup *>(m_rootChannelGroup->getChildValue(t_groupId));
@@ -215,7 +215,7 @@ RootValue *DmxManager::getRootOutput(const uid t_uid) const
   if (t_uid < 0
       || t_uid >= m_L_universe.size())
   {
-    qWarning () << " can't DmxOutput *DmxManager::getRootOutput(const uid t_uid)";
+    qWarning() << " can't DmxOutput *DmxManager::getRootOutput(const uid t_uid)";
     return nullptr;
   }
   return m_L_universe.at(t_uid)->getRootOutput();
@@ -249,6 +249,20 @@ void DmxManager::connectOutputs()
               SLOT(onOutputRequest(uid,id,dmx)));
     }
   }
+}
+
+void DmxManager::submasterToEngine(id t_id,
+                                   dmx t_level)
+{
+  m_dmxEngine->getGroupEngine()->groupLevelChanged(t_id,
+                                                   t_level);
+}
+
+void DmxManager::directChannelToEngine(id t_id,
+                                       dmx t_level)
+{
+  m_dmxEngine->getChannelEngine()->onChannelLevelChangedFromDirectChannel(t_id,
+                                                                          t_level);
 }
 
 void DmxManager::onOutputRequest(uid t_uid,
@@ -510,6 +524,11 @@ void DmxManager::connectValueToWidget(WidgetType t_widgetType,
     if (t_valueType == DmxValue::ChannelGroup)
     {
       emit connectGroupToSubmasterSlider(t_widgetID,
+                                         t_valueID);
+    }
+    else if (t_valueType == DmxValue::Channel)
+    {
+      emit connectChannelToDirectChannelSlider(t_widgetID,
                                          t_valueID);
     }
   }

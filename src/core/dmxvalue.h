@@ -306,15 +306,7 @@ public :
 
   ~DmxChannel();
 
-  dmx getdirectChannelEditLevel() const{ return m_directChannelEditLevel; }
-  dmx getchannelGroupLevel() const{ return m_channelGroupLevel; }
-  //  QMap<id, dmx> getM_channelGroup_Id_Level() const
-  //  { return m_M_channelGroup_Id_Level; }
-  dmx getselectedSceneLevel() const{ return m_selectedSceneLevel; }
-  dmx getnextSceneLevel() const{ return m_nextSceneLevel; }
-  overdmx getOverOffset() const{ return m_overOffset; }
   ChannelFlag getChannelFlag() const{ return m_flag; }
-  bool getIsDirectChannelEdited() const{ return m_isDirectChannelEdited; }
 
   // controled values
   QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
@@ -326,13 +318,6 @@ public :
   void setL_controledOutput(const QList<DmxOutput *> &t_L_controledOutput)
   { m_L_controledOutput = t_L_controledOutput; }
   void setChannelFlag(const DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
-  void setIsDirectChannelEdited(const bool t_isDirectChannelEdited)
-  { m_isDirectChannelEdited = t_isDirectChannelEdited; }
-  void setOverOffset(const overdmx t_overOffset){ m_overOffset = t_overOffset; }
-  //  void setM_channelGroup_Id_Level(const QMap<id, dmx> &t_M_channelGroup_Id_Level)
-  //  { m_M_channelGroup_Id_Level = t_M_channelGroup_Id_Level; }
-  void setChannelGroupLevel(dmx t_channelGroupLevel)
-  { m_channelGroupLevel = t_channelGroupLevel; }
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutput(Uid_Id t_Uid_Id);
@@ -343,23 +328,10 @@ public :
   void removeOutputList(const QList<Uid_Id> t_L_Uid_Id);
   void clearControledOutput();
 
-  //  void addChannelGroupControler(const id t_id);
-  //  void addChannelGroupControlerList(const QList<id> t_L_id);
-  //  void removeChannelGroupControler(const id t_id);
-  //  void removeChannelGroupControlerList(const QList<id> t_L_id);
-
 private :
 
   QList<DmxOutput *>m_L_controledOutput;
-
-  dmx m_directChannelEditLevel = 0;
-  dmx m_channelGroupLevel = 0;
-  //  QMap<id, dmx> m_M_channelGroup_Id_Level;
-  dmx m_selectedSceneLevel = 0;
-  dmx m_nextSceneLevel = 0;
-  overdmx m_overOffset = 0;
   ChannelFlag m_flag = UnknownFlag;
-  bool m_isDirectChannelEdited = false;
 
 };
 Q_DECLARE_METATYPE(DmxChannel)

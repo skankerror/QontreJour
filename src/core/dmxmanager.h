@@ -109,7 +109,6 @@ public :
                             int t_widgetID,
                             DmxValue::ValueType t_valueType,
                             id t_valueID);
-
   void testingMethod();
 
 private :
@@ -126,6 +125,17 @@ signals :
   void connectGroupToSubmasterSlider(int t_sliderID,
                                      id valueID);
   void disconnectGroupFromSubmasterSlider(int t_sliderID);
+
+  void connectChannelToDirectChannelSlider(int t_sliderID,
+                                           id valueID);
+  void disconnectChannelToDirectChannelSlider(int t_sliderID);
+
+public slots :
+
+  void submasterToEngine(id t_id,
+                         dmx t_level);
+  void directChannelToEngine(id t_id,
+                             dmx t_level);
 
 private slots :
 

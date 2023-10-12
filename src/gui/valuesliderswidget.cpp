@@ -79,6 +79,12 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
 
   label->setText(t_value->getName());
   slider->setDmxValue(t_value);
+
+//  auto manager = MANAGER;
+//  connect(slider,
+//          SIGNAL(valueSliderMoved(id,dmx)),
+//          manager,
+//          SLOT(sliderToEngine(id,dmx)));
 }
 
 void ValueSlidersWidget::connectSlider(int t_sliderID,
@@ -129,7 +135,18 @@ void ValueSlidersWidget::disconnectSlider(int t_sliderID)
 DirectChannelWidget::DirectChannelWidget(QWidget *parent)
   : ValueSlidersWidget(parent)
 {
-  setRootValue(MANAGER->getRootChannel());
+  auto manager = MANAGER;
+  setRootValue(manager->getRootChannel());
+  connect(manager,
+          SIGNAL(connectChannelToDirectChannelSlider(int,id)),
+          this,
+          SLOT(connectSlider(int,id)));
+
+  connect(manager,
+          SIGNAL(disconnectChannelToDirectChannelSlider(int)),
+          this,
+          SLOT(disconnectSlider(int)));
+
 }
 
 void DirectChannelWidget::populateWidget()
@@ -147,6 +164,12 @@ void DirectChannelWidget::populateWidget()
 //            SIGNAL(blockDirectChannelSlider(dmx)),
 //            directChannelSlider,
 //            SLOT(unMoveSlider(dmx)));
+
+    connect(directChannelSlider,
+            SIGNAL(valueSliderMoved(id,dmx)),
+            MANAGER,
+            SLOT(directChannelToEngine(id,dmx)));
+
 
     m_L_sliders.append(directChannelSlider);
   }
@@ -174,6 +197,7 @@ void DirectChannelWidget::populateWidget()
                               widget);
       label->setAlignment(Qt::AlignHCenter);
       auto slider = m_L_sliders.at(j + (i * SLIDERS_PER_PAGE));
+      slider->setID(j + (i * SLIDERS_PER_PAGE));
 
       layout->addWidget(slider);
       layout->addWidget(label);
@@ -210,11 +234,6 @@ SubmasterWidget::SubmasterWidget(QWidget *parent)
           this,
           SLOT(disconnectSlider(int)));
 
-//  connect(this,
-//          SIGNAL(aSliderMoved()),
-//          manager,
-//          SLOT(onSubmasterWidgetRequest()));
-
 }
 
 bool SubmasterWidget::getIsSLiderConnected(int t_sliderID)
@@ -246,10 +265,11 @@ void SubmasterWidget::populateWidget()
       auto submasterSlider = new ValueSlider(this);
       submasterSlider->setID(i);
       m_L_sliders.append(submasterSlider);
-//      connect(submasterSlider,
-//              SIGNAL(valueSliderMoved()),
-//              MANAGER,
-//              SLOT(updateSubmasters()));
+
+      connect(submasterSlider,
+              SIGNAL(valueSliderMoved(id,dmx)),
+              MANAGER,
+              SLOT(submasterToEngine(id,dmx)));
 
 
       auto nameLabel = new QLabel("", this);
@@ -294,7 +314,8 @@ ValueSlider::ValueSlider(LeveledValue *t_dmxValue,
 {
   setMinimum(0);
   setMaximum(255);
-
+  setTickInterval(10);
+  setTickPosition(QSlider::TicksBothSides);
   setDmxValue(t_dmxValue);
 }
 
@@ -333,9 +354,11 @@ void ValueSlider::updateLevel(int t_level)
   if (t_level > 255) t_level = 255;
   if (m_dmxValue->getLevel() == t_level) return;
 
-  m_dmxValue->setLevel(t_level);
+  // TODO faire appel à l'engine plutôt
+//  m_dmxValue->setLevel(t_level);
 
-//  emit valueSliderMoved();
+  emit valueSliderMoved(m_ID,
+                        t_level);
 }
 
 void ValueSlider::onValueLevelChanged(id t_id,

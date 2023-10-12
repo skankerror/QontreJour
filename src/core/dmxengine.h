@@ -157,7 +157,10 @@ private :
 /******************************* ChannelData ***********************/
 
 class ChannelData
+    : public QObject
 {
+
+  Q_OBJECT
 
 public :
 
@@ -167,8 +170,10 @@ public :
                        overdmx t_directChannelOffset = NULL_DMX_OFFSET,
                        dmx t_sceneLevel = NULL_DMX,
                        dmx t_nextSceneLevel = NULL_DMX,
-                       bool t_isDirectChannelEdited = false)
-    : m_channelID(t_id),
+                       bool t_isDirectChannelEdited = false,
+                       QObject *parent = nullptr)
+    : QObject(parent),
+      m_channelID(t_id),
       m_channelGroupLevel(t_channelGroupLevel),
       m_directChannelLevel(t_directChannelLevel),
       m_directChannelOffset(t_directChannelOffset),
@@ -185,6 +190,7 @@ public :
   dmx getSceneLevel() const{ return m_sceneLevel; }
   dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
   dmx getActual_Level() const{ return m_actual_Level; }
+  bool getIsDirectChannelEdited() const{ return m_isDirectChannelEdited; }
 
   void setChannelGroupLevel(dmx t_channelGroupLevel)
   { m_channelGroupLevel = t_channelGroupLevel; }
@@ -195,12 +201,18 @@ public :
   void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
   void setNextSceneLevel(dmx t_nextSceneLevel)
   { m_nextSceneLevel = t_nextSceneLevel; }
+  void setIsDirectChannelEdited(const bool t_bool)
+  { m_isDirectChannelEdited = t_bool; }
 
   id getChannelID() const{ return m_channelID; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
 
   DmxChannel::ChannelFlag getFlag_updateLevel();
   void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
+
+signals :
+
+  void blockChannelSlider(dmx t_actualLevel);
 
 private :
 

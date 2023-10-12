@@ -134,9 +134,10 @@ public :
   void setIsConnected(bool t_isConnected){ m_isConnected = t_isConnected; }
   void setID(id t_ID){ m_ID = t_ID; }
 
-//signals :
+signals :
 
-//  void valueSliderMoved();
+  void valueSliderMoved(id t_id,
+                        dmx t_level);
 
 public slots :
 

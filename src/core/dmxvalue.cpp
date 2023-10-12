@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "dmxvalue.h"
 #include "dmxmanager.h"
 #include <QDebug>
@@ -178,8 +177,9 @@ LeveledValue::~LeveledValue()
 
 void LeveledValue::setLevel(dmx t_level)
 {
-  if (m_level == t_level)
-    return;
+  // on l'enlève pour gérer plus facilement le blocage des sliders
+//  if (m_level == t_level)
+//    return;
   m_level = t_level;
   emit levelChanged(m_ID,
                     m_level);
@@ -223,13 +223,7 @@ DmxChannel::DmxChannel(DmxValue::ValueType t_type,
 DmxChannel::DmxChannel(const DmxChannel &t_channel)
   : LeveledValue(t_channel),
     m_L_controledOutput(t_channel.m_L_controledOutput),
-    m_directChannelEditLevel(t_channel.m_directChannelEditLevel),
-    m_channelGroupLevel(t_channel.m_channelGroupLevel),
-    m_selectedSceneLevel(t_channel.m_selectedSceneLevel),
-    m_nextSceneLevel(t_channel.m_nextSceneLevel),
-    m_overOffset(t_channel.m_overOffset),
-    m_flag(t_channel.m_flag),
-    m_isDirectChannelEdited(t_channel.m_isDirectChannelEdited)
+    m_flag(t_channel.m_flag)
 {}
 
 DmxChannel::~DmxChannel()
@@ -332,48 +326,6 @@ void DmxChannel::clearControledOutput()
   m_L_controledOutput.squeeze();
 }
 
-//void DmxChannel::addChannelGroupControler(const id t_id)
-//{
-//  if (m_M_channelGroup_Id_Level.contains(t_id))
-//  {
-//    qWarning() << "DmxChannel::addChannelGroupControler"
-//               << "id yet in the map";
-//    return;
-//  }
-//  m_M_channelGroup_Id_Level.insert(t_id,
-//                                   NULL_DMX);
-//}
-
-//void DmxChannel::addChannelGroupControlerList(const QList<id> t_L_id)
-//{
-//  for (const auto item
-//       : std::as_const(t_L_id))
-//  {
-//    addChannelGroupControler(item);
-//  }
-//}
-
-//void DmxChannel::removeChannelGroupControler(const id t_id)
-//{
-//  if (m_M_channelGroup_Id_Level.contains(t_id))
-//  {
-//    m_M_channelGroup_Id_Level.remove(t_id);
-//    return;
-//  }
-//  qWarning() << "DmxChannel::addChannelGroupControler"
-//             << "id yet in the map";
-//}
-
-//void DmxChannel::removeChannelGroupControlerList(const QList<id> t_L_id)
-//{
-//  for (const auto item
-//       : std::as_const(t_L_id))
-//  {
-//    removeChannelGroupControler(item);
-//  }
-//}
-
-
 /********************************** DMXCHANNELGROUP ************************************/
 
 DmxChannelGroup::DmxChannelGroup(DmxValue::ValueType t_type,
@@ -414,7 +366,6 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
   {
     m_H_controledChannel_storedLevel.insert(t_dmxChannel,
                                             t_storedLevel);
-//    t_dmxChannel->addChannelGroupControler(m_ID);
   }
   else
     qWarning() << "cant DmxChannelGroup::addChannel";
@@ -504,7 +455,7 @@ bool DmxPatch::addOutputToChannel(const id t_channelID,
     return false;
   }
 
-  // chack if it's not in another key
+  // check if it's not in another key
   L_Uid_Id = m_MM_patch.values();
   if (L_Uid_Id.contains(t_outputUid_Id))
   {

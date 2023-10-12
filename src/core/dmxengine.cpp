@@ -19,6 +19,8 @@
 #include <QDebug>
 
 
+/******************************* DmxEngine ***************************/
+
 DmxEngine::DmxEngine(RootValue *t_rootGroup,
                      RootValue *t_rootChannel,
                      QList<RootValue *> t_L_rootOutput,
@@ -66,7 +68,9 @@ ChannelGroupEngine::ChannelGroupEngine(RootValue *t_rootGroup,
                                        QObject *parent):
   QObject(parent),
   m_rootChannelGroup(t_rootGroup)
-{}
+{
+  // TODO ici connecter les direct à l'engine ? pour le direct channel
+}
 
 ChannelGroupEngine::~ChannelGroupEngine()
 {}
@@ -217,7 +221,8 @@ ChannelEngine::~ChannelEngine()
   for (const auto &item
        : std::as_const(m_L_channelData))
   {
-    delete item;
+//    delete item;
+    item->deleteLater();
   }
   m_L_channelData.clear();
 }
@@ -230,6 +235,11 @@ void ChannelEngine::createDatas(int t_channelCount)
   {
     auto channelData = new ChannelData(i);
     m_L_channelData.append(channelData);
+    auto channel = /*GET_CHANNEL(i)*/ m_rootChannel->getChildValue(i);
+    connect(channelData,
+            SIGNAL(blockChannelSlider(dmx)),
+            channel,
+            SLOT(setLevel(dmx)));
   }
 }
 
@@ -246,7 +256,7 @@ void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
 {
   auto channelData = m_L_channelData.at(t_id);
   channelData->setChannelGroupLevel(t_level);
-  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
+//  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
   update(t_id);
 }
 
@@ -254,7 +264,12 @@ void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
                                                            dmx t_level,
                                                            overdmx t_offset)
 {
-
+  auto channelData = m_L_channelData.at(t_id);
+  channelData->setIsDirectChannelEdited(true);
+  channelData->setDirectChannelLevel(t_level);
+  channelData->setDirectChannelOffset(t_offset);
+//  GET_CHANNEL(t_id)->setDirectChannelLevel(t_level);
+  update(t_id);
 }
 
 void ChannelEngine::onChannelLevelChangedFromScene(id t_id,
@@ -279,12 +294,14 @@ DmxChannel::ChannelFlag ChannelData::getFlag_updateLevel()
     {
       if (m_channelGroupLevel > m_actual_Level)
           m_actual_Level = m_channelGroupLevel;
+      emit blockChannelSlider(m_actual_Level);
       return DmxChannel::ChannelGroupFlag;
     }
     else
     {
-      if (m_directChannelLevel > m_actual_Level)
-        m_actual_Level = m_directChannelLevel;
+      //      if (m_directChannelLevel > m_actual_Level)
+      m_actual_Level = m_directChannelLevel;
+//      emit blockChannelSlider(m_actual_Level);
       return DmxChannel::DirectChannelFlag;
     }
   }
