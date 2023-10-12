@@ -18,46 +18,41 @@
 #include "dmxengine.h"
 #include <QDebug>
 
+/******************************** ChannelData *****************************/
 
-/******************************* DmxEngine ***************************/
-
-DmxEngine::DmxEngine(RootValue *t_rootGroup,
-                     RootValue *t_rootChannel,
-                     QList<RootValue *> t_L_rootOutput,
-                     DmxPatch *t_patch,
-                     QObject *parent)
-  : QObject(parent),
-    m_groupEngine(new ChannelGroupEngine(t_rootGroup,
-                                         this)),
-    m_channelEngine(new ChannelEngine(t_rootChannel,
-                                      this)),
-    m_outputEngine(new OutputEngine(t_L_rootOutput,
-                                    t_patch,
-                                    this))
+void ChannelData::update()
 {
-  connect(m_groupEngine,
-          SIGNAL(channelLevelChangedFromGroup(id,dmx)),
-          m_channelEngine,
-          SLOT(onChannelLevelChangedFromGroup(id,dmx)));
-
-  // connect all channels to OutputEngine
-  auto L_channel = t_rootChannel->getL_childValue();
-  for (const auto &item
-       : std::as_const(L_channel))
+  if (m_flag == ChannelDataFlag::DirectChannelFlag)
   {
-    connect(item,
-            SIGNAL(levelChanged(id,dmx)),
-            m_outputEngine,
-            SLOT(onChannelLevelChanged(id,dmx)));
+    if (m_channelGroupLevel > m_directChannelLevel)
+    {
+      if (m_channelGroupLevel > m_actual_Level)
+        m_actual_Level = m_channelGroupLevel;
+      //      emit blockChannelSlider(m_actual_Level);
+      m_flag = ChannelDataFlag::ChannelGroupFlag;
+    }
+    else
+    {
+      //      if (m_directChannelLevel > m_actual_Level)
+      m_actual_Level = m_directChannelLevel;
+      //      emit blockChannelSlider(m_actual_Level);
+      m_flag = ChannelDataFlag::DirectChannelFlag;
+    }
   }
-
-}
-
-DmxEngine::~DmxEngine()
-{
-  m_groupEngine->deleteLater();
-  m_channelEngine->deleteLater();
-  m_outputEngine->deleteLater();
+  else
+  {
+    if (m_channelGroupLevel >= m_sceneLevel)
+    {
+      m_actual_Level = m_channelGroupLevel;
+      m_flag = ChannelDataFlag::ChannelGroupFlag;
+    }
+    else
+    {
+      if (m_sceneLevel > m_actual_Level)
+        m_actual_Level = m_sceneLevel;
+      m_flag = ChannelDataFlag::SelectedSceneFlag;
+    }
+  }
 }
 
 /****************************** ChannelGroupEngine ***********************/
@@ -68,9 +63,7 @@ ChannelGroupEngine::ChannelGroupEngine(RootValue *t_rootGroup,
                                        QObject *parent):
   QObject(parent),
   m_rootChannelGroup(t_rootGroup)
-{
-  // TODO ici connecter les direct à l'engine ? pour le direct channel
-}
+{}
 
 ChannelGroupEngine::~ChannelGroupEngine()
 {}
@@ -247,7 +240,7 @@ void ChannelEngine::update(id t_id)
 {
   auto channelData = m_L_channelData.at(t_id);
   auto channel = GET_CHANNEL(t_id);
-  channel->setChannelFlag(channelData->getFlag_updateLevel());
+  channelData->update();
   channel->setLevel(channelData->getActual_Level());
 }
 
@@ -256,7 +249,6 @@ void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
 {
   auto channelData = m_L_channelData.at(t_id);
   channelData->setChannelGroupLevel(t_level);
-//  GET_CHANNEL(t_id)->setChannelGroupLevel(t_level);
   update(t_id);
 }
 
@@ -265,10 +257,9 @@ void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
                                                            overdmx t_offset)
 {
   auto channelData = m_L_channelData.at(t_id);
-  channelData->setIsDirectChannelEdited(true);
+  channelData->setFlag(ChannelDataFlag::DirectChannelFlag);
   channelData->setDirectChannelLevel(t_level);
   channelData->setDirectChannelOffset(t_offset);
-//  GET_CHANNEL(t_id)->setDirectChannelLevel(t_level);
   update(t_id);
 }
 
@@ -282,43 +273,6 @@ void ChannelEngine::onChannelLevelChangedFromNextScene(id t_id,
                                                        dmx t_level)
 {
 
-}
-
-/******************************** ChannelData *****************************/
-
-DmxChannel::ChannelFlag ChannelData::getFlag_updateLevel()
-{
-  if (m_isDirectChannelEdited)
-  {
-    if (m_channelGroupLevel >= m_directChannelLevel)
-    {
-      if (m_channelGroupLevel > m_actual_Level)
-          m_actual_Level = m_channelGroupLevel;
-      emit blockChannelSlider(m_actual_Level);
-      return DmxChannel::ChannelGroupFlag;
-    }
-    else
-    {
-      //      if (m_directChannelLevel > m_actual_Level)
-      m_actual_Level = m_directChannelLevel;
-//      emit blockChannelSlider(m_actual_Level);
-      return DmxChannel::DirectChannelFlag;
-    }
-  }
-  else
-  {
-    if (m_channelGroupLevel >= m_sceneLevel)
-    {
-      m_actual_Level = m_channelGroupLevel;
-      return DmxChannel::ChannelGroupFlag;
-    }
-    else
-    {
-      if (m_sceneLevel > m_actual_Level)
-        m_actual_Level = m_sceneLevel;
-      return DmxChannel::SelectedSceneFlag;
-    }
-  }
 }
 
 /******************************** OutputEngine *************************/
@@ -347,3 +301,44 @@ void OutputEngine::onChannelLevelChanged(id t_channelId,
     output->setLevel(t_level);
   }
 }
+
+/******************************* DmxEngine ***************************/
+
+DmxEngine::DmxEngine(RootValue *t_rootGroup,
+                     RootValue *t_rootChannel,
+                     QList<RootValue *> t_L_rootOutput,
+                     DmxPatch *t_patch,
+                     QObject *parent)
+    : QObject(parent),
+    m_groupEngine(new ChannelGroupEngine(t_rootGroup,
+                                         this)),
+    m_channelEngine(new ChannelEngine(t_rootChannel,
+                                      this)),
+    m_outputEngine(new OutputEngine(t_L_rootOutput,
+                                    t_patch,
+                                    this))
+{
+  connect(m_groupEngine,
+          SIGNAL(channelLevelChangedFromGroup(id,dmx)),
+          m_channelEngine,
+          SLOT(onChannelLevelChangedFromGroup(id,dmx)));
+
+  // connect all channels to OutputEngine
+  auto L_channel = t_rootChannel->getL_childValue();
+  for (const auto &item
+       : std::as_const(L_channel))
+  {
+    connect(item,
+            SIGNAL(levelChanged(id,dmx)),
+            m_outputEngine,
+            SLOT(onChannelLevelChanged(id,dmx)));
+  }
+}
+
+DmxEngine::~DmxEngine()
+{
+  m_groupEngine->deleteLater();
+  m_channelEngine->deleteLater();
+  m_outputEngine->deleteLater();
+}
+

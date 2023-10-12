@@ -24,13 +24,86 @@
 #define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
 #define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
-/******************************* DmxEngine ***************************/
+/****************************** Ch_Id_Dmx ********************************/
 
-class ChannelGroupEngine;
-class ChannelEngine;
-class OutputEngine;
+class Ch_Id_Dmx
+{
 
-class DmxEngine
+public :
+
+  explicit Ch_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
+      : m_ID(t_ID),
+      m_level(t_level)
+  {}
+
+  virtual ~Ch_Id_Dmx(){}
+
+  bool operator==(const Ch_Id_Dmx t_id_dmx) const
+  { return ((t_id_dmx.getID() == m_ID)
+            && (t_id_dmx.getLevel() == m_level)); }
+  virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_ID == t_id_dmx.getID()); }
+
+  // WARNING : use isBrother() before these operators
+  bool operator<(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level < t_id_dmx.getLevel()); }
+  bool operator>(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level > t_id_dmx.getLevel()); }
+  bool operator<=(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level <= t_id_dmx.getLevel()); }
+  bool operator>=(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level >= t_id_dmx.getLevel()); }
+
+
+  id getID() const{ return m_ID; }
+  dmx getLevel() const{ return m_level; }
+
+  void setID(const id t_ID){ m_ID = t_ID; }
+  void setLevel(const dmx t_level){ m_level = t_level; }
+
+  bool isValid() const{ return (m_ID > NO_ID); }
+
+private :
+
+  id m_ID = NO_ID;
+  dmx m_level = NULL_DMX;
+
+};
+
+/****************************** Gr_Id_Dmx ********************************/
+
+class Gr_Id_Dmx
+    : public Ch_Id_Dmx
+{
+
+public :
+
+  explicit Gr_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
+      : Ch_Id_Dmx(t_ID,
+                  t_level)
+  {}
+
+  ~Gr_Id_Dmx(){}
+
+  bool isBrother(const Ch_Id_Dmx t_id_dmx) const override
+  { return false; }
+};
+
+/******************************* ChannelData ***********************/
+
+enum ChannelDataFlag
+{
+  SelectedSceneFlag,
+  DirectChannelFlag,
+  ChannelGroupFlag,
+  ParkedFlag,
+  IndependantFlag,
+  UnknownFlag
+};
+
+class ChannelData
     : public QObject
 {
 
@@ -38,30 +111,70 @@ class DmxEngine
 
 public :
 
-  explicit DmxEngine(RootValue *t_rootGroup,
-                     RootValue *t_rootChannel,
-                     QList<RootValue *> t_L_rootOutput,
-                     DmxPatch *t_patch,
-                     QObject *parent = nullptr);
+  Q_ENUM(ChannelDataFlag)
 
-  ~DmxEngine();
+  explicit ChannelData(id t_id = NO_ID,
+                       dmx t_channelGroupLevel = NULL_DMX,
+                       dmx t_directChannelLevel = NULL_DMX,
+                       overdmx t_directChannelOffset = NULL_DMX_OFFSET,
+                       dmx t_sceneLevel = NULL_DMX,
+                       dmx t_nextSceneLevel = NULL_DMX,
+                       QObject *parent = nullptr)
+      : QObject(parent),
+      m_channelID(t_id),
+      m_channelGroupLevel(t_channelGroupLevel),
+      m_directChannelLevel(t_directChannelLevel),
+      m_directChannelOffset(t_directChannelOffset),
+      m_sceneLevel(t_sceneLevel),
+      m_nextSceneLevel(t_nextSceneLevel)
+  {}
 
-  ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
-  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
-  OutputEngine *getOutputEngine() const{ return m_outputEngine; }
+  ~ChannelData(){}
+
+  dmx getChannelGroupLevel() const{ return m_channelGroupLevel; }
+  dmx getDirectChannelLevel() const{ return m_directChannelLevel; }
+  overdmx getDirectChannelOffset() const{ return m_directChannelOffset; }
+  dmx getSceneLevel() const{ return m_sceneLevel; }
+  dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
+  dmx getActual_Level() const{ return m_actual_Level; }
+  ChannelDataFlag getFlag() const{ return m_flag; }
+
+  void setChannelGroupLevel(dmx t_channelGroupLevel)
+  { m_channelGroupLevel = t_channelGroupLevel; }
+  void setDirectChannelLevel(dmx t_directChannelLevel)
+  { m_directChannelLevel = t_directChannelLevel; }
+  void setDirectChannelOffset(overdmx t_directChannelOffset)
+  { m_directChannelOffset = t_directChannelOffset; }
+  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
+  void setNextSceneLevel(dmx t_nextSceneLevel)
+  { m_nextSceneLevel = t_nextSceneLevel; }
+  void setFlag(ChannelDataFlag t_flag){ m_flag = t_flag; }
+
+  id getChannelID() const{ return m_channelID; }
+  void setChannelID(id t_channelID){ m_channelID = t_channelID; }
+
+  void update();
+  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
+
+signals :
+
+  void blockChannelSlider(dmx t_actualLevel);
 
 private :
 
-  ChannelGroupEngine *m_groupEngine;
-  ChannelEngine *m_channelEngine;
-  OutputEngine *m_outputEngine;
+  id m_channelID = NO_ID;
+  dmx m_channelGroupLevel = NULL_DMX;
+  dmx m_directChannelLevel = NULL_DMX;
+  overdmx m_directChannelOffset = NULL_DMX_OFFSET;
+  dmx m_sceneLevel = NULL_DMX;
+  dmx m_nextSceneLevel = NULL_DMX;
+  ChannelDataFlag m_flag = UnknownFlag;
+
+  dmx m_actual_Level = NULL_DMX;
 
 };
 
 /****************************** ChannelGroupEngine ***********************/
-
-class Ch_Id_Dmx;
-class Gr_Id_Dmx;
 
 class ChannelGroupEngine :
     public QObject
@@ -113,8 +226,6 @@ private :
 
 /******************************* ChannelEngine ***********************/
 
-class ChannelData;
-
 class ChannelEngine
     : public QObject
 {
@@ -154,80 +265,6 @@ private :
 
 };
 
-/******************************* ChannelData ***********************/
-
-class ChannelData
-    : public QObject
-{
-
-  Q_OBJECT
-
-public :
-
-  explicit ChannelData(id t_id = NO_ID,
-                       dmx t_channelGroupLevel = NULL_DMX,
-                       dmx t_directChannelLevel = NULL_DMX,
-                       overdmx t_directChannelOffset = NULL_DMX_OFFSET,
-                       dmx t_sceneLevel = NULL_DMX,
-                       dmx t_nextSceneLevel = NULL_DMX,
-                       bool t_isDirectChannelEdited = false,
-                       QObject *parent = nullptr)
-    : QObject(parent),
-      m_channelID(t_id),
-      m_channelGroupLevel(t_channelGroupLevel),
-      m_directChannelLevel(t_directChannelLevel),
-      m_directChannelOffset(t_directChannelOffset),
-      m_sceneLevel(t_sceneLevel),
-      m_nextSceneLevel(t_nextSceneLevel),
-      m_isDirectChannelEdited(t_isDirectChannelEdited)
-  {}
-
-  ~ChannelData(){}
-
-  dmx getChannelGroupLevel() const{ return m_channelGroupLevel; }
-  dmx getDirectChannelLevel() const{ return m_directChannelLevel; }
-  overdmx getDirectChannelOffset() const{ return m_directChannelOffset; }
-  dmx getSceneLevel() const{ return m_sceneLevel; }
-  dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
-  dmx getActual_Level() const{ return m_actual_Level; }
-  bool getIsDirectChannelEdited() const{ return m_isDirectChannelEdited; }
-
-  void setChannelGroupLevel(dmx t_channelGroupLevel)
-  { m_channelGroupLevel = t_channelGroupLevel; }
-  void setDirectChannelLevel(dmx t_directChannelLevel)
-  { m_directChannelLevel = t_directChannelLevel; }
-  void setDirectChannelOffset(overdmx t_directChannelOffset)
-  { m_directChannelOffset = t_directChannelOffset; }
-  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
-  void setNextSceneLevel(dmx t_nextSceneLevel)
-  { m_nextSceneLevel = t_nextSceneLevel; }
-  void setIsDirectChannelEdited(const bool t_bool)
-  { m_isDirectChannelEdited = t_bool; }
-
-  id getChannelID() const{ return m_channelID; }
-  void setChannelID(id t_channelID){ m_channelID = t_channelID; }
-
-  DmxChannel::ChannelFlag getFlag_updateLevel();
-  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
-
-signals :
-
-  void blockChannelSlider(dmx t_actualLevel);
-
-private :
-
-  id m_channelID = NO_ID;
-  dmx m_channelGroupLevel = NULL_DMX;
-  dmx m_directChannelLevel = NULL_DMX;
-  overdmx m_directChannelOffset = NULL_DMX_OFFSET;
-  dmx m_sceneLevel = NULL_DMX;
-  dmx m_nextSceneLevel = NULL_DMX;
-  bool m_isDirectChannelEdited = false;
-
-  dmx m_actual_Level = NULL_DMX;
-
-};
-
 /****************************** OutputEngine *****************************/
 
 class OutputEngine
@@ -255,71 +292,34 @@ private :
 
 };
 
-/****************************** Ch_Id_Dmx ********************************/
+/******************************* DmxEngine ***************************/
 
-class Ch_Id_Dmx
+class DmxEngine
+    : public QObject
 {
+
+  Q_OBJECT
 
 public :
 
-  explicit Ch_Id_Dmx(const id t_ID = NO_ID,
-                     const dmx t_level = NULL_DMX)
-    : m_ID(t_ID),
-      m_level(t_level)
-  {}
+  explicit DmxEngine(RootValue *t_rootGroup,
+                     RootValue *t_rootChannel,
+                     QList<RootValue *> t_L_rootOutput,
+                     DmxPatch *t_patch,
+                     QObject *parent = nullptr);
 
-  virtual ~Ch_Id_Dmx(){}
+  ~DmxEngine();
 
-  bool operator==(const Ch_Id_Dmx t_id_dmx) const
-  { return ((t_id_dmx.getID() == m_ID)
-            && (t_id_dmx.getLevel() == m_level)); }
-  virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_ID == t_id_dmx.getID()); }
-
-  // WARNING : use isBrother() before these operators
-  bool operator<(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_level < t_id_dmx.getLevel()); }
-  bool operator>(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_level > t_id_dmx.getLevel()); }
-  bool operator<=(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_level <= t_id_dmx.getLevel()); }
-  bool operator>=(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_level >= t_id_dmx.getLevel()); }
-
-
-  id getID() const{ return m_ID; }
-  dmx getLevel() const{ return m_level; }
-
-  void setID(const id t_ID){ m_ID = t_ID; }
-  void setLevel(const dmx t_level){ m_level = t_level; }
-
-  bool isValid() const{ return (m_ID > NO_ID); }
+  ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
+  ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
+  OutputEngine *getOutputEngine() const{ return m_outputEngine; }
 
 private :
 
-  id m_ID = NO_ID;
-  dmx m_level = NULL_DMX;
+  ChannelGroupEngine *m_groupEngine;
+  ChannelEngine *m_channelEngine;
+  OutputEngine *m_outputEngine;
 
-};
-
-/****************************** Gr_Id_Dmx ********************************/
-
-class Gr_Id_Dmx
-    : public Ch_Id_Dmx
-{
-
-public :
-
-  explicit Gr_Id_Dmx(const id t_ID = NO_ID,
-                     const dmx t_level = NULL_DMX)
-    : Ch_Id_Dmx(t_ID,
-                t_level)
-  {}
-
-  ~Gr_Id_Dmx(){}
-
-  bool isBrother(const Ch_Id_Dmx t_id_dmx) const override
-  { return false; }
 };
 
 #endif // DMXENGINE_H

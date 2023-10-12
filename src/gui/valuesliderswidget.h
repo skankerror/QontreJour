@@ -139,10 +139,6 @@ signals :
   void valueSliderMoved(id t_id,
                         dmx t_level);
 
-public slots :
-
-  void unMoveSlider(dmx t_level); // NOTE : same as onvaluelevelchanged...
-
 protected slots :
 
   virtual void updateLevel(int t_level);

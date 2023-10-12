@@ -222,8 +222,8 @@ DmxChannel::DmxChannel(DmxValue::ValueType t_type,
 
 DmxChannel::DmxChannel(const DmxChannel &t_channel)
   : LeveledValue(t_channel),
-    m_L_controledOutput(t_channel.m_L_controledOutput),
-    m_flag(t_channel.m_flag)
+    m_L_controledOutput(t_channel.m_L_controledOutput)/*,
+    m_flag(t_channel.m_flag)*/
 {}
 
 DmxChannel::~DmxChannel()

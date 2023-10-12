@@ -200,7 +200,6 @@ DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
   {
     H_controledChannel_storedLevel.insert(item,
                                           item->getLevel());
-//    item->addChannelGroupControler(newGroup->getID());
   }
   newGroup->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
   m_rootChannelGroup->addChildValue(newGroup);

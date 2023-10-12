@@ -115,7 +115,7 @@ public :
   {
     RootOutput, // stored in universe
     Output, // stored in root
-    RootChannel, // stored in universe
+    RootChannel, // stored in manager
     Channel, // stored in root
     RootChannelGroup, // stored in manager
     ChannelGroup, // stored in root
@@ -288,17 +288,6 @@ class DmxChannel
 
 public :
 
-  enum ChannelFlag
-  {
-    SelectedSceneFlag,
-    DirectChannelFlag,
-    ChannelGroupFlag,
-    ParkedFlag,
-    IndependantFlag,
-    UnknownFlag
-  };
-  Q_ENUM(ChannelFlag)
-
   DmxChannel(ValueType t_type = Channel,
              RootValue *t_parent = nullptr);
 
@@ -306,7 +295,7 @@ public :
 
   ~DmxChannel();
 
-  ChannelFlag getChannelFlag() const{ return m_flag; }
+//  ChannelFlag getChannelFlag() const{ return m_flag; }
 
   // controled values
   QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
@@ -317,7 +306,7 @@ public :
   // setters
   void setL_controledOutput(const QList<DmxOutput *> &t_L_controledOutput)
   { m_L_controledOutput = t_L_controledOutput; }
-  void setChannelFlag(const DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
+//  void setChannelFlag(const DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutput(Uid_Id t_Uid_Id);
@@ -331,7 +320,6 @@ public :
 private :
 
   QList<DmxOutput *>m_L_controledOutput;
-  ChannelFlag m_flag = UnknownFlag;
 
 };
 Q_DECLARE_METATYPE(DmxChannel)

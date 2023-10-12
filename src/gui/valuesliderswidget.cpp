@@ -337,22 +337,13 @@ void ValueSlider::setDmxValue(LeveledValue *t_dmxValue)
 
   m_dmxValue->setAssignedWidget(this);
   m_isConnected = true;
-
-
-}
-
-void ValueSlider::unMoveSlider(dmx t_level)
-{
-  blockSignals(true);
-  this->setValue(t_level);
-  blockSignals(false);
 }
 
 void ValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
-  if (m_dmxValue->getLevel() == t_level) return;
+//  if (m_dmxValue->getLevel() == t_level) return;
 
   // TODO faire appel à l'engine plutôt
 //  m_dmxValue->setLevel(t_level);
