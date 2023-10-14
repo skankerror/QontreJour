@@ -18,9 +18,8 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include <QDockWidget>
-
-// test
 #include "../core/dmxmanager.h"
+#include "../gui/keypadwidget.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,9 +31,9 @@ MainWindow::MainWindow(QWidget *parent)
   MANAGER;
 
   createCentralWidget();
-//  createDockWidgets();
+  createDockWidgets();
 
-  MANAGER->testingMethod();
+//  MANAGER->testingMethod();
 
 }
 
@@ -84,8 +83,8 @@ QWidget *MainWindow::createUniverseContainerWidget()
   return universeContainerWidget;
 }
 
-//void MainWindow::createDockWidgets()
-//{
+void MainWindow::createDockWidgets()
+{
 //  auto grandMasterWidget = new GrandMasterWidget(this);
 //  auto playbackWidget = new PlaybackWidget(this);
 //  auto sequencerWidget = new SequencerWidget(this);
@@ -115,11 +114,29 @@ QWidget *MainWindow::createUniverseContainerWidget()
 //  bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
 //  addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
-//  setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-//  setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
-//  setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-//  setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-//}
+  auto manager = MANAGER;
+  auto keypadWidget = new KeypadWidget(this);
+  connect(keypadWidget,
+          SIGNAL(buttonClicked(KeypadButton)),
+          manager,
+          SLOT(keypadToInterpreter(KeypadButton)));
+
+  auto rightDock = new QDockWidget(this);
+  auto rightDockWidget = new QWidget(rightDock);
+  auto layout = new QVBoxLayout();
+  layout->addWidget(keypadWidget);
+  rightDockWidget->setLayout(layout);
+  rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
+  rightDock->setWidget(rightDockWidget);
+  rightDock->setFeatures(QDockWidget::DockWidgetFloatable);
+  addDockWidget(Qt::RightDockWidgetArea, rightDock);
+
+
+  setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+  setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+  setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+  setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+}
 
 void MainWindow::addUniverseWidget()
 {

@@ -37,6 +37,9 @@ typedef qint16 id;
 // id for universe. signed cos it can be -1 for channel group, scene, etc...
 typedef qint16 uid;
 
+typedef float sceneID_f;
+typedef float time_f;
+
 #define NO_ID -1
 #define NO_UID -1
 #define NULL_DMX 0
@@ -46,6 +49,45 @@ typedef qint16 uid;
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_CHANNEL_NAME "CH"
 #define DEFAULT_GROUP_NAME "GROUP"
+
+enum KeypadButton
+{
+  Zero,
+  One,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+  Eight,
+  Nine,
+  Dot,
+  Clear,
+  Time,
+  Timein,
+  Timeout,
+  Delayin,
+  Delayout,
+  Channel,
+  Cue,
+  Group,
+  Record,
+  Update,
+  Delete,
+  Patch,
+  Unpatch,
+  Output,
+  Plus,
+  Moins,
+  Pluspc,
+  Moinspc,
+  Arobase,
+  Thru,
+  Enter,
+  All,
+  UnknownButton
+};
 
 /******************************** Uid_Id *************************************/
 

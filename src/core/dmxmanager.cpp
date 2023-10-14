@@ -56,6 +56,8 @@ DmxManager::DmxManager(QObject *parent)
                               m_dmxPatch,
                               this);
 
+  m_interpreter = new Interpreter(this);
+
 }
 
 void DmxManager::testingMethod()
@@ -262,6 +264,64 @@ void DmxManager::directChannelToEngine(id t_id,
 {
   m_dmxEngine->getChannelEngine()->onChannelLevelChangedFromDirectChannel(t_id,
                                                                           t_level);
+}
+
+void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)
+{
+  switch (t_buttonType)
+  {
+  case 0 : case 1 : case 2 : case 3 : case 4 : case 5 : case 6 : case 7 : case 8 : case 9 :
+  m_interpreter->addDigit(t_buttonType); break;
+  case Dot : m_interpreter->addDot(); break;
+  case Clear :
+    break;
+  case Time :
+    break;
+  case Timein :
+    break;
+  case Timeout :
+    break;
+  case Delayin :
+    break;
+  case Delayout :
+    break;
+  case Channel :
+    break;
+  case Cue :
+    break;
+  case Group :
+    break;
+  case Record :
+    break;
+  case Update :
+    break;
+  case Delete :
+    break;
+  case Patch :
+    break;
+  case Unpatch :
+    break;
+  case Output :
+    break;
+  case Plus :
+    break;
+  case Moins :
+    break;
+  case Pluspc :
+    break;
+  case Moinspc :
+    break;
+  case Arobase :
+    break;
+  case Thru :
+    break;
+  case Enter :
+    break;
+  case All :
+    break;
+  default :
+    break;
+  }
 }
 
 void DmxManager::onOutputRequest(uid t_uid,

@@ -22,37 +22,30 @@
 
 void ChannelData::update()
 {
-  if (m_flag == ChannelDataFlag::DirectChannelFlag)
+  setFlag(ChannelDataFlag::UnknownFlag);
+  if (m_channelGroupLevel >= m_directChannelLevel)
   {
-    if (m_channelGroupLevel > m_directChannelLevel)
+    m_actual_Level = m_channelGroupLevel;
+    if (m_actual_Level)
+      setFlag(ChannelDataFlag::ChannelGroupFlag);
+    if (m_sceneLevel >= m_actual_Level)
     {
-      if (m_channelGroupLevel > m_actual_Level)
-        m_actual_Level = m_channelGroupLevel;
-      //      emit blockChannelSlider(m_actual_Level);
-      m_flag = ChannelDataFlag::ChannelGroupFlag;
-    }
-    else
-    {
-      //      if (m_directChannelLevel > m_actual_Level)
-      m_actual_Level = m_directChannelLevel;
-      //      emit blockChannelSlider(m_actual_Level);
-      m_flag = ChannelDataFlag::DirectChannelFlag;
+      m_actual_Level = m_sceneLevel;
+      if (m_actual_Level)
+        setFlag(ChannelDataFlag::SelectedSceneFlag);
     }
   }
   else
   {
-    if (m_channelGroupLevel >= m_sceneLevel)
+    m_actual_Level = m_directChannelLevel;
+    setFlag(ChannelDataFlag::DirectChannelFlag);
+    if (m_sceneLevel >= m_actual_Level)
     {
-      m_actual_Level = m_channelGroupLevel;
-      m_flag = ChannelDataFlag::ChannelGroupFlag;
-    }
-    else
-    {
-      if (m_sceneLevel > m_actual_Level)
-        m_actual_Level = m_sceneLevel;
-      m_flag = ChannelDataFlag::SelectedSceneFlag;
+      m_actual_Level = m_sceneLevel;
+      setFlag(ChannelDataFlag::SelectedSceneFlag);
     }
   }
+  // TODO : développer, gérer l'offset,etc...
 }
 
 /****************************** ChannelGroupEngine ***********************/
@@ -214,7 +207,6 @@ ChannelEngine::~ChannelEngine()
   for (const auto &item
        : std::as_const(m_L_channelData))
   {
-//    delete item;
     item->deleteLater();
   }
   m_L_channelData.clear();
@@ -228,7 +220,7 @@ void ChannelEngine::createDatas(int t_channelCount)
   {
     auto channelData = new ChannelData(i);
     m_L_channelData.append(channelData);
-    auto channel = /*GET_CHANNEL(i)*/ m_rootChannel->getChildValue(i);
+    auto channel = m_rootChannel->getChildValue(i);
     connect(channelData,
             SIGNAL(blockChannelSlider(dmx)),
             channel,
@@ -257,7 +249,6 @@ void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
                                                            overdmx t_offset)
 {
   auto channelData = m_L_channelData.at(t_id);
-  channelData->setFlag(ChannelDataFlag::DirectChannelFlag);
   channelData->setDirectChannelLevel(t_level);
   channelData->setDirectChannelOffset(t_offset);
   update(t_id);

@@ -148,13 +148,16 @@ public :
   void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
   void setNextSceneLevel(dmx t_nextSceneLevel)
   { m_nextSceneLevel = t_nextSceneLevel; }
-  void setFlag(ChannelDataFlag t_flag){ m_flag = t_flag; }
 
   id getChannelID() const{ return m_channelID; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
 
   void update();
   void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
+
+private :
+
+  void setFlag(ChannelDataFlag t_flag){ m_flag = t_flag; }
 
 signals :
 

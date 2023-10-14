@@ -15,49 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
 
-#include <QMainWindow>
+#include <QObject>
+#include "dmxvalue.h"
 #include <QList>
-#include <QPushButton>
-#include "universewidget.h"
-//#include "playbackwidget.h"
-//#include "sequencerwidget.h"
-#include "valuesliderswidget.h"
-//#include "valuetablewidget.h"
 
-
-class MainWindow
-    : public QMainWindow
+class Interpreter
+    : public QObject
 {
 
   Q_OBJECT
 
 public :
 
-  explicit MainWindow(QWidget *parent = nullptr);
+  explicit Interpreter(QObject *parent = nullptr);
 
-  ~MainWindow();
+  void addDigit(KeypadButton t_digit);
+  void addDot();
+
+signals :
+
+  void setSelection(QList<id> t_L_id);
+  void setLevel(dmx t_level);
+
+
+public slots :
+
 
 private :
 
-  void createCentralWidget();
-  QWidget *createUniverseContainerWidget();
-  void createDockWidgets();
 
-private slots :
-
-  void addUniverseWidget();
-  void removeUniverseWidget();
-
-private :
-
-  DirectChannelWidget *m_directChannelWidget;
-  QVBoxLayout *m_universeWidgetContainerLayout;
-  QList<UniverseWidget *> m_L_universeWidget;
-
-//  ValueTableWidget *m_channelTableWidget;
 
 };
-#endif // MAINWINDOW_H
+
+#endif // INTERPRETER_H

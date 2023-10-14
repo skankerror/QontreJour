@@ -50,6 +50,8 @@ set(PROJECT_SOURCES
         src/core/dmxmanager.cpp
         src/core/dmxengine.h
         src/core/dmxengine.cpp
+        src/core/interpreter.h
+        src/core/interpreter.cpp
         src/gui/mainwindow.h
         src/gui/mainwindow.cpp
         src/gui/universewidget.h
@@ -64,6 +66,8 @@ set(PROJECT_SOURCES
 #        src/gui/playbackwidget.cpp
 #        src/gui/valueeditwidget.h
 #        src/gui/valueeditwidget.cpp
+        src/gui/keypadwidget.h
+        src/gui/keypadwidget.cpp
         ${TS_FILES}
         ${DATA_FILES}
 )
@@ -72,6 +76,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QontreJour
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        src/gui/keypadwidget.h src/gui/keypadwidget.cpp
+        src/core/interpreter.h src/core/interpreter.cpp
     )
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

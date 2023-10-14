@@ -20,8 +20,6 @@
 
 #include "dmxvalue.h"
 
-typedef float sceneID_f;
-typedef float time_f;
 
 /****************************** RootScene ****************************/
 

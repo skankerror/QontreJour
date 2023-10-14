@@ -25,6 +25,7 @@
 #include "dmxscene.h"
 #include "dmxuniverse.h"
 #include "dmxengine.h"
+#include "interpreter.h"
 
 #define MANAGER DmxManager::instance()
 #define GET_CHANNEL_GROUP(x) DmxManager::instance()->getChannelGroup(x)
@@ -32,6 +33,8 @@
 #define GET_CHANNEL_COUNT DmxManager::instance()->getChannelCount()
 #define GET_OUTPUT(x,y) DmxManager::instance()->getOutput(Uid_Id(x,y))
 #define GET_UNIVERSE_COUNT DmxManager::instance()->getUniverseCount()
+
+
 
 class DmxPatch;
 
@@ -136,6 +139,7 @@ public slots :
                          dmx t_level);
   void directChannelToEngine(id t_id,
                              dmx t_level);
+  void keypadToInterpreter(KeypadButton t_buttonType);
 
 private slots :
 
@@ -148,6 +152,7 @@ private :
   QDmxManager *m_hwManager;
   DmxPatch *m_dmxPatch;
   DmxEngine *m_dmxEngine;
+  Interpreter *m_interpreter;
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
