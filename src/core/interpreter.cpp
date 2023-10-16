@@ -20,16 +20,89 @@
 
 Interpreter::Interpreter(QObject *parent)
     : QObject{parent}
+{}
+
+void Interpreter::recieveData(KeypadButton t_button)
+{
+  if (t_button == KeypadButton::All)
+  {
+    m_valueCount = 0;
+    m_isValued = false;
+    m_L_selectedChannels.squeeze();
+    m_L_selectedChannels.clear();
+    m_L_digits.squeeze();
+    m_L_digits.clear();
+    emit selectAll();
+    return;
+  }
+
+  if (t_button == KeypadButton::Clear)
+  {
+    m_valueCount = 0;
+    m_isValued = false;
+    m_L_selectedChannels.squeeze();
+    m_L_selectedChannels.clear();
+    m_L_digits.squeeze();
+    m_L_digits.clear();
+    emit clearSelection();
+    return;
+  }
+
+  if ((m_valueCount == 0)
+      && (t_button > KeypadButton::Dot)) // no value yet and it's not value
+  {
+    emit sendError(); // syntax error
+    return;
+  }
+
+
+  // if it's a value
+  if (t_button <= KeypadButton::Dot)
+  {
+    // we add to list
+    m_L_digits.append(t_button);
+    return;
+  }
+
+  // it's not a value.
+  switch (t_button)
+  {
+  case KeypadButton::Channel : calculateId(); selectId(); break;
+  case KeypadButton::Output : calculateId(); selectId(); break;
+  case KeypadButton::Thru : calculateId(); selectThru(); break;
+  case KeypadButton::Plus : calculateId(); selectPlus(); break;
+  case KeypadButton::Moins : calculateId(); selectMoins(); break;
+  default : break;
+  }
+}
+
+void Interpreter::calculateId()
 {
 
 }
 
-void Interpreter::addDigit(KeypadButton t_digit)
-{
-  qDebug() << t_digit;
-}
-
-void Interpreter::addDot()
+void Interpreter::calculateFloat()
 {
 
 }
+
+void Interpreter::selectId()
+{
+
+}
+
+void Interpreter::selectThru()
+{
+
+}
+
+void Interpreter::selectPlus()
+{
+
+}
+
+void Interpreter::selectMoins()
+{
+
+}
+

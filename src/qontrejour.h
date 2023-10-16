@@ -50,4 +50,81 @@
 #define BLACK_COLOR QRgb(0xff000000)
 
 
+#define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
+#define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
+
+#define MANAGER DmxManager::instance()
+#define GET_CHANNEL_GROUP(x) DmxManager::instance()->getChannelGroup(x)
+#define GET_CHANNEL(x) DmxManager::instance()->getChannel(x)
+#define GET_CHANNEL_COUNT DmxManager::instance()->getChannelCount()
+#define GET_OUTPUT(x,y) DmxManager::instance()->getOutput(Uid_Id(x,y))
+#define GET_UNIVERSE_COUNT DmxManager::instance()->getUniverseCount()
+
+// 0 to 255, value for dmx levels
+typedef quint8 dmx ;
+
+// needed when editing channel group level
+// when one channel is at 0 or 255, the editing group can still change
+// when need to keep decay between unchanged values, and those who are still changing
+typedef qint16 overdmx;
+
+// id for every output, channel, channel group, etc...
+// not unsigned cos it can be -1 to specify no id
+typedef qint16 id;
+
+// id for universe. signed cos it can be -1 for channel group, scene, etc...
+typedef qint16 uid;
+
+typedef float sceneID_f;
+typedef float time_f;
+
+#define NO_ID -1
+#define NO_UID -1
+#define NULL_DMX 0
+#define NULL_DMX_OFFSET 0
+#define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
+
+#define DEFAULT_OUTPUT_NAME "OUT"
+#define DEFAULT_CHANNEL_NAME "CH"
+#define DEFAULT_GROUP_NAME "GROUP"
+
+enum KeypadButton
+{
+  Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Dot,
+  Time, Timein, Timeout, Delayin, Delayout,
+  Channel, Output, Cue, Group,
+  Record, Update, Delete,
+  Patch, Unpatch,
+  Plus, Moins, Clear, All, Thru,
+  Pluspc, Moinspc, Arobase,
+  Step, Goto,
+  UnknownButton
+};
+
+enum ValueType
+{
+  RootOutput, // stored in universe
+  OutputType, // stored in root
+  RootChannel, // stored in manager
+  ChannelType, // stored in root
+  RootChannelGroup, // stored in manager
+  ChannelGroup, // stored in root
+  Sequence,
+  MainScene,
+  SubScene,
+  UnknownValueType
+};
+
+enum ChannelDataFlag
+{
+  SelectedSceneFlag,
+  DirectChannelFlag,
+  ChannelGroupFlag,
+  ParkedFlag,
+  IndependantFlag,
+  UnknownFlag
+};
+
+#define BUTTON_WIDTH_MAX 55
+
 #endif // QONTREJOUR_H

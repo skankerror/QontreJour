@@ -21,20 +21,12 @@
 #include <QObject>
 #include <QString>
 #include "qdmxlib/QDmxManager"
+#include "../qontrejour.h"
 #include "dmxvalue.h"
 #include "dmxscene.h"
 #include "dmxuniverse.h"
 #include "dmxengine.h"
 #include "interpreter.h"
-
-#define MANAGER DmxManager::instance()
-#define GET_CHANNEL_GROUP(x) DmxManager::instance()->getChannelGroup(x)
-#define GET_CHANNEL(x) DmxManager::instance()->getChannel(x)
-#define GET_CHANNEL_COUNT DmxManager::instance()->getChannelCount()
-#define GET_OUTPUT(x,y) DmxManager::instance()->getOutput(Uid_Id(x,y))
-#define GET_UNIVERSE_COUNT DmxManager::instance()->getUniverseCount()
-
-
 
 class DmxPatch;
 
@@ -110,7 +102,7 @@ public :
   // connect values with widget
   void connectValueToWidget(DmxManager::WidgetType t_widgetType,
                             int t_widgetID,
-                            DmxValue::ValueType t_valueType,
+                            ValueType t_valueType,
                             id t_valueID);
   void testingMethod();
 

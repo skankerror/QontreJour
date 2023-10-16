@@ -71,20 +71,20 @@ DmxValue::~DmxValue()
 
 /********************************* ROOTVALUE *************************************/
 
-RootValue::RootValue(DmxValue::ValueType t_type,
+RootValue::RootValue(ValueType t_type,
                      DmxValue *t_parent)
   : DmxValue(t_type,
              t_parent)
 {
   switch(t_type)
   {
-  case DmxValue::RootOutput :
+  case ValueType::RootOutput :
     setName("Root Output");
     break;
-  case DmxValue::RootChannel :
+  case ValueType::RootChannel :
     setName("Root Channel");
     break;
-  case DmxValue::RootChannelGroup :
+  case ValueType::RootChannelGroup :
     setName("Root Channel Group");
     break;
   default :
@@ -159,7 +159,7 @@ void RootValue::removeChildValueList(const QList<id> t_L_index)
 
 /******************************** LEVELEDVALUE **************************************/
 
-LeveledValue::LeveledValue(DmxValue::ValueType t_type,
+LeveledValue::LeveledValue(ValueType t_type,
                            RootValue *t_parent)
   : DmxValue(t_type,
              t_parent)
@@ -187,7 +187,7 @@ void LeveledValue::setLevel(dmx t_level)
 
 /********************************* DMXOUTPUT *************************************/
 
-DmxOutput::DmxOutput(DmxValue::ValueType t_type,
+DmxOutput::DmxOutput(ValueType t_type,
                      RootValue *t_parent)
   : LeveledValue(t_type,
                  t_parent)
@@ -212,7 +212,7 @@ void DmxOutput::setLevel(dmx t_level)
 
 /********************************** DMXCHANNEL ************************************/
 
-DmxChannel::DmxChannel(DmxValue::ValueType t_type,
+DmxChannel::DmxChannel(ValueType t_type,
                        RootValue *t_parent)
   : LeveledValue(t_type,
                  t_parent)
@@ -328,7 +328,7 @@ void DmxChannel::clearControledOutput()
 
 /********************************** DMXCHANNELGROUP ************************************/
 
-DmxChannelGroup::DmxChannelGroup(DmxValue::ValueType t_type,
+DmxChannelGroup::DmxChannelGroup(ValueType t_type,
                                  RootValue *t_parent)
   : LeveledValue(t_type,
                  t_parent)

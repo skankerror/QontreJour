@@ -18,54 +18,54 @@
 #ifndef PLAYBACKWIDGET_H
 #define PLAYBACKWIDGET_H
 
-#include <QWidget>
-#include <QSlider>
-#include <QPushButton>
-#include <QLabel>
+//#include <QWidget>
+//#include <QSlider>
+//#include <QPushButton>
+//#include <QLabel>
 
-class PlaybackWidget
-    : public QWidget
-{
+//class PlaybackWidget
+//    : public QWidget
+//{
 
-  Q_OBJECT
+//  Q_OBJECT
 
-public :
+//public :
 
-  explicit PlaybackWidget(QWidget *parent = nullptr);
+//  explicit PlaybackWidget(QWidget *parent = nullptr);
 
-private :
+//private :
 
-  QSlider *m_ASlider;
-  QLabel *m_ALabel;
-  QSlider *m_BSlider;
-  QLabel *m_BLabel;
-  QPushButton *m_seqInfButton;
-  QPushButton *m_seqSupButton;
-  QPushButton *m_pauseButton;
-  QPushButton *m_goBackButton;
-  QPushButton *m_goButton;
+//  QSlider *m_ASlider;
+//  QLabel *m_ALabel;
+//  QSlider *m_BSlider;
+//  QLabel *m_BLabel;
+//  QPushButton *m_seqInfButton;
+//  QPushButton *m_seqSupButton;
+//  QPushButton *m_pauseButton;
+//  QPushButton *m_goBackButton;
+//  QPushButton *m_goButton;
 
-};
+//};
 
-/****************************************************************/
+///****************************************************************/
 
-class GrandMasterWidget
-    : public QWidget
-{
+//class GrandMasterWidget
+//    : public QWidget
+//{
 
-  Q_OBJECT
+//  Q_OBJECT
 
-public :
+//public :
 
-  explicit GrandMasterWidget(QWidget *parent = nullptr);
+//  explicit GrandMasterWidget(QWidget *parent = nullptr);
 
-private :
+//private :
 
-  QSlider *m_grandMasterslider;
-  QPushButton *m_blackOutButton;
-  QLabel *m_grandMasterLabel;
+//  QSlider *m_grandMasterslider;
+//  QPushButton *m_blackOutButton;
+//  QLabel *m_grandMasterLabel;
 
-};
+//};
 
 
 #endif // PLAYBACKWIDGET_H

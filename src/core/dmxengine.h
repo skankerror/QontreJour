@@ -19,10 +19,8 @@
 #define DMXENGINE_H
 
 #include <QObject>
+#include "../qontrejour.h"
 #include "dmxvalue.h"
-
-#define NULL_CH_ID_DMX Ch_Id_Dmx(NO_ID,NULL_DMX)
-#define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
 /****************************** Ch_Id_Dmx ********************************/
 
@@ -92,16 +90,6 @@ public :
 };
 
 /******************************* ChannelData ***********************/
-
-enum ChannelDataFlag
-{
-  SelectedSceneFlag,
-  DirectChannelFlag,
-  ChannelGroupFlag,
-  ParkedFlag,
-  IndependantFlag,
-  UnknownFlag
-};
 
 class ChannelData
     : public QObject

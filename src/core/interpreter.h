@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include "dmxvalue.h"
+#include "../qontrejour.h"
 #include <QList>
 
 class Interpreter
@@ -32,21 +33,45 @@ public :
 
   explicit Interpreter(QObject *parent = nullptr);
 
-  void addDigit(KeypadButton t_digit);
-  void addDot();
+  void recieveData(KeypadButton t_button);
+
+  QList<id> getL_selectedChannels() const
+  { return m_L_selectedChannels; }
+
+  void setL_selectedChannels(const QList<id> &t_L_selectedChannels)
+  { m_L_selectedChannels = t_L_selectedChannels; }
+
+private :
+
+  void calculateId();
+  void calculateFloat();
+  void selectId();
+  void selectOutput();
+  void selectThru();
+  void selectPlus();
+  void selectMoins();
 
 signals :
 
-  void setSelection(QList<id> t_L_id);
+  void addSelection(QList<id> t_L_id);
+  void removeSelection(QList<id> t_L_id);
+  void selectAll();
+  void clearSelection();
   void setLevel(dmx t_level);
-
+  void sendError();
 
 public slots :
 
 
 private :
 
-
+  int m_valueCount = 0;
+  bool m_isValued = false;
+  QList<KeypadButton> m_L_digits;
+  id m_tempID;
+  id m_lastSelectedId;
+  float m_tempFloat;
+  QList<id> m_L_selectedChannels;
 
 };
 

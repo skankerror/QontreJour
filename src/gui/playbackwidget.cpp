@@ -15,62 +15,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QLayout>
-#include "playbackwidget.h"
+//#include <QLayout>
+//#include "playbackwidget.h"
 
-PlaybackWidget::PlaybackWidget(QWidget *parent)
-  : QWidget(parent),
-    m_ASlider(new QSlider(this)),
-    m_ALabel(new QLabel("A", this)),
-    m_BSlider(new QSlider(this)),
-    m_BLabel(new QLabel("B", this)),
-    m_seqInfButton(new QPushButton(this)),
-    m_seqSupButton(new QPushButton(this)),
-    m_pauseButton(new QPushButton(this)),
-    m_goBackButton(new QPushButton(this)),
-    m_goButton(new QPushButton(this))
-{
-  auto layout = new QGridLayout();
+//PlaybackWidget::PlaybackWidget(QWidget *parent)
+//  : QWidget(parent),
+//    m_ASlider(new QSlider(this)),
+//    m_ALabel(new QLabel("A", this)),
+//    m_BSlider(new QSlider(this)),
+//    m_BLabel(new QLabel("B", this)),
+//    m_seqInfButton(new QPushButton(this)),
+//    m_seqSupButton(new QPushButton(this)),
+//    m_pauseButton(new QPushButton(this)),
+//    m_goBackButton(new QPushButton(this)),
+//    m_goButton(new QPushButton(this))
+//{
+//  auto layout = new QGridLayout();
 
-  m_seqInfButton->setText("seq-");
-  m_seqSupButton->setText("seq+");
-  m_pauseButton->setText("pause");
-  m_goBackButton->setText("Go Back");
-  m_goButton->setText("GO");
-  m_ALabel->setAlignment(Qt::AlignHCenter);
-  m_BLabel->setAlignment(Qt::AlignHCenter);
+//  m_seqInfButton->setText("seq-");
+//  m_seqSupButton->setText("seq+");
+//  m_pauseButton->setText("pause");
+//  m_goBackButton->setText("Go Back");
+//  m_goButton->setText("GO");
+//  m_ALabel->setAlignment(Qt::AlignHCenter);
+//  m_BLabel->setAlignment(Qt::AlignHCenter);
 
-  layout->addWidget(m_ASlider, 0, 0, 8, 1);
-  layout->addWidget(m_BSlider, 0, 1, 8, 1);
-  layout->addWidget(m_ALabel, 8, 0, 1, 1);
-  layout->addWidget(m_BLabel, 8, 1, 1, 1);
-  layout->addWidget(m_seqInfButton, 9, 0, 1, 1);
-  layout->addWidget(m_seqSupButton, 9, 1, 1, 1);
-  layout->addWidget(m_pauseButton, 10, 0, 1, 1);
-  layout->addWidget(m_goBackButton, 10, 1, 1, 1);
-  layout->addWidget(m_goButton, 11, 0, 1, 2);
+//  layout->addWidget(m_ASlider, 0, 0, 8, 1);
+//  layout->addWidget(m_BSlider, 0, 1, 8, 1);
+//  layout->addWidget(m_ALabel, 8, 0, 1, 1);
+//  layout->addWidget(m_BLabel, 8, 1, 1, 1);
+//  layout->addWidget(m_seqInfButton, 9, 0, 1, 1);
+//  layout->addWidget(m_seqSupButton, 9, 1, 1, 1);
+//  layout->addWidget(m_pauseButton, 10, 0, 1, 1);
+//  layout->addWidget(m_goBackButton, 10, 1, 1, 1);
+//  layout->addWidget(m_goButton, 11, 0, 1, 2);
 
-  layout->setAlignment(m_ASlider, Qt::AlignHCenter);
-  layout->setAlignment(m_BSlider, Qt::AlignHCenter);
+//  layout->setAlignment(m_ASlider, Qt::AlignHCenter);
+//  layout->setAlignment(m_BSlider, Qt::AlignHCenter);
 
-  setLayout(layout);
-}
+//  setLayout(layout);
+//}
 
-/****************************************************************/
+///****************************************************************/
 
-GrandMasterWidget::GrandMasterWidget(QWidget *parent)
-  : QWidget(parent),
-    m_grandMasterslider(new QSlider(this)),
-    m_blackOutButton(new QPushButton(this)),
-    m_grandMasterLabel(new QLabel("GM",this))
-{
-  auto layout = new QVBoxLayout();
+//GrandMasterWidget::GrandMasterWidget(QWidget *parent)
+//  : QWidget(parent),
+//    m_grandMasterslider(new QSlider(this)),
+//    m_blackOutButton(new QPushButton(this)),
+//    m_grandMasterLabel(new QLabel("GM",this))
+//{
+//  auto layout = new QVBoxLayout();
 
-  m_blackOutButton->setText("Black Out");
-  m_grandMasterLabel->setAlignment(Qt::AlignHCenter);
-  layout->addWidget(m_blackOutButton);
-  layout->addWidget(m_grandMasterslider);
-  layout->addWidget(m_grandMasterLabel);
-  layout->setAlignment(m_grandMasterslider, Qt::AlignHCenter);
-  setLayout(layout);
-}
+//  m_blackOutButton->setText("Black Out");
+//  m_grandMasterLabel->setAlignment(Qt::AlignHCenter);
+//  layout->addWidget(m_blackOutButton);
+//  layout->addWidget(m_grandMasterslider);
+//  layout->addWidget(m_grandMasterLabel);
+//  layout->setAlignment(m_grandMasterslider, Qt::AlignHCenter);
+//  setLayout(layout);
+//}

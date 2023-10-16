@@ -80,11 +80,6 @@ void ValueSlidersWidget::connectSlider(int t_sliderID,
   label->setText(t_value->getName());
   slider->setDmxValue(t_value);
 
-//  auto manager = MANAGER;
-//  connect(slider,
-//          SIGNAL(valueSliderMoved(id,dmx)),
-//          manager,
-//          SLOT(sliderToEngine(id,dmx)));
 }
 
 void ValueSlidersWidget::connectSlider(int t_sliderID,
@@ -160,10 +155,6 @@ void DirectChannelWidget::populateWidget()
   {
     auto directChannelSlider = new ValueSlider(item,
                                                this);
-//    connect(item,
-//            SIGNAL(blockDirectChannelSlider(dmx)),
-//            directChannelSlider,
-//            SLOT(unMoveSlider(dmx)));
 
     connect(directChannelSlider,
             SIGNAL(valueSliderMoved(id,dmx)),

@@ -85,8 +85,6 @@ QWidget *MainWindow::createUniverseContainerWidget()
 
 void MainWindow::createDockWidgets()
 {
-//  auto grandMasterWidget = new GrandMasterWidget(this);
-//  auto playbackWidget = new PlaybackWidget(this);
 //  auto sequencerWidget = new SequencerWidget(this);
 
 //  auto rightDock = new QDockWidget(this);
@@ -121,10 +119,15 @@ void MainWindow::createDockWidgets()
           manager,
           SLOT(keypadToInterpreter(KeypadButton)));
 
+  auto grandMasterWidget = new GrandMasterWidget(this);
+  auto playbackWidget = new PlaybackWidget(this);
+
   auto rightDock = new QDockWidget(this);
   auto rightDockWidget = new QWidget(rightDock);
-  auto layout = new QVBoxLayout();
+  auto layout = new QHBoxLayout();
   layout->addWidget(keypadWidget);
+  layout->addWidget(playbackWidget);
+  layout->addWidget(grandMasterWidget);
   rightDockWidget->setLayout(layout);
   rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
   rightDock->setWidget(rightDockWidget);

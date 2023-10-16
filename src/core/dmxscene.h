@@ -19,6 +19,7 @@
 #define DMXSCENE_H
 
 #include "dmxvalue.h"
+#include "../qontrejour.h"
 
 
 /****************************** RootScene ****************************/
@@ -33,7 +34,7 @@ class RootScene :
 
 public :
 
-  explicit RootScene(DmxValue::ValueType t_type = Sequence,
+  explicit RootScene(ValueType t_type = Sequence,
                      DmxValue *t_parent = nullptr);
 
   ~RootScene();
@@ -54,7 +55,7 @@ class DmxScene :
 
 public :
 
-  explicit DmxScene(DmxValue::ValueType t_type = MainScene,
+  explicit DmxScene(/*DmxValue::*/ValueType t_type = MainScene,
                     RootScene *t_parent = nullptr);
 
   virtual ~DmxScene();

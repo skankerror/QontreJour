@@ -19,7 +19,25 @@
 #define KEYPADWIDGET_H
 
 #include <QWidget>
+#include <QPushButton>
+#include <QSlider>
+#include <QLabel>
+#include "../qontrejour.h"
 #include "../core/dmxmanager.h"
+
+class PushButton
+    : public QPushButton
+{
+  Q_OBJECT
+
+public :
+
+  explicit PushButton(QWidget *parent = nullptr);
+  explicit PushButton(const QString &text,
+                      QWidget *parent = nullptr);
+};
+
+/****************************************************************/
 
 class KeypadWidget
     : public QWidget
@@ -40,6 +58,52 @@ private :
 signals:
 
   void buttonClicked(KeypadButton buttonType);
+};
+
+/****************************************************************/
+
+class PlaybackWidget
+    : public QWidget
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit PlaybackWidget(QWidget *parent = nullptr);
+
+private :
+
+  QSlider *m_ASlider;
+  QLabel *m_ALabel;
+  QSlider *m_BSlider;
+  QLabel *m_BLabel;
+  PushButton *m_seqInfButton;
+  PushButton *m_seqSupButton;
+  PushButton *m_pauseButton;
+  PushButton *m_goBackButton;
+  QPushButton *m_goButton;
+
+};
+
+/****************************************************************/
+
+class GrandMasterWidget
+    : public QWidget
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit GrandMasterWidget(QWidget *parent = nullptr);
+
+private :
+
+  QSlider *m_grandMasterslider;
+  QPushButton *m_blackOutButton;
+  QLabel *m_grandMasterLabel;
+
 };
 
 #endif // KEYPADWIDGET_H
