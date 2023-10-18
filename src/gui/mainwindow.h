@@ -22,7 +22,6 @@
 #include <QList>
 #include <QPushButton>
 #include "universewidget.h"
-#include "playbackwidget.h"
 //#include "sequencerwidget.h"
 #include "valuesliderswidget.h"
 //#include "valuetablewidget.h"

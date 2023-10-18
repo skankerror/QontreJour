@@ -119,7 +119,6 @@ protected :
 
 class LeveledValue;
 
-
 class RootValue
     : public DmxValue
 {

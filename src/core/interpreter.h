@@ -35,43 +35,43 @@ public :
 
   void recieveData(KeypadButton t_button);
 
-  QList<id> getL_selectedChannels() const
-  { return m_L_selectedChannels; }
+  void setLastSelectedChannelId(id t_lastSelectedChannelId)
+  { m_lastSelectedChannelId = t_lastSelectedChannelId; }
 
-  void setL_selectedChannels(const QList<id> &t_L_selectedChannels)
-  { m_L_selectedChannels = t_L_selectedChannels; }
+  void setLastSelectedOutputUidId(const Uid_Id &t_lastSelectedOutputUidId)
+  { m_lastSelectedOutputUidId = t_lastSelectedOutputUidId; }
 
 private :
 
-  void calculateId();
-  void calculateFloat();
-  void selectId();
-  void selectOutput();
-  void selectThru();
-  void selectPlus();
-  void selectMoins();
+  void clearAllSelections();
+  bool calculateChannelId();
+  bool calculateOutputUidId();
+  bool calculateFloatTime();
 
 signals :
 
-  void addSelection(QList<id> t_L_id);
-  void removeSelection(QList<id> t_L_id);
+  void addChannelSelection(QList<id> t_L_id);
+  void removeChannelSelection(QList<id> t_L_id);
+  void addOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void removeOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void selectAll();
-  void clearSelection();
+  void clearChannelSelection();
+  void clearOutputSelection();
   void setLevel(dmx t_level);
   void sendError();
+  void sendError_NoValueSpecified();
 
 public slots :
 
 
 private :
 
-  int m_valueCount = 0;
+//  int m_valueCount = 0;
   bool m_isValued = false;
   QList<KeypadButton> m_L_digits;
-  id m_tempID;
-  id m_lastSelectedId;
-  float m_tempFloat;
-  QList<id> m_L_selectedChannels;
+  id m_lastSelectedChannelId = NO_ID;
+  Uid_Id m_lastSelectedOutputUidId = NULL_UID_ID;
+  float m_tempFloat = 0.0f;
 
 };
 

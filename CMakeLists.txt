@@ -62,8 +62,6 @@ set(PROJECT_SOURCES
 #        src/gui/valuetablewidget.cpp
         src/gui/valuesliderswidget.h
         src/gui/valuesliderswidget.cpp
-        src/gui/playbackwidget.h
-        src/gui/playbackwidget.cpp
 #        src/gui/valueeditwidget.h
 #        src/gui/valueeditwidget.cpp
         src/gui/keypadwidget.h

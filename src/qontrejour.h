@@ -98,6 +98,7 @@ enum KeypadButton
   Plus, Moins, Clear, All, Thru,
   Pluspc, Moinspc, Arobase,
   Step, Goto,
+  Help,
   UnknownButton
 };
 

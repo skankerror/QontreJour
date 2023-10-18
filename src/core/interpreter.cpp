@@ -17,6 +17,7 @@
 
 #include "interpreter.h"
 #include <QDebug>
+#include <QtMath>
 
 Interpreter::Interpreter(QObject *parent)
     : QObject{parent}
@@ -26,83 +27,194 @@ void Interpreter::recieveData(KeypadButton t_button)
 {
   if (t_button == KeypadButton::All)
   {
-    m_valueCount = 0;
-    m_isValued = false;
-    m_L_selectedChannels.squeeze();
-    m_L_selectedChannels.clear();
-    m_L_digits.squeeze();
-    m_L_digits.clear();
+    clearAllSelections();
+    m_lastSelectedChannelId = NO_ID;
+    m_lastSelectedOutputUidId = NULL_UID_ID;
     emit selectAll();
     return;
   }
 
   if (t_button == KeypadButton::Clear)
   {
-    m_valueCount = 0;
-    m_isValued = false;
-    m_L_selectedChannels.squeeze();
-    m_L_selectedChannels.clear();
-    m_L_digits.squeeze();
-    m_L_digits.clear();
-    emit clearSelection();
+    clearAllSelections();
+    m_lastSelectedChannelId = NO_ID;
+    m_lastSelectedOutputUidId = NULL_UID_ID;
+    emit clearChannelSelection();
+    emit clearOutputSelection();
     return;
   }
 
-  if ((m_valueCount == 0)
+  if (!m_isValued
       && (t_button > KeypadButton::Dot)) // no value yet and it's not value
   {
     emit sendError(); // syntax error
     return;
   }
 
-
   // if it's a value
   if (t_button <= KeypadButton::Dot)
   {
     // we add to list
     m_L_digits.append(t_button);
+    m_isValued = true;
     return;
   }
 
   // it's not a value.
+  QList<id> L_channelsToSelect;
+  QList<Uid_Id> L_outputsToSelect;
   switch (t_button)
   {
-  case KeypadButton::Channel : calculateId(); selectId(); break;
-  case KeypadButton::Output : calculateId(); selectId(); break;
-  case KeypadButton::Thru : calculateId(); selectThru(); break;
-  case KeypadButton::Plus : calculateId(); selectPlus(); break;
-  case KeypadButton::Moins : calculateId(); selectMoins(); break;
+  case KeypadButton::Channel :
+    if (calculateChannelId())
+    {
+      clearAllSelections();
+      L_channelsToSelect.append(m_lastSelectedChannelId);
+      emit clearChannelSelection();
+      emit addChannelSelection(L_channelsToSelect);
+    }
+    break;
+  case KeypadButton::Output :
+    if (calculateOutputUidId());
+    {
+      clearAllSelections();
+      L_outputsToSelect.append(m_lastSelectedOutputUidId);
+      emit clearOutputSelection();
+      emit addOutputSelection(L_outputsToSelect);
+    }
+    break;
+  case KeypadButton::Thru :
+    if (m_lastSelectedChannelId != NO_ID)
+    {
+      id lastSelectedChannelId = m_lastSelectedChannelId;
+      if (calculateChannelId())
+      {
+        int decay = m_lastSelectedChannelId - lastSelectedChannelId;
+        if (decay > 0)
+          for (id i = lastSelectedChannelId;
+               i <= m_lastSelectedChannelId;
+               i++)
+            L_channelsToSelect.append(i);
+        if (decay < 0 )
+          for (id i = lastSelectedChannelId;
+               i <= m_lastSelectedChannelId;
+               i--)
+            L_channelsToSelect.append(i);
+        clearAllSelections();
+        emit addChannelSelection(L_channelsToSelect);
+      }
+    }
+    else if (!(m_lastSelectedOutputUidId == NULL_UID_ID))
+    {
+      // déterminer si c'est le même univers
+      Uid_Id lastSelectedOutputUidId = m_lastSelectedOutputUidId;
+      if (calculateOutputUidId())
+        if (lastSelectedOutputUidId.getUniverseID()
+            == m_lastSelectedOutputUidId.getUniverseID())
+        {
+          int decay = lastSelectedOutputUidId.getOutputID()
+                      - m_lastSelectedOutputUidId.getOutputID();
+          if (decay > 0)
+            for (id i = lastSelectedOutputUidId.getOutputID();
+                 i <= m_lastSelectedOutputUidId.getOutputID();
+                 i++)
+              L_outputsToSelect.append(Uid_Id(lastSelectedOutputUidId.getUniverseID()
+                                              , i));
+          if (decay < 0 )
+            for (id i = lastSelectedOutputUidId.getOutputID();
+                 i <= m_lastSelectedOutputUidId.getOutputID();
+                 i--)
+              L_outputsToSelect.append(Uid_Id(lastSelectedOutputUidId.getUniverseID()
+                                              , i));
+          clearAllSelections();
+          emit addOutputSelection(L_outputsToSelect);
+        }
+    }
+    break;
+  case KeypadButton::Plus :
+    if (m_lastSelectedChannelId != NO_ID)
+    {
+      if (calculateChannelId())
+      {
+        L_channelsToSelect.append(m_lastSelectedChannelId);
+        emit addChannelSelection(L_channelsToSelect);
+      }
+    }
+    else if (!(m_lastSelectedOutputUidId == NULL_UID_ID))
+    {
+      if (calculateOutputUidId())
+      {
+        L_outputsToSelect.append(m_lastSelectedOutputUidId);
+        clearAllSelections();
+        emit addOutputSelection(L_outputsToSelect);
+      }
+    }
+    break;
+  case KeypadButton::Moins :
+    if (m_lastSelectedChannelId != NO_ID)
+    {
+      if (calculateChannelId())
+      {
+        L_channelsToSelect.append(m_lastSelectedChannelId);
+        clearAllSelections();
+        emit removeChannelSelection(L_channelsToSelect);
+      }
+    }
+    else if (!(m_lastSelectedOutputUidId == NULL_UID_ID))
+    {
+      if (calculateOutputUidId())
+      {
+        L_outputsToSelect.append(m_lastSelectedOutputUidId);
+        clearAllSelections();
+        emit removeOutputSelection(L_outputsToSelect);
+      }
+    }
+    break;
   default : break;
   }
 }
 
-void Interpreter::calculateId()
+void Interpreter::clearAllSelections()
 {
-
+  m_isValued = false;
+  m_L_digits.squeeze();
+  m_L_digits.clear();
 }
 
-void Interpreter::calculateFloat()
+bool Interpreter::calculateChannelId()
 {
+  // find first dot
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
 
+  m_lastSelectedChannelId = 0;
+
+  auto i = m_L_digits.indexOf(KeypadButton::Dot);
+  if (i > -1)
+    m_L_digits.remove(i, m_L_digits.size() - i);
+
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    m_lastSelectedChannelId += digit * qPow(10, i);
+    qDebug() << m_lastSelectedChannelId;
+  }
+  return true;
 }
 
-void Interpreter::selectId()
+bool Interpreter::calculateOutputUidId()
 {
-
+  return true;
 }
 
-void Interpreter::selectThru()
+bool Interpreter::calculateFloatTime()
 {
-
+  return true;
 }
 
-void Interpreter::selectPlus()
-{
-
-}
-
-void Interpreter::selectMoins()
-{
-
-}
 

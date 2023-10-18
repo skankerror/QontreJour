@@ -208,32 +208,32 @@ void KeypadWidget::populateWidget()
   /**********************************************/
 
   auto delayoutButton = new PushButton("d out", this);
-  layout->addWidget(delayoutButton, 4, 0);
+  layout->addWidget(delayoutButton, 5, 0);
   connect(delayoutButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Delayout); });
 
   auto dotButton = new PushButton(".", this);
-  layout->addWidget(dotButton, 4, 1);
+  layout->addWidget(dotButton, 5, 1);
   connect(dotButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Dot); });
 
   auto zeroButton = new PushButton("0", this);
-  layout->addWidget(zeroButton, 4, 2);
+  layout->addWidget(zeroButton, 5, 2);
   connect(zeroButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Zero); });
 
   auto clearButton = new PushButton("C", this);
-  layout->addWidget(clearButton, 4, 3);
+  layout->addWidget(clearButton, 5, 3);
   connect(clearButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Clear); });
 
   auto allButton = new PushButton("all", this);
-  layout->addWidget(allButton, 4, 4);
+  layout->addWidget(allButton, 5, 4);
   connect(allButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::All); });
 
   auto moinsButton = new PushButton("-", this);
-  layout->addWidget(moinsButton, 4, 5);
+  layout->addWidget(moinsButton, 5, 5);
   connect(moinsButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Moins); });
 
