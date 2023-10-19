@@ -46,6 +46,7 @@ private :
   void clearAllSelections();
   bool calculateChannelId();
   bool calculateOutputUidId();
+  dmx calculateDmx();
   bool calculateFloatTime();
 
 signals :

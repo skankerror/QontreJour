@@ -96,7 +96,7 @@ void UniverseWidget::Connect()
   {
     auto driverString = m_dmxDriversComboBox->currentText();
     auto deviceString = m_dmxDevicesComboBox->currentText();
-    if (MANAGER->hwConnect(DmxManager::HwOutput,
+    if (MANAGER->hwConnect(HwPortType::HwOutput,
                            driverString,
                            deviceString,
                            0, // first output...

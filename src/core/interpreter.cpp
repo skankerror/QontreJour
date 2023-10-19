@@ -170,6 +170,26 @@ void Interpreter::recieveData(KeypadButton t_button)
       }
     }
     break;
+  case KeypadButton::Arobase :
+    emit setLevel(calculateDmx());
+    break;
+  case KeypadButton::Pluspc :
+  case KeypadButton::Moinspc :
+  case KeypadButton::Time :
+  case KeypadButton::Timein :
+  case KeypadButton::Timeout :
+  case KeypadButton::Delayin :
+  case KeypadButton::Delayout :
+  case KeypadButton::Cue :
+  case KeypadButton::Group :
+  case KeypadButton::Record :
+  case KeypadButton::Update :
+  case KeypadButton::Delete :
+  case KeypadButton::Patch :
+  case KeypadButton::Unpatch :
+  case KeypadButton::Step :
+  case KeypadButton::Goto :
+  case KeypadButton::Help :
   default : break;
   }
 }
@@ -183,7 +203,6 @@ void Interpreter::clearAllSelections()
 
 bool Interpreter::calculateChannelId()
 {
-  // find first dot
   if (!m_isValued)
   {
     emit sendError_NoValueSpecified();
@@ -192,6 +211,7 @@ bool Interpreter::calculateChannelId()
 
   m_lastSelectedChannelId = 0;
 
+  // find first dot
   auto i = m_L_digits.indexOf(KeypadButton::Dot);
   if (i > -1)
     m_L_digits.remove(i, m_L_digits.size() - i);
@@ -209,7 +229,85 @@ bool Interpreter::calculateChannelId()
 
 bool Interpreter::calculateOutputUidId()
 {
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
+
+  m_lastSelectedOutputUidId = NULL_UID_ID;
+  uid universeId = 0;
+
+  // find first dot
+  auto index = m_L_digits.indexOf(KeypadButton::Dot);
+
+  if (index != -1) // a universe is precised
+  {
+    int count = m_L_digits.count(KeypadButton::Dot);
+    if (count > 1) // there are other dots
+    { // we erase all others dot and their following digits
+      auto lastIndex = m_L_digits.lastIndexOf(KeypadButton::Dot);
+      while (lastIndex != index)
+      {
+        m_L_digits.remove(lastIndex,
+                          m_L_digits.size() - lastIndex);
+      }
+    }
+    for (int i = 0;
+         i < m_L_digits.size() - 1 - index;
+         i++)
+    {
+      KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+      universeId += digit * qPow(10, i);
+      qDebug() << "uid" << universeId;
+    }
+    // now we erase dot and following digits
+    m_L_digits.remove(index,
+                      m_L_digits.size() - index);
+
+  }
+  m_lastSelectedOutputUidId.setUniverseID(universeId);
+
+  // now don't have any dots in list, only output id
+  id outputId = 0;
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    outputId += digit * qPow(10, i);
+    qDebug() << outputId;
+  }
+  m_lastSelectedOutputUidId.setOutputID(outputId);
+
   return true;
+}
+
+dmx Interpreter::calculateDmx()
+{
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return NULL_DMX;
+  }
+
+  dmx level = NULL_DMX;
+
+  // find first dot
+  auto i = m_L_digits.indexOf(KeypadButton::Dot);
+  if (i > -1)
+    m_L_digits.remove(i, m_L_digits.size() - i);
+
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    level += digit * qPow(10, i);
+    qDebug() << level;
+  }
+  return (level > 255) ?
+             255 :  level;
 }
 
 bool Interpreter::calculateFloatTime()

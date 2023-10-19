@@ -47,7 +47,6 @@ DmxManager::DmxManager(QObject *parent)
 
   // start with straight patch between our channels
   // and outputs from 1st universe
-
   setStraightPatch(0); // patch first universe
 
   m_dmxEngine = new DmxEngine(m_rootChannelGroup,
@@ -57,6 +56,7 @@ DmxManager::DmxManager(QObject *parent)
                               this);
 
   m_interpreter = new Interpreter(this);
+  connectInterpreter();
 
 }
 
@@ -76,7 +76,7 @@ void DmxManager::testingMethod()
   getChannelGroup(0)->setLevel(100);
   getChannelGroup(0)->setLevel(0);
 
-  connectValueToWidget(DmxManager::DmxSlider,
+  connectValueToWidget(WidgetType::DmxSlider,
                        0,
                        ValueType::ChannelGroup,
                        0);
@@ -252,90 +252,57 @@ void DmxManager::connectOutputs()
   }
 }
 
-void DmxManager::submasterToEngine(id t_id,
-                                   dmx t_level)
+void DmxManager::connectInterpreter()
 {
-  m_dmxEngine->getGroupEngine()->groupLevelChanged(t_id,
-                                                   t_level);
-}
+  connect(m_interpreter,
+          &Interpreter::addChannelSelection,
+          this,
+          &DmxManager::onAddChannelSelection);
 
-void DmxManager::directChannelToEngine(id t_id,
-                                       dmx t_level)
-{
-  m_dmxEngine->getChannelEngine()->onChannelLevelChangedFromDirectChannel(t_id,
-                                                                          t_level);
-}
+  connect(m_interpreter,
+          &Interpreter::removeChannelSelection,
+          this,
+          &DmxManager::onRemoveChannelSelection);
 
-void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)
-{
-  m_interpreter->recieveData(t_buttonType);
-//  switch (t_buttonType)
-//  {
-//  case 0 : case 1 : case 2 : case 3 : case 4 : case 5 : case 6 : case 7 : case 8 : case 9 :
-//  m_interpreter->addDigit(t_buttonType); break;
-//  case Dot : m_interpreter->addDot(); break;
-//  case Clear : m_interpreter->clear(); break;
-//  case Time :
-//    break;
-//  case Timein :
-//    break;
-//  case Timeout :
-//    break;
-//  case Delayin :
-//    break;
-//  case Delayout :
-//    break;
-//  case Channel :
-//    break;
-//  case Cue :
-//    break;
-//  case Group :
-//    break;
-//  case Record :
-//    break;
-//  case Update :
-//    break;
-//  case Delete :
-//    break;
-//  case Patch :
-//    break;
-//  case Unpatch :
-//    break;
-//  case Output :
-//    break;
-//  case Plus :
-//    break;
-//  case Moins :
-//    break;
-//  case Pluspc :
-//    break;
-//  case Moinspc :
-//    break;
-//  case Arobase :
-//    break;
-//  case Thru :
-//    break;
-//  case Enter :
-//    break;
-//  case All :
-//    break;
-//  default :
-//    break;
-//  }
-}
+  connect(m_interpreter,
+          &Interpreter::addOutputSelection,
+          this,
+          &DmxManager::onAddOutputSelection);
 
-void DmxManager::onOutputRequest(uid t_uid,
-                                 id t_id,
-                                 dmx t_level)
-{
-  m_hwManager->writeData(t_uid,
-                         t_id,
-                         t_level);
+  connect(m_interpreter,
+          &Interpreter::removeOutputSelection,
+          this,
+          &DmxManager::onRemoveOutputSelection);
 
-  qDebug() << "write uid :"  << t_uid
-           << "id :" << t_id
-           << "level :" << t_level;
+  connect(m_interpreter,
+          &Interpreter::selectAll,
+          this,
+          &DmxManager::onSelectAll);
 
+  connect(m_interpreter,
+          &Interpreter::clearChannelSelection,
+          this,
+          &DmxManager::onClearChannelSelection);
+
+  connect(m_interpreter,
+          &Interpreter::clearOutputSelection,
+          this,
+          &DmxManager::onClearOutputSelection);
+
+  connect(m_interpreter,
+          &Interpreter::setLevel,
+          this,
+          &DmxManager::onSetLevel);
+
+  connect(m_interpreter,
+          &Interpreter::sendError,
+          this,
+          &DmxManager::onSendError);
+
+  connect(m_interpreter,
+          &Interpreter::sendError_NoValueSpecified,
+          this,
+          &DmxManager::onSendError_NoValueSpecified);
 }
 
 void DmxManager::setStraightPatch(const uid t_uid)
@@ -603,6 +570,133 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   auto driver = m_hwManager->driver(t_driverString);
   driver->setEnabled(true);
   return driver->availableDevices();
+}
+
+void DmxManager::submasterToEngine(id t_id,
+                                   dmx t_level)
+{
+  m_dmxEngine->getGroupEngine()->groupLevelChanged(t_id,
+                                                   t_level);
+}
+
+void DmxManager::directChannelToEngine(id t_id,
+                                       dmx t_level)
+{
+  m_dmxEngine->getChannelEngine()->onChannelLevelChangedFromDirectChannel(t_id,
+                                                                          t_level);
+}
+
+void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)
+{
+  m_interpreter->recieveData(t_buttonType);
+}
+
+
+void DmxManager::onOutputRequest(uid t_uid,
+                                 id t_id,
+                                 dmx t_level)
+{
+  m_hwManager->writeData(t_uid,
+                         t_id,
+                         t_level);
+
+  qDebug() << "write uid :"  << t_uid
+           << "id :" << t_id
+           << "level :" << t_level;
+
+}
+
+void DmxManager::onAddChannelSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    id channelId = t_L_id.at(i);
+    if (m_L_channelsIdSelection.indexOf(channelId) == -1)
+    {
+      m_L_channelsIdSelection.append(channelId);
+      emit ChannelSelectionChanged();
+    }
+  }
+}
+
+void DmxManager::onRemoveChannelSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    id channelId = t_L_id.at(i);
+    int index = m_L_channelsIdSelection.indexOf(channelId);
+    if (index != -1)
+    {
+      m_L_channelsIdSelection.remove(index);
+      emit ChannelSelectionChanged();
+    }
+  }
+}
+
+void DmxManager::onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id)
+{
+  for (qsizetype i = 0;
+       i < t_L_Uid_Id.size();
+       i++)
+  {
+    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
+    if (m_L_outputUid_IdSelection.indexOf(outputUid_Id) == -1)
+    {
+      m_L_outputUid_IdSelection.append(outputUid_Id);
+    }
+  }
+}
+
+void DmxManager::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
+{
+  for (qsizetype i = 0;
+       i < t_L_Uid_Id.size();
+       i++)
+  {
+    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
+    int index = m_L_outputUid_IdSelection.indexOf(outputUid_Id);
+    if (index != -1)
+    {
+      m_L_outputUid_IdSelection.remove(index);
+    }
+  }
+}
+
+void DmxManager::onSelectAll()
+{
+
+}
+
+void DmxManager::onClearChannelSelection()
+{
+  m_L_channelsIdSelection.clear();
+  m_L_channelsIdSelection.squeeze();
+  emit ChannelSelectionChanged();
+}
+
+void DmxManager::onClearOutputSelection()
+{
+  m_L_outputUid_IdSelection.clear();
+  m_L_outputUid_IdSelection.squeeze();
+}
+
+void DmxManager::onSetLevel(dmx t_level)
+{
+
+}
+
+void DmxManager::onSendError()
+{
+
+}
+
+void DmxManager::onSendError_NoValueSpecified()
+{
+
 }
 
 

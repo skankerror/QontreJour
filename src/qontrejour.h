@@ -88,6 +88,8 @@ typedef float time_f;
 #define DEFAULT_CHANNEL_NAME "CH"
 #define DEFAULT_GROUP_NAME "GROUP"
 
+#define BUTTON_WIDTH_MAX 55
+
 enum KeypadButton
 {
   Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Dot,
@@ -126,6 +128,17 @@ enum ChannelDataFlag
   UnknownFlag
 };
 
-#define BUTTON_WIDTH_MAX 55
+enum HwPortType
+{
+  HwInput,
+  HwOutput
+};
+
+enum WidgetType
+{
+  DmxSlider,
+  DmxTableView,
+  UnknownWidgetType
+};
 
 #endif // QONTREJOUR_H

@@ -35,22 +35,10 @@ class DmxManager
 {
 
   Q_OBJECT
+  Q_ENUM(HwPortType)
+  Q_ENUM(WidgetType)
 
 public :
-
-  enum HwPortType
-  {
-    HwInput,
-    HwOutput
-  }; Q_ENUM(HwPortType)
-
-  enum WidgetType
-  {
-    DmxSlider,
-    DmxTableView,
-    UnknownWidgetType
-  }; Q_ENUM(WidgetType)
-
 
   static DmxManager *instance();
 
@@ -67,10 +55,6 @@ public :
   RootValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
   DmxChannelGroup *getChannelGroup(id t_groupId);
   int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
-
-  // create everything we need
-  bool createUniverse(uid t_universeID);
-  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
 
   // patch interface
   void setStraightPatch(const uid t_uid); // one universe
@@ -91,7 +75,7 @@ public :
   void clearChannelListPatch(QList<DmxChannel *> t_L_channel);
 
   // hardware connection
-  bool hwConnect(DmxManager::HwPortType t_type,
+  bool hwConnect(HwPortType t_type,
                  QString &t_driver,
                  QString &t_device,
                  quint8 t_port,
@@ -100,7 +84,7 @@ public :
 
   // widget connections
   // connect values with widget
-  void connectValueToWidget(DmxManager::WidgetType t_widgetType,
+  void connectValueToWidget(WidgetType t_widgetType,
                             int t_widgetID,
                             ValueType t_valueType,
                             id t_valueID);
@@ -109,11 +93,17 @@ public :
 private :
 
   explicit DmxManager(QObject *parent = nullptr);
+
+  // create everything we need
+  bool createUniverse(uid t_universeID);
+  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
+
   QList<QDmxDriver *> getAvailableDrivers() const;
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
   RootValue *getRootOutput(const uid t_uid) const;
   QList<RootValue *> getL_rootOutput() const;
   void connectOutputs();
+  void connectInterpreter();
 
 signals :
 
@@ -125,6 +115,8 @@ signals :
                                            id valueID);
   void disconnectChannelToDirectChannelSlider(int t_sliderID);
 
+  void ChannelSelectionChanged();
+
 public slots :
 
   void submasterToEngine(id t_id,
@@ -135,9 +127,22 @@ public slots :
 
 private slots :
 
+  // connected to ?
   void onOutputRequest(uid t_uid,
                        id t_id,
                        dmx t_level);
+  // connected to interpreter
+  void onAddChannelSelection(QList<id> t_L_id);
+  void onRemoveChannelSelection(QList<id> t_L_id);
+  void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void onSelectAll();
+  void onClearChannelSelection();
+  void onClearOutputSelection();
+  void onSetLevel(dmx t_level);
+  void onSendError();
+  void onSendError_NoValueSpecified();
+
 
 private :
 
@@ -148,6 +153,10 @@ private :
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
+
+  // members for interpreter
+  QList<id> m_L_channelsIdSelection;
+  QList<Uid_Id> m_L_outputUid_IdSelection;
 
 };
 
