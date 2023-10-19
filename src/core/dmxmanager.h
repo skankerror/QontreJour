@@ -103,7 +103,7 @@ private :
   RootValue *getRootOutput(const uid t_uid) const;
   QList<RootValue *> getL_rootOutput() const;
   void connectOutputs();
-  void connectInterpreter();
+  void connectInterpreterToEngine();
 
 signals :
 
@@ -115,7 +115,7 @@ signals :
                                            id valueID);
   void disconnectChannelToDirectChannelSlider(int t_sliderID);
 
-  void ChannelSelectionChanged();
+//  void ChannelSelectionChanged();
 
 public slots :
 
@@ -131,18 +131,6 @@ private slots :
   void onOutputRequest(uid t_uid,
                        id t_id,
                        dmx t_level);
-  // connected to interpreter
-  void onAddChannelSelection(QList<id> t_L_id);
-  void onRemoveChannelSelection(QList<id> t_L_id);
-  void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
-  void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
-  void onSelectAll();
-  void onClearChannelSelection();
-  void onClearOutputSelection();
-  void onSetLevel(dmx t_level);
-  void onSendError();
-  void onSendError_NoValueSpecified();
-
 
 private :
 
@@ -153,10 +141,6 @@ private :
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
-
-  // members for interpreter
-  QList<id> m_L_channelsIdSelection;
-  QList<Uid_Id> m_L_outputUid_IdSelection;
 
 };
 

@@ -43,7 +43,7 @@ public :
 
 private :
 
-  void clearAllSelections();
+  void clearValue();
   bool calculateChannelId();
   bool calculateOutputUidId();
   dmx calculateDmx();

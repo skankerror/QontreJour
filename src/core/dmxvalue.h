@@ -257,8 +257,6 @@ public :
 
   ~DmxChannel();
 
-//  ChannelFlag getChannelFlag() const{ return m_flag; }
-
   // controled values
   QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
   DmxOutput *getControledOutput(const id t_index);
@@ -268,7 +266,6 @@ public :
   // setters
   void setL_controledOutput(const QList<DmxOutput *> &t_L_controledOutput)
   { m_L_controledOutput = t_L_controledOutput; }
-//  void setChannelFlag(const DmxChannel::ChannelFlag t_flag){ m_flag = t_flag; }
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutput(Uid_Id t_Uid_Id);

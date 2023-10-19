@@ -276,6 +276,8 @@ public slots :
 
   void onChannelLevelChanged(id t_channelId,
                              dmx t_level);
+  void onDirectOutputLevelChanged(Uid_Id t_uid_id,
+                                  dmx t_level);
 private :
 
   QList<RootValue *> m_L_rootOutput;
@@ -305,11 +307,34 @@ public :
   ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
   OutputEngine *getOutputEngine() const{ return m_outputEngine; }
 
+signals :
+
+  void ChannelSelectionChanged();
+
+public slots :
+
+  // connected to interpreter
+  void onAddChannelSelection(QList<id> t_L_id);
+  void onRemoveChannelSelection(QList<id> t_L_id);
+  void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void onSelectAll();
+  void onClearChannelSelection();
+  void onClearOutputSelection();
+  void onSetLevel(dmx t_level);
+  void onSendError();
+  void onSendError_NoValueSpecified();
+
 private :
 
   ChannelGroupEngine *m_groupEngine;
   ChannelEngine *m_channelEngine;
   OutputEngine *m_outputEngine;
+
+  // members for interpreter
+  QList<id> m_L_channelsIdSelection;
+  QList<Uid_Id> m_L_outputUid_IdSelection;
+  SelectionType m_selType = SelectionType::UnknownSelectionType;
 
 };
 

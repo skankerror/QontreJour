@@ -141,4 +141,11 @@ enum WidgetType
   UnknownWidgetType
 };
 
+enum SelectionType
+{
+  ChannelSelectionType,
+  OutputSelectionType,
+  UnknownSelectionType
+};
+
 #endif // QONTREJOUR_H

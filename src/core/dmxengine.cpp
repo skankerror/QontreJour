@@ -293,6 +293,15 @@ void OutputEngine::onChannelLevelChanged(id t_channelId,
   }
 }
 
+void OutputEngine::onDirectOutputLevelChanged(Uid_Id t_uid_id,
+                                              dmx t_level)
+{
+    auto rootOutput = m_L_rootOutput.at(t_uid_id.getUniverseID());
+    auto output = rootOutput->getChildValue(t_uid_id.getOutputID());
+    output->setLevel(t_level);
+
+}
+
 /******************************* DmxEngine ***************************/
 
 DmxEngine::DmxEngine(RootValue *t_rootGroup,
@@ -333,3 +342,123 @@ DmxEngine::~DmxEngine()
   m_outputEngine->deleteLater();
 }
 
+void DmxEngine::onAddChannelSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    id channelId = t_L_id.at(i);
+    if (m_L_channelsIdSelection.indexOf(channelId) == -1)
+    {
+      m_L_channelsIdSelection.append(channelId);
+      emit ChannelSelectionChanged();
+    }
+  }
+  m_selType = SelectionType::ChannelSelectionType;
+}
+
+void DmxEngine::onRemoveChannelSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    id channelId = t_L_id.at(i);
+    int index = m_L_channelsIdSelection.indexOf(channelId);
+    if (index != -1)
+    {
+      m_L_channelsIdSelection.remove(index);
+      emit ChannelSelectionChanged();
+    }
+  }
+}
+
+void DmxEngine::onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id)
+{
+  for (qsizetype i = 0;
+       i < t_L_Uid_Id.size();
+       i++)
+  {
+    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
+    if (m_L_outputUid_IdSelection.indexOf(outputUid_Id) == -1)
+    {
+      m_L_outputUid_IdSelection.append(outputUid_Id);
+    }
+  }
+  m_selType = SelectionType::OutputSelectionType;
+}
+
+void DmxEngine::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
+{
+  for (qsizetype i = 0;
+       i < t_L_Uid_Id.size();
+       i++)
+  {
+    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
+    int index = m_L_outputUid_IdSelection.indexOf(outputUid_Id);
+    if (index != -1)
+    {
+      m_L_outputUid_IdSelection.remove(index);
+    }
+  }
+}
+
+void DmxEngine::onSelectAll()
+{
+
+}
+
+void DmxEngine::onClearChannelSelection()
+{
+  m_L_channelsIdSelection.clear();
+  m_L_channelsIdSelection.squeeze();
+  emit ChannelSelectionChanged();
+}
+
+void DmxEngine::onClearOutputSelection()
+{
+  m_L_outputUid_IdSelection.clear();
+  m_L_outputUid_IdSelection.squeeze();
+}
+
+void DmxEngine::onSetLevel(dmx t_level)
+{
+  // we have a peoblem
+  if (m_selType == SelectionType::UnknownSelectionType)
+  {
+    qDebug() << "error unknown selection type";
+    return;
+  }
+  // that's channel
+  if (m_selType == SelectionType::ChannelSelectionType)
+  {
+    for (qsizetype i = 0;
+         i < m_L_channelsIdSelection.size();
+         i++)
+    {
+      m_channelEngine->onChannelLevelChangedFromDirectChannel(m_L_channelsIdSelection.at(i),
+                                                              t_level);
+    }
+    return;
+  }
+  // so that' output
+  for (qsizetype i = 0;
+       i < m_L_outputUid_IdSelection.size();
+       i++)
+  {
+    m_outputEngine->onDirectOutputLevelChanged(m_L_outputUid_IdSelection.at(i),
+                                               t_level);
+  }
+  return;
+}
+
+void DmxEngine::onSendError()
+{
+  qDebug() << "error from interpreter";
+}
+
+void DmxEngine::onSendError_NoValueSpecified()
+{
+  qDebug() << "error from interpreter no value specified";
+}

@@ -56,7 +56,7 @@ DmxManager::DmxManager(QObject *parent)
                               this);
 
   m_interpreter = new Interpreter(this);
-  connectInterpreter();
+  connectInterpreterToEngine();
 
 }
 
@@ -252,57 +252,57 @@ void DmxManager::connectOutputs()
   }
 }
 
-void DmxManager::connectInterpreter()
+void DmxManager::connectInterpreterToEngine()
 {
   connect(m_interpreter,
           &Interpreter::addChannelSelection,
-          this,
-          &DmxManager::onAddChannelSelection);
+          m_dmxEngine,
+          &DmxEngine::onAddChannelSelection);
 
   connect(m_interpreter,
           &Interpreter::removeChannelSelection,
-          this,
-          &DmxManager::onRemoveChannelSelection);
+          m_dmxEngine,
+          &DmxEngine::onRemoveChannelSelection);
 
   connect(m_interpreter,
           &Interpreter::addOutputSelection,
-          this,
-          &DmxManager::onAddOutputSelection);
+          m_dmxEngine,
+          &DmxEngine::onAddOutputSelection);
 
   connect(m_interpreter,
           &Interpreter::removeOutputSelection,
-          this,
-          &DmxManager::onRemoveOutputSelection);
+          m_dmxEngine,
+          &DmxEngine::onRemoveOutputSelection);
 
   connect(m_interpreter,
           &Interpreter::selectAll,
-          this,
-          &DmxManager::onSelectAll);
+          m_dmxEngine,
+          &DmxEngine::onSelectAll);
 
   connect(m_interpreter,
           &Interpreter::clearChannelSelection,
-          this,
-          &DmxManager::onClearChannelSelection);
+          m_dmxEngine,
+          &DmxEngine::onClearChannelSelection);
 
   connect(m_interpreter,
           &Interpreter::clearOutputSelection,
-          this,
-          &DmxManager::onClearOutputSelection);
+          m_dmxEngine,
+          &DmxEngine::onClearOutputSelection);
 
   connect(m_interpreter,
           &Interpreter::setLevel,
-          this,
-          &DmxManager::onSetLevel);
+          m_dmxEngine,
+          &DmxEngine::onSetLevel);
 
   connect(m_interpreter,
           &Interpreter::sendError,
-          this,
-          &DmxManager::onSendError);
+          m_dmxEngine,
+          &DmxEngine::onSendError);
 
   connect(m_interpreter,
           &Interpreter::sendError_NoValueSpecified,
-          this,
-          &DmxManager::onSendError_NoValueSpecified);
+          m_dmxEngine,
+          &DmxEngine::onSendError_NoValueSpecified);
 }
 
 void DmxManager::setStraightPatch(const uid t_uid)
@@ -605,98 +605,4 @@ void DmxManager::onOutputRequest(uid t_uid,
            << "level :" << t_level;
 
 }
-
-void DmxManager::onAddChannelSelection(QList<id> t_L_id)
-{
-  for (qsizetype i = 0;
-       i < t_L_id.size();
-       i++)
-  {
-    id channelId = t_L_id.at(i);
-    if (m_L_channelsIdSelection.indexOf(channelId) == -1)
-    {
-      m_L_channelsIdSelection.append(channelId);
-      emit ChannelSelectionChanged();
-    }
-  }
-}
-
-void DmxManager::onRemoveChannelSelection(QList<id> t_L_id)
-{
-  for (qsizetype i = 0;
-       i < t_L_id.size();
-       i++)
-  {
-    id channelId = t_L_id.at(i);
-    int index = m_L_channelsIdSelection.indexOf(channelId);
-    if (index != -1)
-    {
-      m_L_channelsIdSelection.remove(index);
-      emit ChannelSelectionChanged();
-    }
-  }
-}
-
-void DmxManager::onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id)
-{
-  for (qsizetype i = 0;
-       i < t_L_Uid_Id.size();
-       i++)
-  {
-    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
-    if (m_L_outputUid_IdSelection.indexOf(outputUid_Id) == -1)
-    {
-      m_L_outputUid_IdSelection.append(outputUid_Id);
-    }
-  }
-}
-
-void DmxManager::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
-{
-  for (qsizetype i = 0;
-       i < t_L_Uid_Id.size();
-       i++)
-  {
-    Uid_Id outputUid_Id = t_L_Uid_Id.at(i);
-    int index = m_L_outputUid_IdSelection.indexOf(outputUid_Id);
-    if (index != -1)
-    {
-      m_L_outputUid_IdSelection.remove(index);
-    }
-  }
-}
-
-void DmxManager::onSelectAll()
-{
-
-}
-
-void DmxManager::onClearChannelSelection()
-{
-  m_L_channelsIdSelection.clear();
-  m_L_channelsIdSelection.squeeze();
-  emit ChannelSelectionChanged();
-}
-
-void DmxManager::onClearOutputSelection()
-{
-  m_L_outputUid_IdSelection.clear();
-  m_L_outputUid_IdSelection.squeeze();
-}
-
-void DmxManager::onSetLevel(dmx t_level)
-{
-
-}
-
-void DmxManager::onSendError()
-{
-
-}
-
-void DmxManager::onSendError_NoValueSpecified()
-{
-
-}
-
 

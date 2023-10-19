@@ -161,7 +161,6 @@ void DirectChannelWidget::populateWidget()
             MANAGER,
             SLOT(directChannelToEngine(id,dmx)));
 
-
     m_L_sliders.append(directChannelSlider);
   }
 
@@ -334,11 +333,6 @@ void ValueSlider::updateLevel(int t_level)
 {
   if (t_level < 0) t_level = 0;
   if (t_level > 255) t_level = 255;
-//  if (m_dmxValue->getLevel() == t_level) return;
-
-  // TODO faire appel à l'engine plutôt
-//  m_dmxValue->setLevel(t_level);
-
   emit valueSliderMoved(m_ID,
                         t_level);
 }

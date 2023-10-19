@@ -27,7 +27,7 @@ void Interpreter::recieveData(KeypadButton t_button)
 {
   if (t_button == KeypadButton::All)
   {
-    clearAllSelections();
+    clearValue();
     m_lastSelectedChannelId = NO_ID;
     m_lastSelectedOutputUidId = NULL_UID_ID;
     emit selectAll();
@@ -36,11 +36,21 @@ void Interpreter::recieveData(KeypadButton t_button)
 
   if (t_button == KeypadButton::Clear)
   {
-    clearAllSelections();
+    clearValue();
     m_lastSelectedChannelId = NO_ID;
     m_lastSelectedOutputUidId = NULL_UID_ID;
     emit clearChannelSelection();
     emit clearOutputSelection();
+    return;
+  }
+
+  if (t_button == KeypadButton::Pluspc)
+  {
+    return;
+  }
+
+  if (t_button == KeypadButton::Moinspc)
+  {
     return;
   }
 
@@ -68,7 +78,7 @@ void Interpreter::recieveData(KeypadButton t_button)
   case KeypadButton::Channel :
     if (calculateChannelId())
     {
-      clearAllSelections();
+      clearValue();
       L_channelsToSelect.append(m_lastSelectedChannelId);
       emit clearChannelSelection();
       emit addChannelSelection(L_channelsToSelect);
@@ -77,7 +87,7 @@ void Interpreter::recieveData(KeypadButton t_button)
   case KeypadButton::Output :
     if (calculateOutputUidId());
     {
-      clearAllSelections();
+      clearValue();
       L_outputsToSelect.append(m_lastSelectedOutputUidId);
       emit clearOutputSelection();
       emit addOutputSelection(L_outputsToSelect);
@@ -100,7 +110,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                i <= m_lastSelectedChannelId;
                i--)
             L_channelsToSelect.append(i);
-        clearAllSelections();
+        clearValue();
         emit addChannelSelection(L_channelsToSelect);
       }
     }
@@ -126,7 +136,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                  i--)
               L_outputsToSelect.append(Uid_Id(lastSelectedOutputUidId.getUniverseID()
                                               , i));
-          clearAllSelections();
+          clearValue();
           emit addOutputSelection(L_outputsToSelect);
         }
     }
@@ -145,7 +155,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateOutputUidId())
       {
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
-        clearAllSelections();
+        clearValue();
         emit addOutputSelection(L_outputsToSelect);
       }
     }
@@ -156,7 +166,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateChannelId())
       {
         L_channelsToSelect.append(m_lastSelectedChannelId);
-        clearAllSelections();
+        clearValue();
         emit removeChannelSelection(L_channelsToSelect);
       }
     }
@@ -165,16 +175,15 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateOutputUidId())
       {
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
-        clearAllSelections();
+        clearValue();
         emit removeOutputSelection(L_outputsToSelect);
       }
     }
     break;
   case KeypadButton::Arobase :
     emit setLevel(calculateDmx());
+    clearValue();
     break;
-  case KeypadButton::Pluspc :
-  case KeypadButton::Moinspc :
   case KeypadButton::Time :
   case KeypadButton::Timein :
   case KeypadButton::Timeout :
@@ -194,7 +203,7 @@ void Interpreter::recieveData(KeypadButton t_button)
   }
 }
 
-void Interpreter::clearAllSelections()
+void Interpreter::clearValue()
 {
   m_isValued = false;
   m_L_digits.squeeze();
