@@ -56,10 +56,10 @@ set(PROJECT_SOURCES
         src/gui/mainwindow.cpp
         src/gui/universewidget.h
         src/gui/universewidget.cpp
-#        src/gui/sequencerwidget.h
-#        src/gui/sequencerwidget.cpp
-#        src/gui/valuetablewidget.h
-#        src/gui/valuetablewidget.cpp
+        src/gui/sequencerwidget.h
+        src/gui/sequencerwidget.cpp
+        src/gui/valuetablewidget.h
+        src/gui/valuetablewidget.cpp
         src/gui/valuesliderswidget.h
         src/gui/valuesliderswidget.cpp
 #        src/gui/valueeditwidget.h

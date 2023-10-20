@@ -30,39 +30,20 @@
 ValueTableWidget::ValueTableWidget(QWidget *parent)
   : QWidget(parent),
     m_tableView(new ValueTableView(this)),
-    m_model(new ValueTableModel(this)),
-    m_universeSpinBox(new QSpinBox(this)),
-    m_selectAll(new QPushButton("All", this)),
-    m_recGroup(new QPushButton("Rec Group", this)),
-    m_recScene(new QPushButton("Rec Scene", this)),
-    m_clearSelectionButton(new QPushButton("C", this))
+    m_model(new ValueTableModel(this))
 {
   setRootValue(MANAGER
-               ->getRootChannel(0));
+               ->getRootChannel());
 
   auto totalLayout = new QVBoxLayout();
-  auto headerLayout = new QHBoxLayout();
-  auto bottomLayout = new QHBoxLayout();
+//  auto headerLayout = new QHBoxLayout();
+//  auto bottomLayout = new QHBoxLayout();
 
-  auto label = new QLabel("Channels on Universe :", this);
+//  auto label = new QLabel("Channels on Universe :", this);
 
-  // TODO : not good because this widget appear in edit windows
-  // after first instanciation
-  m_universeSpinBox->setMaximum(1);// at the beginning ther's only one universe
-  m_universeSpinBox->setMinimum(1);// there's always at least one universe
-
-  headerLayout->addStretch();
-  headerLayout->addWidget(label);
-  headerLayout->addWidget(m_universeSpinBox);
-  bottomLayout->addStretch();
-  bottomLayout->addWidget(m_selectAll);
-  bottomLayout->addWidget(m_recGroup);
-  bottomLayout->addWidget(m_recScene);
-  bottomLayout->addWidget(m_clearSelectionButton);
-
-  totalLayout->addLayout(headerLayout);
+//  totalLayout->addLayout(headerLayout);
   totalLayout->addWidget(m_tableView);
-  totalLayout->addLayout(bottomLayout);
+//  totalLayout->addLayout(bottomLayout);
 
   setLayout(totalLayout);
 
@@ -76,66 +57,12 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
-
-  connect(m_universeSpinBox,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(onSpinboxSelected(int)));
-
-  connect (m_clearSelectionButton,
-           SIGNAL(clicked(bool)),
-           m_model,
-           SLOT(clearSelectionList()));
-
-  connect(m_selectAll,
-          SIGNAL(clicked(bool)),
-          m_model,
-          SLOT(selectAll()));
-
-  connect(m_recGroup,
-          SIGNAL(clicked(bool)),
-          m_model,
-          SLOT(recordGroup()));
-
 }
 
 ValueTableWidget::~ValueTableWidget()
 {}
 
-void ValueTableWidget::hideRecButtons()
-{
-  m_recGroup->hide();
-  m_recScene->hide();
-}
-
-void ValueTableWidget::onUniverseCountChanged(int t_universeCount)
-{
-  m_universeCount = t_universeCount;
-  m_universeSpinBox->setMaximum(t_universeCount);
-  m_tableView->resizeColumnsToContents();
-  m_tableView->resizeRowsToContents();
-
-}
-
-void ValueTableWidget::setUniverseID(const uid t_ID)
-{
-  m_model->setUniverseID(t_ID);
-
-  disconnect(m_universeSpinBox,
-             SIGNAL(valueChanged(int)),
-             this,
-             SLOT(onSpinboxSelected(int)));
-
-  m_universeSpinBox->setValue(t_ID + 1);
-
-  connect(m_universeSpinBox,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(onSpinboxSelected(int)));
-
-}
-
-void ValueTableWidget::setRootValue(DmxValue *t_rootValue)
+void ValueTableWidget::setRootValue(RootValue *t_rootValue)
 {
   // we connect to update views
   auto L_dmxChannel = t_rootValue->getL_childValue();
@@ -146,21 +73,10 @@ void ValueTableWidget::setRootValue(DmxValue *t_rootValue)
     DmxValue *value = item;
 
     connect(value,
-            SIGNAL(levelChanged(DmxValue::SignalSenderType,dmx)),
+            SIGNAL(levelChanged(id,dmx)),
             this,
             SLOT(repaintTableView()));
   }
-}
-
-void ValueTableWidget::setRootValueFromUid(uid t_uid)
-{
-  setRootValue(MANAGER
-               ->getRootChannel(t_uid));
-}
-
-void ValueTableWidget::onSpinboxSelected(int t_universeID)
-{
-  emit askForUniverseChanged(t_universeID - 1);
 }
 
 void ValueTableWidget::repaintTableView()
@@ -300,17 +216,6 @@ void ValueTableModel::selectAll()
   editedIndexChanged();
 }
 
-void ValueTableModel::recordGroup()
-{
-  auto L_channel = getValuesFromIndexList(getEditedIndexes());
-//  auto newGroup = MANAGER->createChannelGroup(L_channel);
-//  auto groupEditWidget = new ValueEditWidget(newGroup);
-  auto groupEditWidget = new ValueEditWidget(DmxValue::ChannelGroup,
-                                             L_channel);
-  groupEditWidget->show();
-
-}
-
 void ValueTableModel::editedIndexChanged()
 {
   // we try to change the background of selected channels
@@ -351,11 +256,11 @@ QVariant ValueTableModel::data(const QModelIndex &index,
   {
     int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
         + index.column();
-    if (valueID < 0 || valueID >= m_rootValue->getL_ChildValueSize())
+    if (valueID < 0 || valueID >= m_rootValue->getL_childValueSize())
       return QVariant();
 
     auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-    DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
+    ChannelDataFlag flag = static_cast<DmxChannel *>(dmxValue)->getChannelDataFlag();
 
     switch(role)
     {
@@ -372,22 +277,22 @@ QVariant ValueTableModel::data(const QModelIndex &index,
     case Qt::ForegroundRole :
       switch(flag)
       {
-      case DmxValue::SelectedSceneFlag :
+      case ChannelDataFlag::SelectedSceneFlag :
         return QBrush(QColor(LIGHT_GREEN_COLOR));
         break;
-      case DmxValue::DirectChannelFlag :
+      case ChannelDataFlag::DirectChannelFlag :
         return QBrush(QColor(LIGHT_YELLOW_COLOR));
         break;
-      case DmxValue::ChannelGroupFlag :
+      case ChannelDataFlag::ChannelGroupFlag :
         return QBrush(QColor(LIGHT_BLUE_COLOR));
         break;
-      case DmxValue::ParkedFlag :
+      case ChannelDataFlag::ParkedFlag :
         return QBrush(QColor(RED_COLOR));
         break;
-      case DmxValue::IndependantFlag :
+      case ChannelDataFlag::IndependantFlag :
         return QBrush(QColor(PURPLE_COLOR));
         break;
-      case DmxValue::UnknownFlag :
+      case ChannelDataFlag::UnknownFlag :
         return QBrush(QColor(LIGHT_GREY_COLOR));
         break;
       default:
@@ -446,13 +351,13 @@ QVariant ValueTableModel::filterData(const QModelIndex &index, int role) const
       return QVariant();
 
     auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
-    DmxValue::ChannelFlag flag = dmxValue->getChannelFlag();
+    ChannelDataFlag flag = static_cast<DmxChannel *>(dmxValue)->getChannelDataFlag();
 
     switch(role)
     {
     case Qt::DisplayRole :
     case Qt::EditRole :
-      return dmxValue->getLevel();
+      return static_cast<LeveledValue *>(dmxValue)->getLevel();
       break;
     case Qt::TextAlignmentRole :
       return Qt::AlignCenter;
@@ -463,22 +368,22 @@ QVariant ValueTableModel::filterData(const QModelIndex &index, int role) const
     case Qt::ForegroundRole :
       switch(flag)
       {
-      case DmxValue::SelectedSceneFlag :
+      case ChannelDataFlag::SelectedSceneFlag :
         return QBrush(QColor(LIGHT_GREEN_COLOR));
         break;
-      case DmxValue::DirectChannelFlag :
+      case ChannelDataFlag::DirectChannelFlag :
         return QBrush(QColor(LIGHT_YELLOW_COLOR));
         break;
-      case DmxValue::ChannelGroupFlag :
+      case ChannelDataFlag::ChannelGroupFlag :
         return QBrush(QColor(LIGHT_BLUE_COLOR));
         break;
-      case DmxValue::ParkedFlag :
+      case ChannelDataFlag::ParkedFlag :
         return QBrush(QColor(RED_COLOR));
         break;
-      case DmxValue::IndependantFlag :
+      case ChannelDataFlag::IndependantFlag :
         return QBrush(QColor(PURPLE_COLOR));
         break;
-      case DmxValue::UnknownFlag :
+      case ChannelDataFlag::UnknownFlag :
         return QBrush(QColor(LIGHT_GREY_COLOR));
         break;
       default:
@@ -533,10 +438,13 @@ bool ValueTableModel::setData(const QModelIndex &index,
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
 //  auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
-  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
+//  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
   // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
-  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-                     value.toInt());
+//  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
+//                     value.toInt());
+
+  MANAGER->directChannelToEngine(valueID,
+                                 value.toInt());
 
   emit dataChanged(index,index);
 
@@ -552,8 +460,8 @@ bool ValueTableModel::setFilterData(const QModelIndex &index, const QVariant &va
       + index.column();
   auto dmxValue = m_rootValue->getL_childValue().at(valueID);
   // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
-  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-                     value.toInt());
+//  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
+//                     value.toInt());
 
   emit dataChanged(index,index);
 
@@ -578,7 +486,7 @@ bool ValueTableModel::setHeaderData(int section,
 
 Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
 {
-  // TODO : handle universe with less than 512 channel
+  // TODO : with less than 512 channel ?
   if (!index.isValid())
     return Qt::NoItemFlags;
 
@@ -597,7 +505,7 @@ DmxValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
 {
   int valueID = (((t_index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + t_index.column();
-  if (valueID < 0 || valueID >= m_rootValue->getL_ChildValueSize())
+  if (valueID < 0 || valueID >= m_rootValue->getL_childValueSize())
     return nullptr;
 
   return m_rootValue->getL_childValue().at(valueID);

@@ -112,9 +112,9 @@ enum ValueType
   ChannelType, // stored in root
   RootChannelGroup, // stored in manager
   ChannelGroup, // stored in root
-  Sequence,
+  SequenceType,
   MainScene,
-  SubScene,
+  SubSceneType,
   UnknownValueType
 };
 
@@ -146,6 +146,19 @@ enum SelectionType
   ChannelSelectionType,
   OutputSelectionType,
   UnknownSelectionType
+};
+
+enum HeaderField
+{
+  StepField,
+  IDField,
+  NameField,
+  NoteField,
+  InField,
+  OutField,
+  DelayInField,
+  DelayOutField,
+  HeaderFieldCount
 };
 
 #endif // QONTREJOUR_H

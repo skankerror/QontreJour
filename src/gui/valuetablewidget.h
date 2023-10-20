@@ -44,39 +44,23 @@ public :
 
   virtual ~ValueTableWidget();
 
-  // for value edit widget
-  void hideRecButtons();
-
   ValueTableModel *getModel() const{ return m_model; }
 
 signals :
 
-  void askForUniverseChanged(int); // universeID to ask to mainwindow
 
 public slots :
 
-  void onUniverseCountChanged(int t_universeCount);
-  void setUniverseID(const uid t_ID);
-  void setRootValue(DmxValue *t_rootValue);
-
-  void setRootValueFromUid(uid t_uid);
+  void setRootValue(RootValue *t_rootValue);
 
 protected slots :
 
-  void onSpinboxSelected(int t_universeID);
   void repaintTableView();
 
 protected :
 
   ValueTableView *m_tableView;
   ValueTableModel *m_model;
-
-  QSpinBox *m_universeSpinBox;
-  QPushButton *m_selectAll;
-  QPushButton *m_recGroup;
-  QPushButton *m_recScene;
-  QPushButton *m_clearSelectionButton;
-  int m_universeCount;
 
 };
 
@@ -135,7 +119,7 @@ public :
 
 public slots :
 
-  void setRootValue(DmxValue *t_rootValue){ m_rootValue = t_rootValue; }
+  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
   void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
   void setEditedIndexes(const QModelIndexList &t_editedIndexes);
 
@@ -143,9 +127,6 @@ public slots :
 
   void clearSelectionList();
   void selectAll();
-  void recordGroup();
-
-//private slots :
 
   //public because we need this edit widgets
   void editedIndexChanged();
@@ -186,7 +167,7 @@ private :
 protected :
 
   uid m_universeID;
-  DmxValue *m_rootValue;
+  RootValue *m_rootValue;
   QModelIndexList m_editedIndexes;
 
 };

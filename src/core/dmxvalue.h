@@ -113,6 +113,7 @@ protected :
   QString m_name = "Unknow Value";
   ValueType m_type = UnknownValueType;
 
+
 };
 
 /********************************* ROOTVALUE *************************************/
@@ -262,10 +263,14 @@ public :
   DmxOutput *getControledOutput(const id t_index);
   dmx getControledOutputLevel(const id t_index);
   int getL_controledOutputSize() const{ return m_L_controledOutput.size(); }
+  ChannelDataFlag getChannelDataFlag() const
+  { return m_channelDataFlag; }
 
   // setters
   void setL_controledOutput(const QList<DmxOutput *> &t_L_controledOutput)
   { m_L_controledOutput = t_L_controledOutput; }
+  void setChannelDataFlag(ChannelDataFlag t_channelDataFlag)
+  { m_channelDataFlag = t_channelDataFlag; }
 
   void addOutput(DmxOutput *t_dmxOutput);
   void addOutput(Uid_Id t_Uid_Id);
@@ -276,9 +281,11 @@ public :
   void removeOutputList(const QList<Uid_Id> t_L_Uid_Id);
   void clearControledOutput();
 
+
 private :
 
   QList<DmxOutput *>m_L_controledOutput;
+  ChannelDataFlag m_channelDataFlag = ChannelDataFlag::UnknownFlag;
 
 };
 Q_DECLARE_METATYPE(DmxChannel)

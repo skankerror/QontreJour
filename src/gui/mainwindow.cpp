@@ -23,8 +23,8 @@
 
 
 MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent),/*
-    m_channelTableWidget(new ValueTableWidget(this)),*/
+  : QMainWindow(parent),
+    m_channelTableWidget(new ValueTableWidget(this)),
     m_directChannelWidget(new DirectChannelWidget(this)),
     m_universeWidgetContainerLayout(new QVBoxLayout())
 {
@@ -85,32 +85,20 @@ QWidget *MainWindow::createUniverseContainerWidget()
 
 void MainWindow::createDockWidgets()
 {
-//  auto sequencerWidget = new SequencerWidget(this);
+  auto sequencerWidget = new SequencerWidget(this);
 
-//  auto rightDock = new QDockWidget(this);
-//  auto rightDockWidget = new QWidget(rightDock);
-//  auto layout = new QVBoxLayout();
-//  layout->addWidget(grandMasterWidget);
-//  layout->addWidget(playbackWidget);
-//  rightDockWidget->setLayout(layout);
-//  rightDock->setAllowedAreas(Qt::RightDockWidgetArea);
-//  rightDock->setWidget(rightDockWidget);
-//  rightDock->setFeatures(QDockWidget::DockWidgetFloatable);
-//  addDockWidget(Qt::RightDockWidgetArea, rightDock);
+  auto topDock = new QDockWidget(this);
+  topDock->setAllowedAreas(Qt::TopDockWidgetArea);
+  topDock->setWidget(sequencerWidget);
+  topDock->setFeatures(QDockWidget::DockWidgetFloatable);
+  addDockWidget(Qt::TopDockWidgetArea, topDock);
 
-//  auto topDock = new QDockWidget(this);
-//  topDock->setAllowedAreas(Qt::TopDockWidgetArea);
-//  topDock->setWidget(sequencerWidget);
-//  topDock->setFeatures(QDockWidget::DockWidgetFloatable);
-//  addDockWidget(Qt::TopDockWidgetArea, topDock);
-
-//  auto bottomDock = new QDockWidget();
-//  m_channelTableWidget->setRootValueFromUid(0);
-//  m_channelTableWidget->setUniverseID(0);
-//  bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-//  bottomDock->setWidget(m_channelTableWidget);
-//  bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
-//  addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
+  auto bottomDock = new QDockWidget();
+  m_channelTableWidget->setRootValue(MANAGER->getRootChannel());
+  bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+  bottomDock->setWidget(m_channelTableWidget);
+  bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);
+  addDockWidget(Qt::BottomDockWidgetArea, bottomDock);
 
   auto manager = MANAGER;
   auto keypadWidget = new KeypadWidget(this);

@@ -26,18 +26,18 @@
 
 class DmxScene;
 
-class RootScene :
-    public DmxValue
+class Sequence :
+    public RootValue
 {
 
   Q_OBJECT
 
 public :
 
-  explicit RootScene(ValueType t_type = Sequence,
-                     DmxValue *t_parent = nullptr);
+  explicit Sequence(ValueType t_type = ValueType::SequenceType,
+                    DmxValue *t_parent = nullptr);
 
-  ~RootScene();
+  ~Sequence();
 
 private :
 
@@ -46,19 +46,22 @@ private :
 };
 
 /****************************** DmxScene *****************************/
+class SubScene;
 
 class DmxScene :
-    public DmxValue
+    public LeveledValue
 {
 
   Q_OBJECT
 
 public :
 
-  explicit DmxScene(/*DmxValue::*/ValueType t_type = MainScene,
-                    RootScene *t_parent = nullptr);
+  explicit DmxScene(ValueType t_type = ValueType::MainScene,
+                    Sequence *t_parent = nullptr);
 
   virtual ~DmxScene();
+
+  void addSubScene(SubScene *t_subScene);
 
   // getters
   QString getNotes() const{ return m_notes; }
@@ -66,9 +69,10 @@ public :
   time_f getTimeOut() const{ return m_timeOut; }
   time_f getDelayIn() const{ return m_delayIn; }
   time_f getDelayOut() const{ return m_delayOut; }
-  id getStepNumber() const{ return m_ID; }
+  id getStepNumber() const{ return LeveledValue::getID(); }
   sceneID_f getSceneID() const{ return m_sceneID; }
-  RootScene *getSequence() const{ return m_sequence; }
+  Sequence *getSequence() const{ return m_sequence; }
+  QList<SubScene *> getL_subScene() const{ return m_L_subScene; }
 
   // setters
   void setNotes(const QString &t_notes){ m_notes = t_notes; }
@@ -77,8 +81,10 @@ public :
   void setDelayIn(time_f t_delayIn){ m_delayIn = t_delayIn; }
   void setDelayOut(time_f t_delayOut){ m_delayOut = t_delayOut; }
   void setSceneID(sceneID_f t_sceneID){ m_sceneID = t_sceneID; }
-  void setStepNumber(id t_stepNumber){ m_ID = t_stepNumber; }
-  void setSequence(RootScene *t_sequence){ m_sequence = t_sequence; }
+  void setStepNumber(id t_stepNumber){ LeveledValue::setID(t_stepNumber); }
+  void setSequence(Sequence *t_sequence){ m_sequence = t_sequence; }
+  void setL_subScene(const QList<SubScene *> &t_L_subScene)
+  { m_L_subScene = t_L_subScene; }
 
 protected :
 
@@ -89,12 +95,33 @@ protected :
   time_f m_delayIn;
   time_f m_delayOut;
 
-  RootScene *m_sequence;
+  Sequence *m_sequence;
+  QList<SubScene *> m_L_subScene;
 
 };
 
 /*************************** DmxSubScene *******************************/
 
+class SubScene :
+    public DmxScene
+{
+  Q_OBJECT
+
+public :
+
+  explicit SubScene(ValueType t_type = ValueType::SubSceneType,
+                    DmxScene *t_parent = nullptr);
+
+  DmxScene *getParentScene() const
+  { return m_parentScene; }
+
+  void setParentScene(DmxScene *t_parentScene)
+  { m_parentScene = t_parentScene; }
+
+protected :
+
+  DmxScene *m_parentScene;
+};
 
 
 #endif // DMXSCENE_H

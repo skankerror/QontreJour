@@ -41,7 +41,7 @@ public :
                            QWidget *parent = nullptr);
 
   // cstr for new group
-  explicit ValueEditWidget(DmxValue::ValueType t_type,
+  explicit ValueEditWidget(ValueType t_type,
                            QList<DmxValue *> t_L_value,
                            QWidget *parent = nullptr);
 

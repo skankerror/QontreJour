@@ -74,18 +74,6 @@ class SequencerTreeModel
 
 public :
 
-  enum HeaderField
-  {
-    StepField,
-    IDField,
-    NameField,
-    NoteField,
-    InField,
-    OutField,
-    DelayInField,
-    DelayOutField,
-    HeaderFieldCount
-  };
   Q_ENUM(HeaderField)
 
   explicit SequencerTreeModel(QAbstractItemModel *parent = nullptr);
@@ -93,12 +81,11 @@ public :
   virtual ~SequencerTreeModel();
 
   DmxScene *getScene(const QModelIndex &index) const;
-
-  DmxScene *getRootItem() const{ return m_rootItem; }
+  Sequence *getRootItem() const{ return m_rootItem; }
 
 public slots :
 
-  void setRootItem(DmxScene *t_rootItem){ m_rootItem = t_rootItem; }
+  void setRootItem(Sequence *t_rootItem){ m_rootItem = t_rootItem; }
 
 protected :
 
@@ -118,7 +105,7 @@ protected :
 
 protected :
 
-  DmxScene *m_rootItem;
+  Sequence *m_rootItem;
 
 };
 

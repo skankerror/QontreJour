@@ -234,6 +234,7 @@ void ChannelEngine::update(id t_id)
   auto channel = GET_CHANNEL(t_id);
   channelData->update();
   channel->setLevel(channelData->getActual_Level());
+  channel->setChannelDataFlag(channelData->getFlag());
 }
 
 void ChannelEngine::onChannelLevelChangedFromGroup(id t_id,
@@ -424,7 +425,7 @@ void DmxEngine::onClearOutputSelection()
 
 void DmxEngine::onSetLevel(dmx t_level)
 {
-  // we have a peoblem
+  // we have a problem
   if (m_selType == SelectionType::UnknownSelectionType)
   {
     qDebug() << "error unknown selection type";
@@ -442,7 +443,7 @@ void DmxEngine::onSetLevel(dmx t_level)
     }
     return;
   }
-  // so that' output
+  // so that's output
   for (qsizetype i = 0;
        i < m_L_outputUid_IdSelection.size();
        i++)

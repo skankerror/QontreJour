@@ -20,13 +20,13 @@
 
 /****************************** RootScene ****************************/
 
-RootScene::RootScene(ValueType t_type,
-                     DmxValue *t_parent)
-  : DmxValue(t_type,
-             t_parent)
+Sequence::Sequence(ValueType t_type,
+                   DmxValue *t_parent)
+  : RootValue(t_type,
+              t_parent)
 {}
 
-RootScene::~RootScene()
+Sequence::~Sequence()
 {
   m_L_childScene.clear();
   m_L_childScene.squeeze();
@@ -34,15 +34,27 @@ RootScene::~RootScene()
 
 /****************************** DmxScene *****************************/
 
-DmxScene::DmxScene(ValueType t_type,
-                   RootScene *t_parent)
-  : DmxValue(t_type,
-             t_parent),
+DmxScene::DmxScene(ValueType t_type, Sequence *t_parent)
+    : LeveledValue(ValueType::MainScene,
+                   t_parent),
     m_sequence(t_parent)
 {}
 
 DmxScene::~DmxScene()
 {}
 
+void DmxScene::addSubScene(SubScene *t_subScene)
+{
+  // TODO : vérifier, lui donner une id...
+  m_L_subScene.append(t_subScene);
+}
 
+/*************************** DmxSubScene *******************************/
 
+SubScene::SubScene(ValueType t_type,
+                   DmxScene *t_parent)
+    : DmxScene(t_type,
+               t_parent->getSequence())
+{
+  setParentScene(t_parent);
+}

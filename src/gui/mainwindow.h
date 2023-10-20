@@ -22,9 +22,9 @@
 #include <QList>
 #include <QPushButton>
 #include "universewidget.h"
-//#include "sequencerwidget.h"
+#include "sequencerwidget.h"
 #include "valuesliderswidget.h"
-//#include "valuetablewidget.h"
+#include "valuetablewidget.h"
 
 
 class MainWindow
@@ -56,7 +56,7 @@ private :
   QVBoxLayout *m_universeWidgetContainerLayout;
   QList<UniverseWidget *> m_L_universeWidget;
 
-//  ValueTableWidget *m_channelTableWidget;
+  ValueTableWidget *m_channelTableWidget;
 
 };
 #endif // MAINWINDOW_H

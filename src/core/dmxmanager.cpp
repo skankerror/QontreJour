@@ -58,6 +58,8 @@ DmxManager::DmxManager(QObject *parent)
   m_interpreter = new Interpreter(this);
   connectInterpreterToEngine();
 
+  // TEST
+//  testingMethod();
 }
 
 void DmxManager::testingMethod()
