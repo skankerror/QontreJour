@@ -37,7 +37,8 @@ class SequencerWidget
 
 public :
 
-  explicit SequencerWidget(QWidget *parent = nullptr);
+  explicit SequencerWidget(Sequence *t_seq,
+                           QWidget *parent = nullptr);
 
   virtual ~SequencerWidget();
 
@@ -76,11 +77,12 @@ public :
 
   Q_ENUM(HeaderField)
 
-  explicit SequencerTreeModel(QAbstractItemModel *parent = nullptr);
+  explicit SequencerTreeModel(Sequence *t_seq,
+                              QAbstractItemModel *parent = nullptr);
 
   virtual ~SequencerTreeModel();
 
-  DmxScene *getScene(const QModelIndex &index) const;
+  DmxValue *getDmxValue(const QModelIndex &index) const;
   Sequence *getRootItem() const{ return m_rootItem; }
 
 public slots :

@@ -44,6 +44,8 @@ public :
 
   ~DmxManager();
 
+  // TODO : creer les methodes pour ajouter des sequences
+
   // getters
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
@@ -55,6 +57,7 @@ public :
   RootValue *getRootChannelGroup() const{ return m_rootChannelGroup; }
   DmxChannelGroup *getChannelGroup(id t_groupId);
   int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
+  QList<Sequence *> getL_sequence() const{ return m_L_sequence; }
 
   // patch interface
   void setStraightPatch(const uid t_uid); // one universe
@@ -141,6 +144,7 @@ private :
   QList<DmxUniverse *> m_L_universe;
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
+  QList<Sequence *> m_L_sequence;
 
 };
 

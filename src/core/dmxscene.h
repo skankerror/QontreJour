@@ -39,6 +39,15 @@ public :
 
   ~Sequence();
 
+  QList<DmxScene *> getL_childScene() const{ return m_L_childScene; }
+  DmxScene *getScene(id t_step);
+  DmxScene *getScene(sceneID_f t_id);
+  int getSize() const{ return m_L_childScene.size() ;}
+
+  void addScene(DmxScene *t_scene);
+  void setL_childScene(const QList<DmxScene *> &t_L_childScene)
+  { m_L_childScene = t_L_childScene; }
+
 private :
 
   QList<DmxScene *> m_L_childScene;

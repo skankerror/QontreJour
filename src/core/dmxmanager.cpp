@@ -58,8 +58,13 @@ DmxManager::DmxManager(QObject *parent)
   m_interpreter = new Interpreter(this);
   connectInterpreterToEngine();
 
+  auto sequence = new Sequence();
+  sequence->setID(0);
+  sequence->setName("Main Sequence");
+  m_L_sequence.append(sequence);
+
   // TEST
-//  testingMethod();
+  testingMethod();
 }
 
 void DmxManager::testingMethod()
@@ -82,6 +87,20 @@ void DmxManager::testingMethod()
                        0,
                        ValueType::ChannelGroup,
                        0);
+
+  auto mainSeq = m_L_sequence.at(0);
+  auto name = QString("accueil public");
+  auto scene = new DmxScene(ValueType::MainScene,
+                            mainSeq);
+  scene->setID(10);
+  scene->setName(name);
+  scene->setTimeIn(5.0);
+  scene->setTimeOut(5.0);
+  scene->setDelayIn(0);
+  scene->setDelayOut(0);
+  scene->setParentValue(mainSeq);
+  scene->setStepNumber(0);
+  mainSeq->addScene(scene);
 
 }
 

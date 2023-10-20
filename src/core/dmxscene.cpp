@@ -32,6 +32,25 @@ Sequence::~Sequence()
   m_L_childScene.squeeze();
 }
 
+DmxScene *Sequence::getScene(id t_step)
+{
+  if (t_step < m_L_childScene.size())
+    return m_L_childScene.at(t_step);
+
+  return nullptr;
+}
+
+DmxScene *Sequence::getScene(sceneID_f t_id)
+{
+
+}
+
+void Sequence::addScene(DmxScene *t_scene)
+{
+  // TODO
+  m_L_childScene.append(t_scene);
+}
+
 /****************************** DmxScene *****************************/
 
 DmxScene::DmxScene(ValueType t_type, Sequence *t_parent)

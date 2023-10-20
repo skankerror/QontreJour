@@ -32,9 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
 
   createCentralWidget();
   createDockWidgets();
-
-//  MANAGER->testingMethod();
-
 }
 
 MainWindow::~MainWindow()
@@ -85,7 +82,9 @@ QWidget *MainWindow::createUniverseContainerWidget()
 
 void MainWindow::createDockWidgets()
 {
-  auto sequencerWidget = new SequencerWidget(this);
+
+  auto sequencerWidget = new SequencerWidget(MANAGER->getL_sequence().at(0),
+                                             this);
 
   auto topDock = new QDockWidget(this);
   topDock->setAllowedAreas(Qt::TopDockWidgetArea);
