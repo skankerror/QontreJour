@@ -92,15 +92,25 @@ void DmxManager::testingMethod()
   auto name = QString("accueil public");
   auto scene = new DmxScene(ValueType::MainScene,
                             mainSeq);
-  scene->setID(10);
   scene->setName(name);
   scene->setTimeIn(5.0);
   scene->setTimeOut(5.0);
   scene->setDelayIn(0);
   scene->setDelayOut(0);
   scene->setParentValue(mainSeq);
-  scene->setStepNumber(0);
   mainSeq->addScene(scene);
+
+  auto scene2 = new DmxScene(ValueType::MainScene,
+                            mainSeq);
+  scene2->setID(10);
+  scene2->setName("bluk");
+  scene2->setTimeIn(4.7);
+  scene2->setTimeOut(5.0);
+  scene2->setDelayIn(0);
+  scene2->setDelayOut(0);
+  scene2->setParentValue(mainSeq);
+  mainSeq->addScene(scene2, 10);
+
 
 }
 

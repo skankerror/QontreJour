@@ -22,7 +22,7 @@
 #include "../qontrejour.h"
 
 
-/****************************** RootScene ****************************/
+/****************************** Sequence ****************************/
 
 class DmxScene;
 
@@ -45,8 +45,25 @@ public :
   int getSize() const{ return m_L_childScene.size() ;}
 
   void addScene(DmxScene *t_scene);
+  void addScene(DmxScene *t_scene,
+                sceneID_f t_id);
+
+  void removeScene(id t_step);
+  void removeScene(sceneID_f);
+
   void setL_childScene(const QList<DmxScene *> &t_L_childScene)
   { m_L_childScene = t_L_childScene; }
+
+signals :
+
+  void seqSizeChanged();
+
+public slots :
+
+private:
+
+  // update from t_step till end
+  void update(id t_step);
 
 private :
 
@@ -58,7 +75,7 @@ private :
 class SubScene;
 
 class DmxScene :
-    public LeveledValue
+    public DmxChannelGroup
 {
 
   Q_OBJECT
@@ -68,7 +85,14 @@ public :
   explicit DmxScene(ValueType t_type = ValueType::MainScene,
                     Sequence *t_parent = nullptr);
 
+  explicit DmxScene(DmxScene &t_scene);
+
   virtual ~DmxScene();
+
+  bool operator <(const DmxScene &t_scene)const;
+  bool operator >(const DmxScene &t_scene)const;
+  bool operator <=(const DmxScene &t_scene)const;
+  bool operator >=(const DmxScene &t_scene)const;
 
   void addSubScene(SubScene *t_subScene);
 
@@ -99,10 +123,10 @@ protected :
 
   sceneID_f m_sceneID;
   QString m_notes;
-  time_f m_timeIn;
-  time_f m_timeOut;
-  time_f m_delayIn;
-  time_f m_delayOut;
+  time_f m_timeIn = 5.0f;
+  time_f m_timeOut = 5.0f;
+  time_f m_delayIn = 0.0f;
+  time_f m_delayOut = 0.0f;
 
   Sequence *m_sequence;
   QList<SubScene *> m_L_subScene;

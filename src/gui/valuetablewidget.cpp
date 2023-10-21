@@ -36,14 +36,7 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
                ->getRootChannel());
 
   auto totalLayout = new QVBoxLayout();
-//  auto headerLayout = new QHBoxLayout();
-//  auto bottomLayout = new QHBoxLayout();
-
-//  auto label = new QLabel("Channels on Universe :", this);
-
-//  totalLayout->addLayout(headerLayout);
   totalLayout->addWidget(m_tableView);
-//  totalLayout->addLayout(bottomLayout);
 
   setLayout(totalLayout);
 

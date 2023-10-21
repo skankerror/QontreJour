@@ -1,19 +1,15 @@
-- établir des noms par défaut aux values :
-
-Root Scene
-Sc %
-SubSc %
-
-- mettre un système pour l'id des scenes.
-ce doit être un double.
-caler par défaut 10 après le dernier chiffre des dizaines sauf en cas de *9.99
-
 - voir à mettre des Shared Data ? Mutex ?
 
+- gérer le master
+- les indépendants
+- mettre ts les sliders en 255 et gérer l'affichage %
+- gérer le rpn en %
+
+- midi
+- osc
 
 
-
-
+- revoir le schéma des connect
 connections :
 engine : group (setlevel)-> groupengine
          groupengine -> channelengine (puis envoie channel->setlevel)

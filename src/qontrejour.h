@@ -113,6 +113,7 @@ enum ValueType
   RootChannelGroup, // stored in manager
   ChannelGroup, // stored in root
   SequenceType,
+  Scene0,
   MainScene,
   SubSceneType,
   UnknownValueType

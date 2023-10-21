@@ -19,25 +19,66 @@
 #include <QLayout>
 #include <QDebug>
 
+/********************** SequencerWidget ****************************/
 
 SequencerWidget::SequencerWidget(Sequence *t_seq,
                                  QWidget *parent)
   : QWidget(parent),
-    m_treeView(new SequencerTreeView(this)),
+    m_treeViewTop(new SequencerTreeView(this)),
+    m_timeWidget(new SequencerTimeWidget(this)),
+    m_treeViewBottom(new SequencerTreeView(this)),
     m_model(new SequencerTreeModel(t_seq))
 {
   auto layout = new QVBoxLayout();
 
-  m_treeView->setModel(m_model);
+  m_treeViewTop->setModel(m_model);
+  m_treeViewBottom->setModel(m_model);
+  m_treeViewBottom->setHeaderHidden(true);
 
-  layout->addWidget(m_treeView);
+  updateTableViews();
+
+  layout->addWidget(m_treeViewTop);
+  layout->addStretch();
+  layout->addWidget(m_timeWidget);
+  layout->addWidget(m_treeViewBottom);
   setLayout(layout);
+
+  connect(t_seq,
+          &Sequence::seqSizeChanged,
+          this,
+          &SequencerWidget::updateTableViews);
 }
 
 SequencerWidget::~SequencerWidget()
 {}
 
-/************************************************************/
+void SequencerWidget::updateTableViews()
+{
+  qsizetype seqSize = m_model->getRootItem()->getL_childScene().size();
+  for (qsizetype i = 1;
+       i < seqSize;
+       i++)
+  {
+    m_treeViewTop->setRowHidden(i,
+                                QModelIndex(),
+                                true);
+  }
+
+  m_treeViewBottom->setRowHidden(0,
+                                 QModelIndex(),
+                                 true);
+
+}
+
+/********************** SequencerTimeWidget**************************/
+
+SequencerTimeWidget::SequencerTimeWidget(QWidget *parent,
+                                         const Qt::WindowFlags &f)
+    : QWidget(parent,
+              f)
+{}
+
+/********************** SequencerTreeView ****************************/
 
 SequencerTreeView::SequencerTreeView(QWidget *parent)
   : QTreeView(parent)
@@ -46,7 +87,7 @@ SequencerTreeView::SequencerTreeView(QWidget *parent)
 SequencerTreeView::~SequencerTreeView()
 {}
 
-/*********************************************************/
+/********************* SequencerTreeModel **************************/
 
 SequencerTreeModel::SequencerTreeModel(Sequence *t_seq,
                                        QAbstractItemModel *parent)
@@ -160,7 +201,7 @@ QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
     switch(col)
     {
     case StepField : return scene->getStepNumber(); break;
-    case IDField : return scene->getID(); break;
+    case IDField : return scene->getSceneID(); break;
     case NameField : return scene->getName(); break;
     case NoteField : return scene->getNotes(); break;
     case InField : return scene->getTimeIn(); break;
@@ -188,7 +229,7 @@ bool SequencerTreeModel::setData(const QModelIndex &index, const QVariant &value
   int col = index.column();
   switch(col)
   {
-  case IDField : scene->setID(value.toInt()); emit dataChanged(index,index); return true; break;
+  case IDField : scene->setSceneID(value.toInt()); emit dataChanged(index,index); return true; break;
   case NameField : scene->setName(value.toString()); emit dataChanged(index,index); return true; break;
   case NoteField : scene->setNotes(value.toString()); emit dataChanged(index,index); return true; break;
   case InField : scene->setTimeIn(value.toFloat()); emit dataChanged(index,index); return true; break;
@@ -262,3 +303,4 @@ Qt::ItemFlags SequencerTreeModel::flags(const QModelIndex &index) const
 
   return QAbstractItemModel::flags(index);
 }
+

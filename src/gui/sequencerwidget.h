@@ -25,9 +25,11 @@
 #include "../core/dmxscene.h"
 
 
+/********************** SequencerWidget ****************************/
+
+class SequencerTimeWidget;
 class SequencerTreeView;
 class SequencerTreeModel;
-
 
 class SequencerWidget
     : public QWidget
@@ -42,14 +44,37 @@ public :
 
   virtual ~SequencerWidget();
 
+public slots :
+
+  void updateTableViews();
+
 protected :
 
-  SequencerTreeView *m_treeView;
+  SequencerTreeView *m_treeViewTop;
+  SequencerTimeWidget *m_timeWidget;
+  SequencerTreeView *m_treeViewBottom;
   SequencerTreeModel *m_model;
 
 };
 
-/******************************************************************/
+/********************** SequencerTimeWidget**************************/
+
+class SequencerTimeWidget
+    : public QWidget
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit SequencerTimeWidget(QWidget *parent = nullptr,
+                               const Qt::WindowFlags &f = Qt::WindowFlags());
+
+
+};
+
+
+/********************** SequencerTreeView ****************************/
 
 class SequencerTreeView
     : public QTreeView
@@ -65,7 +90,7 @@ public :
 
 };
 
-/***************************************************************/
+/********************* SequencerTreeModel **************************/
 
 class SequencerTreeModel
     : public QAbstractItemModel
