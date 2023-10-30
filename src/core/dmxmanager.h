@@ -58,6 +58,8 @@ public :
   DmxChannelGroup *getChannelGroup(id t_groupId);
   int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
   QList<Sequence *> getL_sequence() const{ return m_L_sequence; }
+  Sequence *getMainSequence() const
+  { return m_L_sequence.at(m_mainSeq); }
 
   // patch interface
   void setStraightPatch(const uid t_uid); // one universe
@@ -145,6 +147,7 @@ private :
   RootValue *m_rootChannel;
   RootValue *m_rootChannelGroup;
   QList<Sequence *> m_L_sequence;
+  id m_mainSeq = 0;
 
 };
 

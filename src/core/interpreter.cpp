@@ -16,6 +16,7 @@
  */
 
 #include "interpreter.h"
+#include "dmxmanager.h"
 #include <QDebug>
 #include <QtMath>
 
@@ -30,6 +31,8 @@ void Interpreter::recieveData(KeypadButton t_button)
     clearValue();
     m_lastSelectedChannelId = NO_ID;
     m_lastSelectedOutputUidId = NULL_UID_ID;
+    m_lastSelectedGroupId = NO_ID;
+    m_lastSelectedCueId = 0.0f;
     emit selectAll();
     return;
   }
@@ -39,8 +42,12 @@ void Interpreter::recieveData(KeypadButton t_button)
     clearValue();
     m_lastSelectedChannelId = NO_ID;
     m_lastSelectedOutputUidId = NULL_UID_ID;
+    m_lastSelectedGroupId = NO_ID;
+    m_lastSelectedCueId = 0.0f;
     emit clearChannelSelection();
     emit clearOutputSelection();
+    emit clearGroupSelection();
+    emit clearCueSelection();
     return;
   }
 
@@ -75,6 +82,8 @@ void Interpreter::recieveData(KeypadButton t_button)
   // it's not a value.
   QList<id> L_channelsToSelect;
   QList<Uid_Id> L_outputsToSelect;
+  QList<id> L_groupsToSelect;
+  QList<sceneID_f> L_cuesToSelect;
   switch (t_button)
   {
   case KeypadButton::Channel :
@@ -95,6 +104,24 @@ void Interpreter::recieveData(KeypadButton t_button)
       emit addOutputSelection(L_outputsToSelect);
     }
     break;
+  case KeypadButton::Cue :
+    if (calculateCueId())
+    {
+      clearValue();
+      L_cuesToSelect.append(m_lastSelectedCueId);
+      emit clearCueSelection();
+      emit addCueSelection(L_cuesToSelect);
+    }
+    break;
+  case KeypadButton::Group :
+    if (calculateGroupId())
+    {
+      clearValue();
+      L_groupsToSelect.append(m_lastSelectedGroupId);
+      emit clearGroupSelection();
+      emit addGroupSelection(L_groupsToSelect);
+    }
+    break;
   case KeypadButton::Thru :
     if (m_lastSelectedChannelId != NO_ID)
     {
@@ -107,7 +134,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                i <= m_lastSelectedChannelId;
                i++)
             L_channelsToSelect.append(i);
-        if (decay < 0 )
+        else if (decay < 0 )
           for (id i = lastSelectedChannelId;
                i <= m_lastSelectedChannelId;
                i--)
@@ -132,7 +159,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                  i++)
               L_outputsToSelect.append(Uid_Id(lastSelectedOutputUidId.getUniverseID()
                                               , i));
-          if (decay < 0 )
+          else if (decay < 0 )
             for (id i = lastSelectedOutputUidId.getOutputID();
                  i <= m_lastSelectedOutputUidId.getOutputID();
                  i--)
@@ -142,6 +169,74 @@ void Interpreter::recieveData(KeypadButton t_button)
           emit addOutputSelection(L_outputsToSelect);
         }
     }
+    else if (m_lastSelectedGroupId != NO_ID)
+    {
+      id lastSelectedGroupId = m_lastSelectedGroupId;
+      if (calculateGroupId())
+      {
+        int decay = m_lastSelectedGroupId - lastSelectedGroupId;
+        if (decay > 0)
+          for (id i = lastSelectedGroupId;
+               i <= m_lastSelectedGroupId;
+               i++)
+            L_groupsToSelect.append(i);
+        else if (decay < 0 )
+          for (id i = lastSelectedGroupId;
+               i <= m_lastSelectedGroupId;
+               i--)
+            L_groupsToSelect.append(i);
+        clearValue();
+        emit addGroupSelection(L_groupsToSelect);
+      }
+    }
+    else if (m_lastSelectedCueId != 0)
+    {
+      sceneID_f lastSelectedCueId = m_lastSelectedCueId;
+      if (calculateCueId())
+      {
+        qreal decay_f = m_lastSelectedCueId - lastSelectedCueId;
+        if (decay_f > 0)
+        {
+          auto seq = MANAGER->getMainSequence();
+          auto firstScene = seq->getScene(lastSelectedCueId);
+          if (firstScene)
+          {
+            auto lastScene = seq->getScene(m_lastSelectedCueId);
+            if (lastScene)
+            {
+              for (id i = firstScene->getStepNumber();
+                   i < lastScene->getStepNumber();
+                   i++)
+              {
+                L_cuesToSelect.append(seq->getScene(i)->getSceneID());
+              }
+              clearValue();
+              emit addCueSelection(L_cuesToSelect);
+            }
+          }
+        }
+        else if (decay_f < 0)
+        {
+          auto seq = MANAGER->getMainSequence();
+          auto firstScene = seq->getScene(m_lastSelectedCueId);
+          if (firstScene)
+          {
+            auto lastScene = seq->getScene(lastSelectedCueId);
+            if (lastScene)
+            {
+              for (id i = firstScene->getStepNumber();
+                   i < lastScene->getStepNumber();
+                   i++)
+              {
+                L_cuesToSelect.append(seq->getScene(i)->getSceneID());
+              }
+              clearValue();
+              emit addCueSelection(L_cuesToSelect);
+            }
+          }
+        }
+      }
+    }
     break;
   case KeypadButton::Plus :
     if (m_lastSelectedChannelId != NO_ID)
@@ -149,6 +244,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateChannelId())
       {
         L_channelsToSelect.append(m_lastSelectedChannelId);
+        clearValue();
         emit addChannelSelection(L_channelsToSelect);
       }
     }
@@ -159,6 +255,24 @@ void Interpreter::recieveData(KeypadButton t_button)
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
         clearValue();
         emit addOutputSelection(L_outputsToSelect);
+      }
+    }
+    else if (m_lastSelectedGroupId != NO_ID)
+    {
+      if (calculateGroupId())
+      {
+        L_groupsToSelect.append(m_lastSelectedCueId);
+        clearValue();
+        emit addGroupSelection(L_groupsToSelect);
+      }
+    }
+    else if (m_lastSelectedCueId != 0)
+    {
+      if (calculateCueId())
+      {
+        L_cuesToSelect.append(m_lastSelectedCueId);
+        clearValue();
+        emit addCueSelection(L_cuesToSelect);
       }
     }
     break;
@@ -179,6 +293,24 @@ void Interpreter::recieveData(KeypadButton t_button)
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
         clearValue();
         emit removeOutputSelection(L_outputsToSelect);
+      }
+    }
+    else if (m_lastSelectedGroupId != NO_ID)
+    {
+      if (calculateGroupId())
+      {
+        L_groupsToSelect.append(m_lastSelectedCueId);
+        clearValue();
+        emit removeGroupSelection(L_groupsToSelect);
+      }
+    }
+    else if (m_lastSelectedCueId != 0)
+    {
+      if (calculateCueId())
+      {
+        L_cuesToSelect.append(m_lastSelectedCueId);
+        clearValue();
+        emit removeCueSelection(L_cuesToSelect);
       }
     }
     break;
@@ -209,8 +341,6 @@ void Interpreter::recieveData(KeypadButton t_button)
     if (calculateFloatTime())
       emit setDelayOut(m_time);
     break;
-  case KeypadButton::Cue :
-  case KeypadButton::Group :
   case KeypadButton::Record :
   case KeypadButton::Update :
   case KeypadButton::Delete :
@@ -312,6 +442,80 @@ bool Interpreter::calculateOutputUidId()
 
   clearValue();
   return true;
+}
+
+bool Interpreter::calculateGroupId()
+{
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
+
+  m_lastSelectedGroupId = 0;
+
+  // find first dot
+  auto i = m_L_digits.indexOf(KeypadButton::Dot);
+  if (i > -1)
+    m_L_digits.remove(i, m_L_digits.size() - i);
+
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    m_lastSelectedGroupId += digit * qPow(10, i);
+    qDebug() << m_lastSelectedGroupId;
+  }
+  clearValue();
+  return true;
+}
+
+bool Interpreter::calculateCueId()
+{
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
+  m_lastSelectedCueId = 0.0f;
+
+  // find first dot
+  auto index = m_L_digits.indexOf(KeypadButton::Dot);
+  if (index > -1) // il y a un point
+  {
+    int count = m_L_digits.count(KeypadButton::Dot);
+    if (count > 1) // there are other dots
+    { // we erase all others dot and their following digits
+      auto lastIndex = m_L_digits.lastIndexOf(KeypadButton::Dot);
+      while (lastIndex != index)
+      {
+        m_L_digits.remove(lastIndex,
+                          m_L_digits.size() - lastIndex);
+      }
+    }
+    for (int i = index + 1;
+         i < m_L_digits.size();
+         i++)
+    {
+      KeypadButton digit = m_L_digits.at(i);
+      m_lastSelectedCueId += digit * qPow(10, index - i);
+    }
+    // now we erase dot and following digits
+    m_L_digits.remove(index,
+                      m_L_digits.size() - index);
+  }
+  for (int i = 0; // no more dots
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    m_lastSelectedCueId += digit * qPow(10, i);
+  }
+  qDebug() << m_lastSelectedCueId;
+  clearValue();
+  return true;
+
 }
 
 dmx Interpreter::calculateDmx()

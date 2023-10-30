@@ -75,8 +75,8 @@ typedef qint16 id;
 // id for universe. signed cos it can be -1 for channel group, scene, etc...
 typedef qint16 uid;
 
-typedef float sceneID_f;
-typedef float time_f;
+typedef qreal sceneID_f;
+typedef qreal time_f;
 
 #define NO_ID -1
 #define NO_UID -1
@@ -146,6 +146,8 @@ enum SelectionType
 {
   ChannelSelectionType,
   OutputSelectionType,
+  GroupSelectionType,
+  CueSelectionType,
   UnknownSelectionType
 };
 

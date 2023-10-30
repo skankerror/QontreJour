@@ -21,6 +21,7 @@
 #include <QObject>
 #include "../qontrejour.h"
 #include "dmxvalue.h"
+#include "dmxscene.h"
 
 /****************************** Ch_Id_Dmx ********************************/
 
@@ -319,6 +320,7 @@ public :
                      RootValue *t_rootChannel,
                      QList<RootValue *> t_L_rootOutput,
                      DmxPatch *t_patch,
+                     Sequence *t_mainSeq,
                      QObject *parent = nullptr);
 
   ~DmxEngine();
@@ -326,6 +328,9 @@ public :
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
   ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
   OutputEngine *getOutputEngine() const{ return m_outputEngine; }
+
+  void setMainSeq(Sequence *t_mainSeq)
+  { m_mainSeq = t_mainSeq; }
 
 signals :
 
@@ -338,9 +343,15 @@ public slots :
   void onRemoveChannelSelection(QList<id> t_L_id);
   void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
+  void onAddGroupSelection(QList<id> t_L_id);
+  void onRemoveGroupSelection(QList<id> t_L_id);
+  void onAddCueSelection(QList<sceneID_f> t_L_sceneID);
+  void onRemoveCueSelection(QList<sceneID_f> t_L_sceneID);
   void onSelectAll();
   void onClearChannelSelection();
   void onClearOutputSelection();
+  void onClearGroupSelection();
+  void onClearCueSelection();
   void onSetLevel(dmx t_level);
   void onSendError();
   void onSendError_NoValueSpecified();
@@ -361,7 +372,11 @@ private :
   // members for interpreter
   QList<id> m_L_channelsIdSelection;
   QList<Uid_Id> m_L_outputUid_IdSelection;
+  QList<id> m_L_channelGroupIdSelection;
+  QList<sceneID_f> m_L_cueIdSelection;
   SelectionType m_selType = SelectionType::UnknownSelectionType;
+
+  Sequence *m_mainSeq;
 
 };
 

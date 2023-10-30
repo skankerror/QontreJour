@@ -378,6 +378,7 @@ DmxEngine::DmxEngine(RootValue *t_rootGroup,
                      RootValue *t_rootChannel,
                      QList<RootValue *> t_L_rootOutput,
                      DmxPatch *t_patch,
+                     Sequence *t_mainSeq,
                      QObject *parent)
     : QObject(parent),
     m_groupEngine(new ChannelGroupEngine(t_rootGroup,
@@ -386,7 +387,8 @@ DmxEngine::DmxEngine(RootValue *t_rootGroup,
                                       this)),
     m_outputEngine(new OutputEngine(t_L_rootOutput,
                                     t_patch,
-                                    this))
+                                    this)),
+    m_mainSeq(t_mainSeq)
 {
   connect(m_groupEngine,
           SIGNAL(channelLevelChangedFromGroup(id,dmx)),
@@ -476,6 +478,26 @@ void DmxEngine::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
   }
 }
 
+void DmxEngine::onAddGroupSelection(QList<id> t_L_id)
+{
+
+}
+
+void DmxEngine::onRemoveGroupSelection(QList<id> t_L_id)
+{
+
+}
+
+void DmxEngine::onAddCueSelection(QList<sceneID_f> t_L_sceneID)
+{
+
+}
+
+void DmxEngine::onRemoveCueSelection(QList<sceneID_f> t_L_sceneID)
+{
+
+}
+
 void DmxEngine::onSelectAll()
 {
   m_L_channelsIdSelection = m_channelEngine->selectNonNullChannels();
@@ -494,6 +516,16 @@ void DmxEngine::onClearOutputSelection()
 {
   m_L_outputUid_IdSelection.clear();
   m_L_outputUid_IdSelection.squeeze();
+}
+
+void DmxEngine::onClearGroupSelection()
+{
+
+}
+
+void DmxEngine::onClearCueSelection()
+{
+
 }
 
 void DmxEngine::onSetLevel(dmx t_level)
@@ -516,15 +548,32 @@ void DmxEngine::onSetLevel(dmx t_level)
     }
     return;
   }
-  // so that's output
-  for (qsizetype i = 0;
-       i < m_L_outputUid_IdSelection.size();
-       i++)
+  // that's output
+  if (m_selType == SelectionType::ChannelSelectionType)
   {
-    m_outputEngine->onDirectOutputLevelChanged(m_L_outputUid_IdSelection.at(i),
-                                               t_level);
+    for (qsizetype i = 0;
+         i < m_L_outputUid_IdSelection.size();
+         i++)
+    {
+      m_outputEngine->onDirectOutputLevelChanged(m_L_outputUid_IdSelection.at(i),
+                                                 t_level);
+    }
+    return;
   }
-  return;
+  // that's group
+  if (m_selType == SelectionType::GroupSelectionType)
+  {
+    qDebug() << "error can't change group level from keypad";
+    return;
+    // dont change gruop level from interpreter
+  }
+  // that's channel
+  if (m_selType == SelectionType::CueSelectionType)
+  {
+    // cue don't have editable level
+    qDebug() << "error cue don't have editable level";
+    return;
+  }
 }
 
 void DmxEngine::onSendError()
@@ -549,20 +598,64 @@ void DmxEngine::onMoinsPercent()
 
 void DmxEngine::onSetTimeIn(time_f t_time)
 {
-
+  if (m_selType != CueSelectionType)
+  {
+    qDebug() << "can't change time on this";
+    return;
+  }
+  for (qsizetype i = 0;
+       i < m_L_cueIdSelection.size();
+       i++)
+  {
+    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    scene->setTimeIn(t_time);
+  }
 }
 
 void DmxEngine::onSetTimeOut(time_f t_time)
 {
-
+  if (m_selType != CueSelectionType)
+  {
+    qDebug() << "can't change time on this";
+    return;
+  }
+  for (qsizetype i = 0;
+       i < m_L_cueIdSelection.size();
+       i++)
+  {
+    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    scene->setTimeOut(t_time);
+  }
 }
 
 void DmxEngine::onSetDelayIn(time_f t_time)
 {
-
+  if (m_selType != CueSelectionType)
+  {
+    qDebug() << "can't change time on this";
+    return;
+  }
+  for (qsizetype i = 0;
+       i < m_L_cueIdSelection.size();
+       i++)
+  {
+    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    scene->setDelayIn(t_time);
+  }
 }
 
 void DmxEngine::onSetDelayOut(time_f t_time)
 {
-
+  if (m_selType != CueSelectionType)
+  {
+    qDebug() << "can't change time on this";
+    return;
+  }
+  for (qsizetype i = 0;
+       i < m_L_cueIdSelection.size();
+       i++)
+  {
+    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    scene->setDelayOut(t_time);
+  }
 }

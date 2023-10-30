@@ -49,19 +49,21 @@ DmxManager::DmxManager(QObject *parent)
   // and outputs from 1st universe
   setStraightPatch(0); // patch first universe
 
+  auto sequence = new Sequence();
+  sequence->setID(0);
+  sequence->setName("Main Sequence");
+  m_L_sequence.append(sequence);
+
   m_dmxEngine = new DmxEngine(m_rootChannelGroup,
                               m_rootChannel,
                               getL_rootOutput(),
                               m_dmxPatch,
+                              sequence,
                               this);
 
   m_interpreter = new Interpreter(this);
   connectInterpreterToEngine();
 
-  auto sequence = new Sequence();
-  sequence->setID(0);
-  sequence->setName("Main Sequence");
-  m_L_sequence.append(sequence);
 
   // TEST
   testingMethod();
@@ -321,6 +323,16 @@ void DmxManager::connectInterpreterToEngine()
           &DmxEngine::onClearOutputSelection);
 
   connect(m_interpreter,
+          &Interpreter::clearGroupSelection,
+          m_dmxEngine,
+          &DmxEngine::onClearGroupSelection);
+
+  connect(m_interpreter,
+          &Interpreter::clearCueSelection,
+          m_dmxEngine,
+          &DmxEngine::onClearCueSelection);
+
+  connect(m_interpreter,
           &Interpreter::setLevel,
           m_dmxEngine,
           &DmxEngine::onSetLevel);
@@ -363,6 +375,26 @@ void DmxManager::connectInterpreterToEngine()
           &Interpreter::setDelayOut,
           m_dmxEngine,
           &DmxEngine::onSetDelayOut);
+
+  connect(m_interpreter,
+          &Interpreter::addGroupSelection,
+          m_dmxEngine,
+          &DmxEngine::onAddGroupSelection);
+
+  connect(m_interpreter,
+          &Interpreter::removeGroupSelection,
+          m_dmxEngine,
+          &DmxEngine::onRemoveGroupSelection);
+
+  connect(m_interpreter,
+          &Interpreter::addCueSelection,
+          m_dmxEngine,
+          &DmxEngine::onAddCueSelection);
+
+  connect(m_interpreter,
+          &Interpreter::removeCueSelection,
+          m_dmxEngine,
+          &DmxEngine::onRemoveCueSelection);
 
 }
 

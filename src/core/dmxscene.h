@@ -72,6 +72,7 @@ private :
 };
 
 /****************************** DmxScene *****************************/
+
 class SubScene;
 
 class DmxScene :
