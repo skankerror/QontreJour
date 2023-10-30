@@ -212,6 +212,75 @@ ChannelEngine::~ChannelEngine()
   m_L_channelData.clear();
 }
 
+QList<id> ChannelEngine::selectNonNullChannels()
+{
+  QList<id> L_selectedId;
+  for (const auto &item
+       : std::as_const(m_L_channelData))
+  {
+    dmx level = item->getActual_Level();
+    ChannelDataFlag flag = item->getFlag();
+    if (level > 0
+        && (flag == ChannelDataFlag::SelectedSceneFlag
+            || flag == ChannelDataFlag::DirectChannelFlag
+            || flag == ChannelDataFlag::ChannelGroupFlag))
+    {
+      L_selectedId.append(item->getChannelID());
+      item->setIsSelected(true);
+    }
+  }
+  qDebug() << L_selectedId;
+  return L_selectedId;
+}
+
+void ChannelEngine::addChannelDataSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    auto selectId = t_L_id.at(i);
+    ChannelData *channelData = m_L_channelData.at(selectId);
+    channelData->setIsSelected(true);
+  }
+  emit selectionChanged(getSelectedChannelsId());
+}
+
+void ChannelEngine::removeChannelDataSelection(QList<id> t_L_id)
+{
+  for (qsizetype i = 0;
+       i < t_L_id.size();
+       i++)
+  {
+    auto selectId = t_L_id.at(i);
+    ChannelData *channelData = m_L_channelData.at(selectId);
+    channelData->setIsSelected(false);
+  }
+  emit selectionChanged(getSelectedChannelsId());
+}
+
+void ChannelEngine::clearChannelDataSelection()
+{
+  for (const auto &item
+       : std::as_const(m_L_channelData))
+  {
+    item->setIsSelected(false);
+  }
+  emit selectionChanged(QList<id>());
+}
+
+QList<id> ChannelEngine::getSelectedChannelsId()
+{
+  QList<id> L_selectedId;
+  for (const auto &item
+       : std::as_const(m_L_channelData))
+  {
+    if (item->getIsSelected())
+      L_selectedId.append(item->getChannelID());
+  }
+  return L_selectedId;
+}
+
 void ChannelEngine::createDatas(int t_channelCount)
 {
   for (int i = 0;
@@ -353,10 +422,12 @@ void DmxEngine::onAddChannelSelection(QList<id> t_L_id)
     if (m_L_channelsIdSelection.indexOf(channelId) == -1)
     {
       m_L_channelsIdSelection.append(channelId);
-      emit ChannelSelectionChanged();
+//      emit ChannelSelectionChanged();
     }
   }
   m_selType = SelectionType::ChannelSelectionType;
+  // TODO : c'est chiant, il faut updater les channeldata qui sont dans le channel engine...
+
 }
 
 void DmxEngine::onRemoveChannelSelection(QList<id> t_L_id)
@@ -370,7 +441,7 @@ void DmxEngine::onRemoveChannelSelection(QList<id> t_L_id)
     if (index != -1)
     {
       m_L_channelsIdSelection.remove(index);
-      emit ChannelSelectionChanged();
+//      emit ChannelSelectionChanged();
     }
   }
 }
@@ -407,14 +478,16 @@ void DmxEngine::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
 
 void DmxEngine::onSelectAll()
 {
-
+  m_L_channelsIdSelection = m_channelEngine->selectNonNullChannels();
+  m_selType = SelectionType::ChannelSelectionType;
+//  emit channelSelectionChanged();
 }
 
 void DmxEngine::onClearChannelSelection()
 {
   m_L_channelsIdSelection.clear();
   m_L_channelsIdSelection.squeeze();
-  emit ChannelSelectionChanged();
+  emit channelSelectionChanged();
 }
 
 void DmxEngine::onClearOutputSelection()
@@ -462,4 +535,34 @@ void DmxEngine::onSendError()
 void DmxEngine::onSendError_NoValueSpecified()
 {
   qDebug() << "error from interpreter no value specified";
+}
+
+void DmxEngine::onPlusPercent()
+{
+
+}
+
+void DmxEngine::onMoinsPercent()
+{
+
+}
+
+void DmxEngine::onSetTimeIn(time_f t_time)
+{
+
+}
+
+void DmxEngine::onSetTimeOut(time_f t_time)
+{
+
+}
+
+void DmxEngine::onSetDelayIn(time_f t_time)
+{
+
+}
+
+void DmxEngine::onSetDelayOut(time_f t_time)
+{
+
 }

@@ -46,11 +46,13 @@ void Interpreter::recieveData(KeypadButton t_button)
 
   if (t_button == KeypadButton::Pluspc)
   {
+    emit plusPercent();
     return;
   }
 
   if (t_button == KeypadButton::Moinspc)
   {
+    emit moinsPercent();
     return;
   }
 
@@ -185,10 +187,28 @@ void Interpreter::recieveData(KeypadButton t_button)
     clearValue();
     break;
   case KeypadButton::Time :
+    if (calculateFloatTime())
+    {
+      emit setTimeIn(m_time);
+      emit setTimeOut(m_time);
+    }
+    break;
   case KeypadButton::Timein :
+    if (calculateFloatTime())
+      emit setTimeIn(m_time);
+    break;
   case KeypadButton::Timeout :
+    if (calculateFloatTime())
+      emit setTimeOut(m_time);
+    break;
   case KeypadButton::Delayin :
+    if (calculateFloatTime())
+      emit setDelayIn(m_time);
+    break;
   case KeypadButton::Delayout :
+    if (calculateFloatTime())
+      emit setDelayOut(m_time);
+    break;
   case KeypadButton::Cue :
   case KeypadButton::Group :
   case KeypadButton::Record :
@@ -233,6 +253,7 @@ bool Interpreter::calculateChannelId()
     m_lastSelectedChannelId += digit * qPow(10, i);
     qDebug() << m_lastSelectedChannelId;
   }
+  clearValue();
   return true;
 }
 
@@ -289,6 +310,7 @@ bool Interpreter::calculateOutputUidId()
   }
   m_lastSelectedOutputUidId.setOutputID(outputId);
 
+  clearValue();
   return true;
 }
 
@@ -315,13 +337,53 @@ dmx Interpreter::calculateDmx()
     level += digit * qPow(10, i);
     qDebug() << level;
   }
+  clearValue();
   return (level > 255) ?
              255 :  level;
 }
 
 bool Interpreter::calculateFloatTime()
 {
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
+  m_time = 0.0f;
+
+  // find first dot
+  auto index = m_L_digits.indexOf(KeypadButton::Dot);
+  if (index > -1) // il y a un point
+  {
+    int count = m_L_digits.count(KeypadButton::Dot);
+    if (count > 1) // there are other dots
+    { // we erase all others dot and their following digits
+      auto lastIndex = m_L_digits.lastIndexOf(KeypadButton::Dot);
+      while (lastIndex != index)
+      {
+        m_L_digits.remove(lastIndex,
+                          m_L_digits.size() - lastIndex);
+      }
+    }
+    for (int i = index + 1;
+         i < m_L_digits.size();
+         i++)
+    {
+      KeypadButton digit = m_L_digits.at(i);
+      m_time += digit * qPow(10, index - i);
+    }
+    // now we erase dot and following digits
+    m_L_digits.remove(index,
+                      m_L_digits.size() - index);
+  }
+  for (int i = 0; // no more dots
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    m_time += digit * qPow(10, i);
+  }
+  qDebug() << m_time;
+  clearValue();
   return true;
 }
-
-

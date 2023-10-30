@@ -334,6 +334,36 @@ void DmxManager::connectInterpreterToEngine()
           &Interpreter::sendError_NoValueSpecified,
           m_dmxEngine,
           &DmxEngine::onSendError_NoValueSpecified);
+  connect(m_interpreter,
+          &Interpreter::plusPercent,
+          m_dmxEngine,
+          &DmxEngine::onPlusPercent);
+
+  connect(m_interpreter,
+          &Interpreter::moinsPercent,
+          m_dmxEngine,
+          &DmxEngine::onMoinsPercent);
+
+  connect(m_interpreter,
+          &Interpreter::setTimeIn,
+          m_dmxEngine,
+          &DmxEngine::onSetTimeIn);
+
+  connect(m_interpreter,
+          &Interpreter::setTimeOut,
+          m_dmxEngine,
+          &DmxEngine::onSetTimeOut);
+
+  connect(m_interpreter,
+          &Interpreter::setDelayIn,
+          m_dmxEngine,
+          &DmxEngine::onSetDelayIn);
+
+  connect(m_interpreter,
+          &Interpreter::setDelayOut,
+          m_dmxEngine,
+          &DmxEngine::onSetDelayOut);
+
 }
 
 void DmxManager::setStraightPatch(const uid t_uid)

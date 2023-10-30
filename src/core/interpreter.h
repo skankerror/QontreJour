@@ -35,12 +35,6 @@ public :
 
   void recieveData(KeypadButton t_button);
 
-  void setLastSelectedChannelId(id t_lastSelectedChannelId)
-  { m_lastSelectedChannelId = t_lastSelectedChannelId; }
-
-  void setLastSelectedOutputUidId(const Uid_Id &t_lastSelectedOutputUidId)
-  { m_lastSelectedOutputUidId = t_lastSelectedOutputUidId; }
-
 private :
 
   void clearValue();
@@ -58,12 +52,23 @@ signals :
   void selectAll();
   void clearChannelSelection();
   void clearOutputSelection();
+  void plusPercent();
+  void moinsPercent();
+  void setTimeIn(time_f t_time);
+  void setTimeOut(time_f t_time);
+  void setDelayIn(time_f t_time);
+  void setDelayOut(time_f t_time);
   void setLevel(dmx t_level);
   void sendError();
   void sendError_NoValueSpecified();
 
 public slots :
 
+  void setLastSelectedChannelId(id t_lastSelectedChannelId)
+  { m_lastSelectedChannelId = t_lastSelectedChannelId; }
+
+  void setLastSelectedOutputUidId(const Uid_Id &t_lastSelectedOutputUidId)
+  { m_lastSelectedOutputUidId = t_lastSelectedOutputUidId; }
 
 private :
 
@@ -73,6 +78,7 @@ private :
   id m_lastSelectedChannelId = NO_ID;
   Uid_Id m_lastSelectedOutputUidId = NULL_UID_ID;
   float m_tempFloat = 0.0f;
+  time_f m_time;
 
 };
 

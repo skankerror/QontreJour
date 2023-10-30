@@ -297,8 +297,16 @@ bool SequencerTreeModel::setHeaderData(int section, Qt::Orientation orientation,
 
 Qt::ItemFlags SequencerTreeModel::flags(const QModelIndex &index) const
 {
-  if (!index.isValid()) return Qt::NoItemFlags;
-  if (index.column() == 0) return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  if (!index.isValid())
+    return Qt::NoItemFlags;
+
+  auto scene = qobject_cast<DmxScene *>(getDmxValue(index));
+  if (scene)
+    if (scene->getStepNumber() == 0)
+      return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+  if (index.column() == 0)
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
   else return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 
   return QAbstractItemModel::flags(index);

@@ -126,6 +126,8 @@ public :
   dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
   dmx getActual_Level() const{ return m_actual_Level; }
   ChannelDataFlag getFlag() const{ return m_flag; }
+  id getChannelID() const{ return m_channelID; }
+  bool getIsSelected() const{ return m_isSelected; }
 
   void setChannelGroupLevel(dmx t_channelGroupLevel)
   { m_channelGroupLevel = t_channelGroupLevel; }
@@ -136,12 +138,11 @@ public :
   void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
   void setNextSceneLevel(dmx t_nextSceneLevel)
   { m_nextSceneLevel = t_nextSceneLevel; }
-
-  id getChannelID() const{ return m_channelID; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
+  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
+  void setIsSelected(bool t_isSelected){ m_isSelected = t_isSelected; }
 
   void update();
-  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
 
 private :
 
@@ -160,6 +161,7 @@ private :
   dmx m_sceneLevel = NULL_DMX;
   dmx m_nextSceneLevel = NULL_DMX;
   ChannelDataFlag m_flag = UnknownFlag;
+  bool m_isSelected;
 
   dmx m_actual_Level = NULL_DMX;
 
@@ -230,10 +232,27 @@ public :
 
   ~ChannelEngine();
 
+  QList<id> selectNonNullChannels();
+  void addChannelDataSelection(QList<id> t_L_id);
+  void removeChannelDataSelection(QList<id> t_L_id);
+  void clearChannelDataSelection();
+  QList<id> getSelectedChannelsId();
+
+  QList<ChannelData *> getL_channelData() const
+  { return m_L_channelData; }
+
+  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
+  { m_L_channelData = t_L_channelData; }
+
 private :
 
   void createDatas(int t_channelCount);
   void update(id t_id);
+
+signals :
+
+  void selectionChanged(QList<id> t_L_id);
+
 
 public slots :
 
@@ -253,6 +272,7 @@ private :
   RootValue *m_rootChannel;
 
   QList<ChannelData *> m_L_channelData;
+
 
 };
 
@@ -309,7 +329,7 @@ public :
 
 signals :
 
-  void ChannelSelectionChanged();
+  void channelSelectionChanged();
 
 public slots :
 
@@ -324,7 +344,14 @@ public slots :
   void onSetLevel(dmx t_level);
   void onSendError();
   void onSendError_NoValueSpecified();
+  void onPlusPercent();
+  void onMoinsPercent();
+  void onSetTimeIn(time_f t_time);
+  void onSetTimeOut(time_f t_time);
+  void onSetDelayIn(time_f t_time);
+  void onSetDelayOut(time_f t_time);
 
+  // TODO : renvoyer le dernier id selectionné à l'interpreter
 private :
 
   ChannelGroupEngine *m_groupEngine;
