@@ -218,6 +218,33 @@ private :
   QMap<id, Gr_Id_Dmx> m_M_channelLevel;
 };
 
+/******************************* CueEngine ****************************/
+
+class CueEngine :
+    public QObject
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit CueEngine(QList<Sequence *> t_L_seq,
+                     QObject *parent = nullptr);
+
+  QList<Sequence *> getL_seq() const{ return m_L_seq; }
+
+  void setL_seq(const QList<Sequence *> &t_L_seq){ m_L_seq = t_L_seq; }
+  void setMainSeqId(id t_mainSeqId){ m_mainSeqId = t_mainSeqId; }
+
+  Sequence *getMainSeq();
+
+private :
+
+  QList<Sequence *> m_L_seq;
+  id m_mainSeqId;
+
+};
+
 /******************************* ChannelEngine ***********************/
 
 class ChannelEngine
@@ -320,17 +347,18 @@ public :
                      RootValue *t_rootChannel,
                      QList<RootValue *> t_L_rootOutput,
                      DmxPatch *t_patch,
-                     Sequence *t_mainSeq,
+                     QList<Sequence *> t_L_seq,
                      QObject *parent = nullptr);
 
   ~DmxEngine();
 
   ChannelGroupEngine *getGroupEngine() const{ return m_groupEngine; }
+  CueEngine *getCueEngine() const{ return m_cueEngine; }
   ChannelEngine *getChannelEngine() const{ return m_channelEngine; }
   OutputEngine *getOutputEngine() const{ return m_outputEngine; }
 
-  void setMainSeq(Sequence *t_mainSeq)
-  { m_mainSeq = t_mainSeq; }
+  void setMainSeq(id t_id);
+
 
 signals :
 
@@ -366,6 +394,7 @@ public slots :
 private :
 
   ChannelGroupEngine *m_groupEngine;
+  CueEngine *m_cueEngine;
   ChannelEngine *m_channelEngine;
   OutputEngine *m_outputEngine;
 
@@ -376,7 +405,7 @@ private :
   QList<sceneID_f> m_L_cueIdSelection;
   SelectionType m_selType = SelectionType::UnknownSelectionType;
 
-  Sequence *m_mainSeq;
+//  Sequence *m_mainSeq;
 
 };
 

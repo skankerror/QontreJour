@@ -238,6 +238,7 @@ void KeypadWidget::populateWidget()
           { emit buttonClicked(KeypadButton::Moins); });
 
   setLayout(layout);
+  layout->setSizeConstraint(QLayout::SetMaximumSize);
 }
 
 /****************************************************************/
@@ -278,6 +279,8 @@ PlaybackWidget::PlaybackWidget(QWidget *parent)
   layout->setAlignment(m_BSlider, Qt::AlignHCenter);
 
   setLayout(layout);
+//  layout->setSizeConstraint(QLayout::SetMaximumSize);
+
 }
 
 /****************************************************************/
@@ -297,4 +300,6 @@ GrandMasterWidget::GrandMasterWidget(QWidget *parent)
   layout->addWidget(m_grandMasterLabel);
   layout->setAlignment(m_grandMasterslider, Qt::AlignHCenter);
   setLayout(layout);
+//  layout->setSizeConstraint(QLayout::SetMaximumSize);
+
 }

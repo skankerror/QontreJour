@@ -76,6 +76,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         src/gui/keypadwidget.h src/gui/keypadwidget.cpp
         src/core/interpreter.h src/core/interpreter.cpp
+        resources/resources.qrc
     )
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

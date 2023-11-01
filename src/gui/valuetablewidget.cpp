@@ -100,7 +100,7 @@ void ValueTableView::mousePressEvent(QMouseEvent *event)
       m_originEditingPoint = event->pos();
       if (indexList.indexOf(index) == -1) // si l'index n'est pas ds la selection
       {
-        myModel->clearSelectionList(); // on clear
+//        myModel->clearSelectionList(); // on clear
         myModel->addEditedIndex(index); // on ajoute notre index
       }
       return;
@@ -168,21 +168,21 @@ void ValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
   editedIndexChanged();
 }
 
-QModelIndexList ValueTableModel::getNon0ValueIndexList() const
-{
-  auto listRet = QModelIndexList();
-  auto L_childValue = m_rootValue->getL_childValue();
-  for(const auto &item
-      : std::as_const(L_childValue))
-  {
-    if (item->getLevel() > 0) // TODO : problem with parked independant
-    {
-      auto index = getIndexFromValue(item);
-      listRet.append(index);
-    }
-  }
-  return listRet;
-}
+//QModelIndexList ValueTableModel::getNon0ValueIndexList() const
+//{
+//  auto listRet = QModelIndexList();
+//  auto L_childValue = m_rootValue->getL_childValue();
+//  for(const auto &item
+//      : std::as_const(L_childValue))
+//  {
+//    if (item->getLevel() > 0) // TODO : problem with parked independant
+//    {
+//      auto index = getIndexFromValue(item);
+//      listRet.append(index);
+//    }
+//  }
+//  return listRet;
+//}
 
 QModelIndex ValueTableModel::getIndexFromValue(const DmxValue *t_value) const
 {
@@ -196,18 +196,18 @@ QModelIndex ValueTableModel::getIndexFromValue(const DmxValue *t_value) const
   return indexRet;
 }
 
-void ValueTableModel::clearSelectionList()
-{
-  m_editedIndexes.clear();
-  //  editedIndexChanged();
-  emit dataChanged(index(0,0),index(31,31)); // NOTE : BEURK !!
-}
+//void ValueTableModel::clearSelectionList()
+//{
+//  m_editedIndexes.clear();
+//  //  editedIndexChanged();
+//  emit dataChanged(index(0,0),index(31,31)); // NOTE : BEURK !!
+//}
 
-void ValueTableModel::selectAll()
-{
-  m_editedIndexes = getNon0ValueIndexList();
-  editedIndexChanged();
-}
+//void ValueTableModel::selectAll()
+//{
+//  m_editedIndexes = getNon0ValueIndexList();
+//  editedIndexChanged();
+//}
 
 void ValueTableModel::editedIndexChanged()
 {

@@ -58,7 +58,7 @@ DmxManager::DmxManager(QObject *parent)
                               m_rootChannel,
                               getL_rootOutput(),
                               m_dmxPatch,
-                              sequence,
+                              m_L_sequence,
                               this);
 
   m_interpreter = new Interpreter(this);

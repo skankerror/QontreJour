@@ -190,6 +190,22 @@ void ChannelGroupEngine::groupLevelChanged(const id t_groupID,
   }
 }
 
+/******************************* CueEngine ***************************/
+
+CueEngine::CueEngine(QList<Sequence *> t_L_seq,
+                     QObject *parent)
+    : m_L_seq(t_L_seq),
+    m_mainSeqId(0),
+    QObject(parent)
+{}
+
+Sequence *CueEngine::getMainSeq()
+{
+  if (m_mainSeqId < m_L_seq.size())
+    return m_L_seq.at(m_mainSeqId);
+  return nullptr;
+}
+
 /******************************* ChannelEngine ***********************/
 
 #define GET_CHANNEL(x) static_cast<DmxChannel*>(m_rootChannel->getChildValue(x))
@@ -378,17 +394,18 @@ DmxEngine::DmxEngine(RootValue *t_rootGroup,
                      RootValue *t_rootChannel,
                      QList<RootValue *> t_L_rootOutput,
                      DmxPatch *t_patch,
-                     Sequence *t_mainSeq,
+                     QList<Sequence *> t_L_seq,
                      QObject *parent)
     : QObject(parent),
     m_groupEngine(new ChannelGroupEngine(t_rootGroup,
                                          this)),
+    m_cueEngine(new CueEngine(t_L_seq,
+                              this)),
     m_channelEngine(new ChannelEngine(t_rootChannel,
                                       this)),
     m_outputEngine(new OutputEngine(t_L_rootOutput,
                                     t_patch,
-                                    this)),
-    m_mainSeq(t_mainSeq)
+                                    this))
 {
   connect(m_groupEngine,
           SIGNAL(channelLevelChangedFromGroup(id,dmx)),
@@ -410,8 +427,14 @@ DmxEngine::DmxEngine(RootValue *t_rootGroup,
 DmxEngine::~DmxEngine()
 {
   m_groupEngine->deleteLater();
+  m_cueEngine->deleteLater();
   m_channelEngine->deleteLater();
   m_outputEngine->deleteLater();
+}
+
+void DmxEngine::setMainSeq(id t_id)
+{
+  m_cueEngine->setMainSeqId(t_id);
 }
 
 void DmxEngine::onAddChannelSelection(QList<id> t_L_id)
@@ -520,12 +543,14 @@ void DmxEngine::onClearOutputSelection()
 
 void DmxEngine::onClearGroupSelection()
 {
-
+  m_L_channelGroupIdSelection.clear();
+  m_L_channelGroupIdSelection.squeeze();
 }
 
 void DmxEngine::onClearCueSelection()
 {
-
+  m_L_cueIdSelection.clear();
+  m_L_cueIdSelection.squeeze();
 }
 
 void DmxEngine::onSetLevel(dmx t_level)
@@ -607,7 +632,7 @@ void DmxEngine::onSetTimeIn(time_f t_time)
        i < m_L_cueIdSelection.size();
        i++)
   {
-    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
     scene->setTimeIn(t_time);
   }
 }
@@ -623,7 +648,7 @@ void DmxEngine::onSetTimeOut(time_f t_time)
        i < m_L_cueIdSelection.size();
        i++)
   {
-    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
     scene->setTimeOut(t_time);
   }
 }
@@ -639,7 +664,7 @@ void DmxEngine::onSetDelayIn(time_f t_time)
        i < m_L_cueIdSelection.size();
        i++)
   {
-    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
     scene->setDelayIn(t_time);
   }
 }
@@ -655,7 +680,8 @@ void DmxEngine::onSetDelayOut(time_f t_time)
        i < m_L_cueIdSelection.size();
        i++)
   {
-    auto scene = m_mainSeq->getScene(m_L_cueIdSelection.at(i));
+    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
     scene->setDelayOut(t_time);
   }
 }
+

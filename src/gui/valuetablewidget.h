@@ -125,8 +125,8 @@ public slots :
 
   void addEditedIndex(QModelIndex &t_editedIndexes);
 
-  void clearSelectionList();
-  void selectAll();
+//  void clearSelectionList();
+//  void selectAll();
 
   //public because we need this edit widgets
   void editedIndexChanged();
@@ -162,7 +162,7 @@ private :
   DmxValue *getValueFromIndex(const QModelIndex &t_index) const;
   QList<DmxValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
   QModelIndex getIndexFromValue(const DmxValue *t_value ) const;
-  QModelIndexList getNon0ValueIndexList() const;
+//  QModelIndexList getNon0ValueIndexList() const;
 
 protected :
 

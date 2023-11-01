@@ -18,6 +18,7 @@
 #include "src/gui/mainwindow.h"
 
 #include <QApplication>
+#include <QFile>
 //#include <QLocale>
 //#include <QTranslator>
 
@@ -25,6 +26,12 @@
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
+
+  QFile file(":/qss/qss/MyStyleSheet.qss"); //:/qss/qss/MyStyleSheet.qss
+  file.open(QFile::ReadOnly);
+  QString styleSheet = QString::fromLatin1(file.readAll());
+
+  a.setStyleSheet(styleSheet);
 
 //  QTranslator translator;
 //  const QStringList uiLanguages = QLocale::system().uiLanguages();

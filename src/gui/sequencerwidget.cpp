@@ -190,8 +190,12 @@ QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
   if (!index.isValid())
     return QVariant();
 
+  if (role == Qt::TextAlignmentRole)
+    return Qt::AlignCenter;
+
   if (role != Qt::DisplayRole && role != Qt::EditRole)
     return QVariant();
+
 
   auto scene = qobject_cast<DmxScene *>(getDmxValue(index));
 
