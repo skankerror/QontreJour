@@ -199,10 +199,34 @@ CueEngine::CueEngine(QList<Sequence *> t_L_seq,
     QObject(parent)
 {}
 
-Sequence *CueEngine::getMainSeq()
+Sequence *CueEngine::getMainSeq() const
 {
   if (m_mainSeqId < m_L_seq.size())
     return m_L_seq.at(m_mainSeqId);
+  return nullptr;
+}
+
+DmxScene *CueEngine::getSelectedScene() const
+{
+  auto seq = getMainSeq();
+  if (seq)
+    return seq->getScene(m_selectedCueId);
+  return nullptr;
+}
+
+DmxScene *CueEngine::getNextScene() const
+{
+  auto seq = getMainSeq();
+  if (seq)
+  {
+    auto scene = seq->getScene(m_selectedCueId);
+    if (scene)
+    {
+      id step = scene->getStepNumber() + 1;
+      auto nextScene = seq->getScene(step);
+      return nextScene;
+    }
+  }
   return nullptr;
 }
 
@@ -501,26 +525,6 @@ void DmxEngine::onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id)
   }
 }
 
-void DmxEngine::onAddGroupSelection(QList<id> t_L_id)
-{
-
-}
-
-void DmxEngine::onRemoveGroupSelection(QList<id> t_L_id)
-{
-
-}
-
-void DmxEngine::onAddCueSelection(QList<sceneID_f> t_L_sceneID)
-{
-
-}
-
-void DmxEngine::onRemoveCueSelection(QList<sceneID_f> t_L_sceneID)
-{
-
-}
-
 void DmxEngine::onSelectAll()
 {
   m_L_channelsIdSelection = m_channelEngine->selectNonNullChannels();
@@ -541,18 +545,6 @@ void DmxEngine::onClearOutputSelection()
   m_L_outputUid_IdSelection.squeeze();
 }
 
-void DmxEngine::onClearGroupSelection()
-{
-  m_L_channelGroupIdSelection.clear();
-  m_L_channelGroupIdSelection.squeeze();
-}
-
-void DmxEngine::onClearCueSelection()
-{
-  m_L_cueIdSelection.clear();
-  m_L_cueIdSelection.squeeze();
-}
-
 void DmxEngine::onSetLevel(dmx t_level)
 {
   // we have a problem
@@ -568,8 +560,9 @@ void DmxEngine::onSetLevel(dmx t_level)
          i < m_L_channelsIdSelection.size();
          i++)
     {
-      m_channelEngine->onChannelLevelChangedFromDirectChannel(m_L_channelsIdSelection.at(i),
-                                                              t_level);
+      m_channelEngine
+          ->onChannelLevelChangedFromDirectChannel(m_L_channelsIdSelection.at(i),
+                                                   t_level);
     }
     return;
   }
@@ -580,25 +573,13 @@ void DmxEngine::onSetLevel(dmx t_level)
          i < m_L_outputUid_IdSelection.size();
          i++)
     {
-      m_outputEngine->onDirectOutputLevelChanged(m_L_outputUid_IdSelection.at(i),
-                                                 t_level);
+      m_outputEngine
+          ->onDirectOutputLevelChanged(m_L_outputUid_IdSelection.at(i),
+                                       t_level);
     }
     return;
   }
-  // that's group
-  if (m_selType == SelectionType::GroupSelectionType)
-  {
-    qDebug() << "error can't change group level from keypad";
-    return;
-    // dont change gruop level from interpreter
-  }
-  // that's channel
-  if (m_selType == SelectionType::CueSelectionType)
-  {
-    // cue don't have editable level
-    qDebug() << "error cue don't have editable level";
-    return;
-  }
+  return;
 }
 
 void DmxEngine::onSendError()
@@ -623,65 +604,29 @@ void DmxEngine::onMoinsPercent()
 
 void DmxEngine::onSetTimeIn(time_f t_time)
 {
-  if (m_selType != CueSelectionType)
-  {
-    qDebug() << "can't change time on this";
-    return;
-  }
-  for (qsizetype i = 0;
-       i < m_L_cueIdSelection.size();
-       i++)
-  {
-    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
+  auto scene = m_cueEngine->getNextScene();
+  if (scene)
     scene->setTimeIn(t_time);
-  }
 }
 
 void DmxEngine::onSetTimeOut(time_f t_time)
 {
-  if (m_selType != CueSelectionType)
-  {
-    qDebug() << "can't change time on this";
-    return;
-  }
-  for (qsizetype i = 0;
-       i < m_L_cueIdSelection.size();
-       i++)
-  {
-    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
+  auto scene = m_cueEngine->getNextScene();
+  if (scene)
     scene->setTimeOut(t_time);
-  }
 }
 
 void DmxEngine::onSetDelayIn(time_f t_time)
 {
-  if (m_selType != CueSelectionType)
-  {
-    qDebug() << "can't change time on this";
-    return;
-  }
-  for (qsizetype i = 0;
-       i < m_L_cueIdSelection.size();
-       i++)
-  {
-    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
+  auto scene = m_cueEngine->getNextScene();
+  if (scene)
     scene->setDelayIn(t_time);
-  }
 }
 
 void DmxEngine::onSetDelayOut(time_f t_time)
 {
-  if (m_selType != CueSelectionType)
-  {
-    qDebug() << "can't change time on this";
-    return;
-  }
-  for (qsizetype i = 0;
-       i < m_L_cueIdSelection.size();
-       i++)
-  {
-    auto scene = m_cueEngine->getMainSeq()->getScene(m_L_cueIdSelection.at(i));
+  auto scene = m_cueEngine->getNextScene();
+  if (scene)
     scene->setDelayOut(t_time);
-  }
 }
 

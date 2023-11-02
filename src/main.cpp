@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
 
-  QFile file(":/qss/qss/MyStyleSheet.qss"); //:/qss/qss/MyStyleSheet.qss
+  QFile file(":/qss/qss/MyStyleSheet.qss");
   file.open(QFile::ReadOnly);
   QString styleSheet = QString::fromLatin1(file.readAll());
 

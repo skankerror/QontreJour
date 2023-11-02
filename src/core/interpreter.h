@@ -51,15 +51,9 @@ signals :
   void removeChannelSelection(QList<id> t_L_id);
   void addOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void removeOutputSelection(QList<Uid_Id> t_L_Uid_Id);
-  void addGroupSelection(QList<id> t_L_id);
-  void removeGroupSelection(QList<id> t_L_id);
-  void addCueSelection(QList<sceneID_f> t_L_sceneID);
-  void removeCueSelection(QList<sceneID_f> t_L_sceneID);
   void selectAll();
   void clearChannelSelection();
   void clearOutputSelection();
-  void clearGroupSelection();
-  void clearCueSelection();
   void plusPercent();
   void moinsPercent();
   void setTimeIn(time_f t_time);
@@ -78,20 +72,14 @@ public slots :
   void setLastSelectedOutputUidId(const Uid_Id &t_lastSelectedOutputUidId)
   { m_lastSelectedOutputUidId = t_lastSelectedOutputUidId; }
 
-  void setLastSelectedGroupId(id t_lastSelectedGroupId)
-  { m_lastSelectedGroupId = t_lastSelectedGroupId; }
-
-  void setLastSelectedCueId(sceneID_f t_lastSelectedCueId)
-  { m_lastSelectedCueId = t_lastSelectedCueId; }
-
 private :
 
   bool m_isValued = false;
   QList<KeypadButton> m_L_digits;
   id m_lastSelectedChannelId = NO_ID;
   Uid_Id m_lastSelectedOutputUidId = NULL_UID_ID;
-  id m_lastSelectedGroupId = NO_ID;
-  sceneID_f m_lastSelectedCueId = 0.0f;
+  id m_selectedGroupId = NO_ID;
+  sceneID_f m_selectedCueId = 0.0f;
   time_f m_time = 0.0f;
 
 };

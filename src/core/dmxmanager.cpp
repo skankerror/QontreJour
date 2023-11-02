@@ -201,6 +201,39 @@ DmxChannelGroup *DmxManager::getChannelGroup(id t_groupId)
   return static_cast<DmxChannelGroup *>(m_rootChannelGroup->getChildValue(t_groupId));
 }
 
+Sequence *DmxManager::getMainSequence() const
+{
+  return m_L_sequence.at(m_mainSeq);
+}
+
+Sequence *DmxManager::getSequence(id t_seqId)
+{
+  if (t_seqId < m_L_sequence.size())
+  {
+    return m_L_sequence.at(t_seqId);
+  }
+  return nullptr;
+}
+
+DmxScene *DmxManager::getScene(sceneID_f t_sceneID)
+{
+  return getScene(t_sceneID,
+                  m_mainSeq);
+}
+
+DmxScene *DmxManager::getScene(sceneID_f t_sceneID,
+                               id t_SeqId)
+{
+  auto seq = getSequence(t_SeqId);
+  if (seq)
+  {
+    auto scene = seq->getScene(t_sceneID);
+    if (scene)
+      return scene;
+  }
+  return nullptr;
+}
+
 bool DmxManager::createUniverse(uid t_universeID)
 {
   if (t_universeID == getUniverseCount())
@@ -322,15 +355,15 @@ void DmxManager::connectInterpreterToEngine()
           m_dmxEngine,
           &DmxEngine::onClearOutputSelection);
 
-  connect(m_interpreter,
-          &Interpreter::clearGroupSelection,
-          m_dmxEngine,
-          &DmxEngine::onClearGroupSelection);
+//  connect(m_interpreter,
+//          &Interpreter::clearGroupSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onClearGroupSelection);
 
-  connect(m_interpreter,
-          &Interpreter::clearCueSelection,
-          m_dmxEngine,
-          &DmxEngine::onClearCueSelection);
+//  connect(m_interpreter,
+//          &Interpreter::clearCueSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onClearCueSelection);
 
   connect(m_interpreter,
           &Interpreter::setLevel,
@@ -376,25 +409,25 @@ void DmxManager::connectInterpreterToEngine()
           m_dmxEngine,
           &DmxEngine::onSetDelayOut);
 
-  connect(m_interpreter,
-          &Interpreter::addGroupSelection,
-          m_dmxEngine,
-          &DmxEngine::onAddGroupSelection);
+//  connect(m_interpreter,
+//          &Interpreter::addGroupSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onAddGroupSelection);
 
-  connect(m_interpreter,
-          &Interpreter::removeGroupSelection,
-          m_dmxEngine,
-          &DmxEngine::onRemoveGroupSelection);
+//  connect(m_interpreter,
+//          &Interpreter::removeGroupSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onRemoveGroupSelection);
 
-  connect(m_interpreter,
-          &Interpreter::addCueSelection,
-          m_dmxEngine,
-          &DmxEngine::onAddCueSelection);
+//  connect(m_interpreter,
+//          &Interpreter::addCueSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onAddCueSelection);
 
-  connect(m_interpreter,
-          &Interpreter::removeCueSelection,
-          m_dmxEngine,
-          &DmxEngine::onRemoveCueSelection);
+//  connect(m_interpreter,
+//          &Interpreter::removeCueSelection,
+//          m_dmxEngine,
+//          &DmxEngine::onRemoveCueSelection);
 
 }
 
@@ -673,10 +706,14 @@ void DmxManager::submasterToEngine(id t_id,
 }
 
 void DmxManager::directChannelToEngine(id t_id,
-                                       dmx t_level)
+                                       dmx t_level,
+                                       overdmx t_offset)
 {
-  m_dmxEngine->getChannelEngine()->onChannelLevelChangedFromDirectChannel(t_id,
-                                                                          t_level);
+  m_dmxEngine
+      ->getChannelEngine()
+      ->onChannelLevelChangedFromDirectChannel(t_id,
+                                               t_level,
+                                               t_offset);
 }
 
 void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)

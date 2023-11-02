@@ -270,8 +270,8 @@ void DmxChannel::addOutput(DmxOutput *t_dmxOutput)
 
 void DmxChannel::addOutput(Uid_Id t_Uid_Id)
 {
-  addOutput(GET_OUTPUT(t_Uid_Id.getUniverseID(),
-                       t_Uid_Id.getOutputID()));
+  addOutput(MANAGER->getOutput(t_Uid_Id.getUniverseID(),
+                               t_Uid_Id.getOutputID()));
 }
 
 void DmxChannel::addOutputList(const QList<DmxOutput *> t_L_controledOutput)
@@ -298,8 +298,8 @@ void DmxChannel::removeOutput(const DmxOutput *t_output)
 
 void DmxChannel::removeOutput(const Uid_Id t_Uid_Id)
 {
-  removeOutput(GET_OUTPUT(t_Uid_Id.getUniverseID(),
-                          t_Uid_Id.getOutputID()));
+  removeOutput(MANAGER->getOutput(t_Uid_Id.getUniverseID(),
+                                  t_Uid_Id.getOutputID()));
 }
 
 void DmxChannel::removeOutputList(const QList<DmxOutput *> t_L_output)
@@ -343,7 +343,7 @@ DmxChannelGroup::~DmxChannelGroup()
 
 dmx DmxChannelGroup::getControledChannelStoredLevel(const id t_id)
 {
-  return getControledChannelStoredLevel(GET_CHANNEL(t_id));
+  return getControledChannelStoredLevel(MANAGER->getChannel(t_id));
 }
 
 dmx DmxChannelGroup::getControledChannelStoredLevel(/*const */DmxChannel *m_channel)
@@ -375,7 +375,7 @@ void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
 void DmxChannelGroup::addChannel(const id t_id,
                                  const dmx t_storedLevel)
 {
-  auto channel = GET_CHANNEL(t_id);
+  auto channel = MANAGER->getChannel(t_id);
   addChannel(channel,
              t_storedLevel);
 }
@@ -406,7 +406,7 @@ void DmxChannelGroup::removeChannel(DmxChannel *t_channel)
 
 void DmxChannelGroup::removeChannel(const id t_id)
 {
-  removeChannel(GET_CHANNEL(t_id));
+  removeChannel(MANAGER->getChannel(t_id));
 }
 
 void DmxChannelGroup::removeChannelList(const QList<DmxChannel *> t_L_channel)

@@ -141,8 +141,13 @@ public :
   { m_nextSceneLevel = t_nextSceneLevel; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
   void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
-  void setIsSelected(bool t_isSelected){ m_isSelected = t_isSelected; }
+  void setIsSelected(bool t_isSelected)
+  {
+    m_isSelected = t_isSelected;
+    if (!t_isSelected) clearOverdmx();
+  }
 
+  void clearOverdmx(){ m_directChannelOffset = NULL_DMX_OFFSET; }
   void update();
 
 private :
@@ -236,12 +241,19 @@ public :
   void setL_seq(const QList<Sequence *> &t_L_seq){ m_L_seq = t_L_seq; }
   void setMainSeqId(id t_mainSeqId){ m_mainSeqId = t_mainSeqId; }
 
-  Sequence *getMainSeq();
+  Sequence *getMainSeq() const;
+  DmxScene *getSelectedScene() const;
+  DmxScene *getNextScene() const;
+
+  id getSelectedCueId() const{ return m_selectedCueId; }
+  void setSelectedCueId(id t_selectedCueId)
+  { m_selectedCueId = t_selectedCueId; }
 
 private :
 
   QList<Sequence *> m_L_seq;
   id m_mainSeqId;
+  sceneID_f m_selectedCueId;
 
 };
 
@@ -371,15 +383,9 @@ public slots :
   void onRemoveChannelSelection(QList<id> t_L_id);
   void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
-  void onAddGroupSelection(QList<id> t_L_id);
-  void onRemoveGroupSelection(QList<id> t_L_id);
-  void onAddCueSelection(QList<sceneID_f> t_L_sceneID);
-  void onRemoveCueSelection(QList<sceneID_f> t_L_sceneID);
   void onSelectAll();
   void onClearChannelSelection();
   void onClearOutputSelection();
-  void onClearGroupSelection();
-  void onClearCueSelection();
   void onSetLevel(dmx t_level);
   void onSendError();
   void onSendError_NoValueSpecified();
@@ -401,11 +407,7 @@ private :
   // members for interpreter
   QList<id> m_L_channelsIdSelection;
   QList<Uid_Id> m_L_outputUid_IdSelection;
-  QList<id> m_L_channelGroupIdSelection;
-  QList<sceneID_f> m_L_cueIdSelection;
   SelectionType m_selType = SelectionType::UnknownSelectionType;
-
-//  Sequence *m_mainSeq;
 
 };
 

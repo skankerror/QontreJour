@@ -44,13 +44,15 @@ public :
 
   ~DmxManager();
 
-  // TODO : creer les methodes pour ajouter des sequences
-
   // getters
   QStringList getAvailableDriversNames() const;
   QStringList getAvailableDevicesNames(const QString &t_driverString);
   int getUniverseCount() const{ return m_L_universe.size() ;}
   DmxOutput *getOutput(Uid_Id t_output_Uid_Id);
+  DmxOutput *getOutput(uid t_uid,
+                       id t_id)
+      { return getOutput(Uid_Id(t_uid,
+                                t_id)); }
   RootValue *getRootChannel() const{ return m_rootChannel; }
   DmxChannel *getChannel(id t_channelId);
   int getChannelCount() const{ return m_rootChannel->getL_childValueSize(); }
@@ -58,8 +60,11 @@ public :
   DmxChannelGroup *getChannelGroup(id t_groupId);
   int getChannelGroupCount() const{ return m_rootChannelGroup->getL_childValueSize(); }
   QList<Sequence *> getL_sequence() const{ return m_L_sequence; }
-  Sequence *getMainSequence() const
-  { return m_L_sequence.at(m_mainSeq); }
+  Sequence *getMainSequence() const;
+  Sequence *getSequence(id t_seqId);
+  DmxScene *getScene(sceneID_f t_sceneID); // automatically from mainseq
+  DmxScene *getScene(sceneID_f t_sceneID,
+                     id t_SeqId);
 
   // patch interface
   void setStraightPatch(const uid t_uid); // one universe
@@ -93,7 +98,6 @@ public :
                             int t_widgetID,
                             ValueType t_valueType,
                             id t_valueID);
-  void testingMethod();
 
 private :
 
@@ -109,6 +113,8 @@ private :
   QList<RootValue *> getL_rootOutput() const;
   void connectOutputs();
   void connectInterpreterToEngine();
+
+  void testingMethod();
 
 signals :
 
@@ -127,7 +133,8 @@ public slots :
   void submasterToEngine(id t_id,
                          dmx t_level);
   void directChannelToEngine(id t_id,
-                             dmx t_level);
+                             dmx t_level,
+                             overdmx t_offset);
   void keypadToInterpreter(KeypadButton t_buttonType);
 
 private slots :

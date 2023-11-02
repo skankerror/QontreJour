@@ -157,9 +157,9 @@ void DirectChannelWidget::populateWidget()
                                                this);
 
     connect(directChannelSlider,
-            SIGNAL(valueSliderMoved(id,dmx)),
+            SIGNAL(valueSliderMoved(id,dmx,overdmx)),
             MANAGER,
-            SLOT(directChannelToEngine(id,dmx)));
+            SLOT(directChannelToEngine(id,dmx,overdmx)));
 
     m_L_sliders.append(directChannelSlider);
   }

@@ -54,11 +54,6 @@
 #define NULL_GR_ID_DMX Gr_Id_Dmx(NO_ID,NULL_DMX)
 
 #define MANAGER DmxManager::instance()
-#define GET_CHANNEL_GROUP(x) DmxManager::instance()->getChannelGroup(x)
-#define GET_CHANNEL(x) DmxManager::instance()->getChannel(x)
-#define GET_CHANNEL_COUNT DmxManager::instance()->getChannelCount()
-#define GET_OUTPUT(x,y) DmxManager::instance()->getOutput(Uid_Id(x,y))
-#define GET_UNIVERSE_COUNT DmxManager::instance()->getUniverseCount()
 
 // 0 to 255, value for dmx levels
 typedef quint8 dmx ;
@@ -146,8 +141,6 @@ enum SelectionType
 {
   ChannelSelectionType,
   OutputSelectionType,
-  GroupSelectionType,
-  CueSelectionType,
   UnknownSelectionType
 };
 

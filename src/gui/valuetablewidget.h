@@ -18,7 +18,6 @@
 #ifndef VALUETABLEWIDGET_H
 #define VALUETABLEWIDGET_H
 
-
 #include <QWidget>
 #include <QLabel>
 #include <QSpinBox>
@@ -64,7 +63,7 @@ protected :
 
 };
 
-/******************************************************************/
+/************************* ValueTableView ******************************/
 
 class ValueTableView
     : public QTableView
@@ -99,7 +98,7 @@ protected :
 };
 
 
-/********************************************************************/
+/************************* ValueTableModel ******************************/
 
 class ValueTableModel
     : public QAbstractTableModel
@@ -114,19 +113,17 @@ public :
   virtual ~ValueTableModel();
 
   DmxValue *getRootValue() const{ return m_rootValue; }
-  uid getUniverseID() const { return m_universeID; }
   QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
+
+  void recieveValueFromMouse(const QModelIndex &t_index,
+                             const int t_value);
 
 public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-  void setUniverseID(uid t_universeID) { m_universeID = t_universeID; }
   void setEditedIndexes(const QModelIndexList &t_editedIndexes);
 
   void addEditedIndex(QModelIndex &t_editedIndexes);
-
-//  void clearSelectionList();
-//  void selectAll();
 
   //public because we need this edit widgets
   void editedIndexChanged();
@@ -161,12 +158,11 @@ private :
 
   DmxValue *getValueFromIndex(const QModelIndex &t_index) const;
   QList<DmxValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
-  QModelIndex getIndexFromValue(const DmxValue *t_value ) const;
-//  QModelIndexList getNon0ValueIndexList() const;
+  QModelIndex getIndexFromValue(const DmxValue *t_value) const;
+  QModelIndex getIndexFromValueId(const id &t_id) const;
 
 protected :
 
-  uid m_universeID;
   RootValue *m_rootValue;
   QModelIndexList m_editedIndexes;
 

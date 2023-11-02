@@ -78,7 +78,7 @@ void ValueTableWidget::repaintTableView()
 }
 
 
-/*************************************************************************/
+/************************* ValueTableView ******************************/
 
 ValueTableView::ValueTableView(QWidget *parent)
   :QTableView(parent)
@@ -135,11 +135,19 @@ void ValueTableView::mouseMoveEvent(QMouseEvent *event)
       auto yValue = event->pos().y()
           - m_originEditingPoint.y();
       value -= yValue;
-      if (value > 255) value = 255;
-      if (value < 0) value = 0;
-      model()->setData(item,
-                       value,
-                       Qt::EditRole);
+//      if (value > 255)
+//      {
+//        value = 255;
+//      }
+//      if (value < 0)
+//      {
+//        value = 0;
+//      }
+//      model()->setData(item,
+//                       value,
+//                       Qt::EditRole);
+      myModel->recieveValueFromMouse(item,
+                                     value);
     }
     m_originEditingPoint = event->pos();
     return;
@@ -147,7 +155,7 @@ void ValueTableView::mouseMoveEvent(QMouseEvent *event)
   QTableView::mouseMoveEvent(event);
 }
 
-/************************************************************************/
+/************************* ValueTableModel ******************************/
 
 ValueTableModel::ValueTableModel(QObject *parent)
   : QAbstractTableModel(parent)
@@ -155,6 +163,22 @@ ValueTableModel::ValueTableModel(QObject *parent)
 
 ValueTableModel::~ValueTableModel()
 {}
+
+void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
+                                            const int t_value)
+{
+  int valueID = (((t_index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+                + t_index.column();
+  overdmx over = 0;
+  dmx value = 0;
+  if (t_value > 255) value = 255;
+  else if (t_value < 0) value = 0;
+  else value = t_value;
+  over = t_value - value;
+  MANAGER->directChannelToEngine(valueID,
+                                 value,
+                                 over);
+}
 
 void ValueTableModel::setEditedIndexes(const QModelIndexList &t_editedIndexes)
 {
@@ -168,46 +192,17 @@ void ValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
   editedIndexChanged();
 }
 
-//QModelIndexList ValueTableModel::getNon0ValueIndexList() const
-//{
-//  auto listRet = QModelIndexList();
-//  auto L_childValue = m_rootValue->getL_childValue();
-//  for(const auto &item
-//      : std::as_const(L_childValue))
-//  {
-//    if (item->getLevel() > 0) // TODO : problem with parked independant
-//    {
-//      auto index = getIndexFromValue(item);
-//      listRet.append(index);
-//    }
-//  }
-//  return listRet;
-//}
-
 QModelIndex ValueTableModel::getIndexFromValue(const DmxValue *t_value) const
 {
-  auto valueID = t_value->getID();
-  // determine row et column for the value
-  auto row =  (2 * (valueID / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT)) + 1;
-  auto column = valueID % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT;
-
-  auto indexRet = index(row,
-                        column);
-  return indexRet;
+  return getIndexFromValueId(t_value->getID());
 }
 
-//void ValueTableModel::clearSelectionList()
-//{
-//  m_editedIndexes.clear();
-//  //  editedIndexChanged();
-//  emit dataChanged(index(0,0),index(31,31)); // NOTE : BEURK !!
-//}
+QModelIndex ValueTableModel::getIndexFromValueId(const id &t_id) const
+{
+  return index((2 * (t_id / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT)) + 1,
+               t_id % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT);
 
-//void ValueTableModel::selectAll()
-//{
-//  m_editedIndexes = getNon0ValueIndexList();
-//  editedIndexChanged();
-//}
+}
 
 void ValueTableModel::editedIndexChanged()
 {
@@ -420,10 +415,7 @@ bool ValueTableModel::setData(const QModelIndex &index,
                               const QVariant &value,
                               int role)
 {
-  // test
-//  return setFilterData(index,
-//                       value,
-//                       role);
+  Q_UNUSED(role)
 
   if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
     return false;
@@ -436,8 +428,8 @@ bool ValueTableModel::setData(const QModelIndex &index,
 //  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
 //                     value.toInt());
 
-  MANAGER->directChannelToEngine(valueID,
-                                 value.toInt());
+//  MANAGER->directChannelToEngine(valueID,
+//                                 value.toInt());
 
   emit dataChanged(index,index);
 

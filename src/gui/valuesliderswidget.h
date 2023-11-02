@@ -137,7 +137,8 @@ public :
 signals :
 
   void valueSliderMoved(id t_id,
-                        dmx t_level);
+                        dmx t_level,
+                        overdmx t_offset = 0);
 
 protected slots :
 

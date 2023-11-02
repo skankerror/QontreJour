@@ -34,7 +34,7 @@ Sequence::Sequence(ValueType t_type,
   scene0->setStepNumber(0);
   m_L_childScene.append(scene0);
 
-  emit seqSizeChanged();
+//  emit seqSizeChanged();
 }
 
 Sequence::~Sequence()
