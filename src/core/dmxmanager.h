@@ -105,7 +105,7 @@ private :
 
   // create everything we need
   bool createUniverse(uid t_universeID);
-  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
+//  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
 
   QList<QDmxDriver *> getAvailableDrivers() const;
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);

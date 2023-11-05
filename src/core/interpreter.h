@@ -43,7 +43,16 @@ private :
   bool calculateGroupId();
   bool calculateCueId();
   dmx calculateDmx();
+  percent calculatePercent();
   bool calculateFloatTime();
+  bool calculateStepId();
+  void clearCue() { m_selectedCueId = 0.0f; }
+  void clearGroup() { m_selectedGroupId = NO_ID; }
+  void resetInterpreter()
+  { clearValue(); clearGroup(); clearCue(); }
+
+  percent dmxToPercent(dmx t_dLevel);
+  dmx percentToDmx(percent t_pLevel);
 
 signals :
 
@@ -61,6 +70,16 @@ signals :
   void setDelayIn(time_f t_time);
   void setDelayOut(time_f t_time);
   void setLevel(dmx t_level);
+  void recordNextCue();
+  void recordNewCue(sceneID_f t_id);
+  void updateCurrentCue();
+  void updateCue(sceneID_f t_id);
+  void recordGroup(id t_id);
+  void gotoCue(sceneID_f t_id);
+  void gotoStep(id t_id);
+  void deleteCue(sceneID_f t_id);
+  void deleteStep(id t_id);
+  void deleteGroup(id t_id);
   void sendError();
   void sendError_NoValueSpecified();
 
@@ -80,8 +99,7 @@ private :
   Uid_Id m_lastSelectedOutputUidId = NULL_UID_ID;
   id m_selectedGroupId = NO_ID;
   sceneID_f m_selectedCueId = 0.0f;
+  id m_stepId = NO_ID;
   time_f m_time = 0.0f;
-
 };
-
 #endif // INTERPRETER_H

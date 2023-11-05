@@ -214,12 +214,14 @@ public :
 
   virtual ~DmxOutput();
 
+//  uid getUniverseID() const { return m_universeID; }
   dmx getMaxLevel() const{ return m_maxLevel; }
   bool getIsParked() const{ return m_isParked; }
   DmxChannel *getChannelControler() const{ return m_channelControler; }
 
   void setChannelControler(DmxChannel *t_channelControler)
   { m_channelControler = t_channelControler; }
+//  void setUniverseID(const uid t_universeID) { m_universeID = t_universeID; }
 
 signals :
 
@@ -235,9 +237,10 @@ public slots :
 
 private :
 
-  dmx m_maxLevel = 255;
+  dmx m_maxLevel = MAX_DMX;
   bool m_isParked;
   DmxChannel *m_channelControler = nullptr;
+//  uid m_universeID = NO_UID;
 
 };
 

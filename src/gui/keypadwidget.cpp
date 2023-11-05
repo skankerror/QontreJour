@@ -131,10 +131,10 @@ void KeypadWidget::populateWidget()
   connect(nineButton, &PushButton::clicked, [=]
           { emit buttonClicked(KeypadButton::Nine); });
 
-  auto arobaseButton = new PushButton("@", this);
+  auto arobaseButton = new PushButton("@%", this);
   layout->addWidget(arobaseButton, 2, 4);
   connect(arobaseButton, &PushButton::clicked, [=]
-          { emit buttonClicked(KeypadButton::Arobase); });
+          { emit buttonClicked(KeypadButton::ArobasePercent); });
 
   auto levelPlusButton = new PushButton("+%", this);
   layout->addWidget(levelPlusButton, 2, 5);

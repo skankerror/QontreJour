@@ -100,18 +100,27 @@ void Sequence::addScene(DmxScene *t_scene,
       if (scene->getSceneID() == t_id)
       {
         // TODO : ouvrir une fenetre pour confirmer
+        // la scene d'avant est pas détruite
         qWarning() << "erase scene" << t_id;
         t_scene->setStepNumber(scene->getStepNumber());
         m_L_childScene[i] = t_scene;
+        emit seqSizeChanged();
         return;
       }
-      if (scene->getSceneID() > t_id)
+      else if (scene->getSceneID() > t_id)
       {
-        m_L_childScene.insert(i + 1, t_scene);
-        update(i + 1);
+        m_L_childScene.insert(i /*+ 1*/, t_scene);
+        update(i /*+ 1*/);
+        emit seqSizeChanged();
+        return;
       }
     }
+    // we're at the end, scen id is the highest of the seq
+    t_scene->setStepNumber(m_L_childScene.size());
+    m_L_childScene.append(t_scene);
+    emit seqSizeChanged();
   }
+  // TODO : ça va pas
   emit seqSizeChanged();
 }
 

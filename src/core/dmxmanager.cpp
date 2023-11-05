@@ -80,7 +80,8 @@ void DmxManager::testingMethod()
   auto L_channel = QList<DmxChannel *>();
   L_channel.append(channel1);
   L_channel.append(channel2);
-  createChannelGroup(L_channel);
+  m_dmxEngine->getGroupEngine()->createChannelGroup(L_channel);
+//  createChannelGroup(L_channel);
 
   getChannelGroup(0)->setLevel(100);
   getChannelGroup(0)->setLevel(0);
@@ -89,31 +90,6 @@ void DmxManager::testingMethod()
                        0,
                        ValueType::ChannelGroup,
                        0);
-
-  auto mainSeq = m_L_sequence.at(0);
-  auto name = QString("accueil public");
-  auto scene = new DmxScene(ValueType::MainScene,
-                            mainSeq);
-  scene->setName(name);
-  scene->setTimeIn(5.0);
-  scene->setTimeOut(5.0);
-  scene->setDelayIn(0);
-  scene->setDelayOut(0);
-  scene->setParentValue(mainSeq);
-  mainSeq->addScene(scene);
-
-  auto scene2 = new DmxScene(ValueType::MainScene,
-                            mainSeq);
-  scene2->setID(10);
-  scene2->setName("bluk");
-  scene2->setTimeIn(4.7);
-  scene2->setTimeOut(5.0);
-  scene2->setDelayIn(0);
-  scene2->setDelayOut(0);
-  scene2->setParentValue(mainSeq);
-  mainSeq->addScene(scene2, 10);
-
-
 }
 
 DmxManager *DmxManager::instance()
@@ -258,25 +234,6 @@ bool DmxManager::createUniverse(uid t_universeID)
   return false;
 }
 
-DmxChannelGroup *DmxManager::createChannelGroup(QList<DmxChannel *> t_L_channel)
-{
-  auto newGroup = new DmxChannelGroup(ValueType::ChannelGroup);
-  newGroup->setID(getChannelGroupCount());
-  auto H_controledChannel_storedLevel = QHash<DmxChannel *,dmx>();
-  for (const auto item
-       : std::as_const(t_L_channel))
-  {
-    H_controledChannel_storedLevel.insert(item,
-                                          item->getLevel());
-  }
-  newGroup->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
-  m_rootChannelGroup->addChildValue(newGroup);
-
-  m_dmxEngine->getGroupEngine()->addNewGroup(newGroup);
-
-  return newGroup;
-}
-
 RootValue *DmxManager::getRootOutput(const uid t_uid) const
 {
   if (t_uid < 0
@@ -320,115 +277,83 @@ void DmxManager::connectOutputs()
 
 void DmxManager::connectInterpreterToEngine()
 {
-  connect(m_interpreter,
-          &Interpreter::addChannelSelection,
-          m_dmxEngine,
-          &DmxEngine::onAddChannelSelection);
+  connect(m_interpreter, &Interpreter::addChannelSelection,
+          m_dmxEngine, &DmxEngine::onAddChannelSelection);
 
-  connect(m_interpreter,
-          &Interpreter::removeChannelSelection,
-          m_dmxEngine,
-          &DmxEngine::onRemoveChannelSelection);
+  connect(m_interpreter, &Interpreter::removeChannelSelection,
+          m_dmxEngine, &DmxEngine::onRemoveChannelSelection);
 
-  connect(m_interpreter,
-          &Interpreter::addOutputSelection,
-          m_dmxEngine,
-          &DmxEngine::onAddOutputSelection);
+  connect(m_interpreter, &Interpreter::addOutputSelection,
+          m_dmxEngine, &DmxEngine::onAddOutputSelection);
 
-  connect(m_interpreter,
-          &Interpreter::removeOutputSelection,
-          m_dmxEngine,
-          &DmxEngine::onRemoveOutputSelection);
+  connect(m_interpreter, &Interpreter::removeOutputSelection,
+          m_dmxEngine, &DmxEngine::onRemoveOutputSelection);
 
-  connect(m_interpreter,
-          &Interpreter::selectAll,
-          m_dmxEngine,
-          &DmxEngine::onSelectAll);
+  connect(m_interpreter, &Interpreter::selectAll,
+          m_dmxEngine, &DmxEngine::onSelectAll);
 
-  connect(m_interpreter,
-          &Interpreter::clearChannelSelection,
-          m_dmxEngine,
-          &DmxEngine::onClearChannelSelection);
+  connect(m_interpreter, &Interpreter::clearChannelSelection,
+          m_dmxEngine, &DmxEngine::onClearChannelSelection);
 
-  connect(m_interpreter,
-          &Interpreter::clearOutputSelection,
-          m_dmxEngine,
-          &DmxEngine::onClearOutputSelection);
+  connect(m_interpreter, &Interpreter::clearOutputSelection,
+          m_dmxEngine, &DmxEngine::onClearOutputSelection);
 
-//  connect(m_interpreter,
-//          &Interpreter::clearGroupSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onClearGroupSelection);
+  connect(m_interpreter, &Interpreter::setLevel,
+          m_dmxEngine, &DmxEngine::onSetLevel);
 
-//  connect(m_interpreter,
-//          &Interpreter::clearCueSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onClearCueSelection);
+  connect(m_interpreter, &Interpreter::sendError,
+          m_dmxEngine, &DmxEngine::onSendError);
 
-  connect(m_interpreter,
-          &Interpreter::setLevel,
-          m_dmxEngine,
-          &DmxEngine::onSetLevel);
+  connect(m_interpreter, &Interpreter::sendError_NoValueSpecified,
+          m_dmxEngine, &DmxEngine::onSendError_NoValueSpecified);
 
-  connect(m_interpreter,
-          &Interpreter::sendError,
-          m_dmxEngine,
-          &DmxEngine::onSendError);
+  connect(m_interpreter, &Interpreter::plusPercent,
+          m_dmxEngine, &DmxEngine::onPlusPercent);
 
-  connect(m_interpreter,
-          &Interpreter::sendError_NoValueSpecified,
-          m_dmxEngine,
-          &DmxEngine::onSendError_NoValueSpecified);
-  connect(m_interpreter,
-          &Interpreter::plusPercent,
-          m_dmxEngine,
-          &DmxEngine::onPlusPercent);
+  connect(m_interpreter, &Interpreter::moinsPercent,
+          m_dmxEngine, &DmxEngine::onMoinsPercent);
 
-  connect(m_interpreter,
-          &Interpreter::moinsPercent,
-          m_dmxEngine,
-          &DmxEngine::onMoinsPercent);
+  connect(m_interpreter, &Interpreter::setTimeIn,
+          m_dmxEngine, &DmxEngine::onSetTimeIn);
 
-  connect(m_interpreter,
-          &Interpreter::setTimeIn,
-          m_dmxEngine,
-          &DmxEngine::onSetTimeIn);
+  connect(m_interpreter, &Interpreter::setTimeOut,
+          m_dmxEngine, &DmxEngine::onSetTimeOut);
 
-  connect(m_interpreter,
-          &Interpreter::setTimeOut,
-          m_dmxEngine,
-          &DmxEngine::onSetTimeOut);
+  connect(m_interpreter, &Interpreter::setDelayIn,
+          m_dmxEngine, &DmxEngine::onSetDelayIn);
 
-  connect(m_interpreter,
-          &Interpreter::setDelayIn,
-          m_dmxEngine,
-          &DmxEngine::onSetDelayIn);
+  connect(m_interpreter, &Interpreter::setDelayOut,
+          m_dmxEngine, &DmxEngine::onSetDelayOut);
 
-  connect(m_interpreter,
-          &Interpreter::setDelayOut,
-          m_dmxEngine,
-          &DmxEngine::onSetDelayOut);
+  connect(m_interpreter, &Interpreter::recordNextCue,
+          m_dmxEngine, &DmxEngine::onRecordNextCue);
 
-//  connect(m_interpreter,
-//          &Interpreter::addGroupSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onAddGroupSelection);
+  connect(m_interpreter, &Interpreter::recordNewCue,
+          m_dmxEngine, &DmxEngine::onRecordNewCue);
 
-//  connect(m_interpreter,
-//          &Interpreter::removeGroupSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onRemoveGroupSelection);
+  connect(m_interpreter, &Interpreter::updateCurrentCue,
+          m_dmxEngine, &DmxEngine::onUpdateCurrentCue);
 
-//  connect(m_interpreter,
-//          &Interpreter::addCueSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onAddCueSelection);
+  connect(m_interpreter, &Interpreter::updateCue,
+          m_dmxEngine, &DmxEngine::onUpdateCue);
 
-//  connect(m_interpreter,
-//          &Interpreter::removeCueSelection,
-//          m_dmxEngine,
-//          &DmxEngine::onRemoveCueSelection);
+  connect(m_interpreter, &Interpreter::recordGroup,
+          m_dmxEngine, &DmxEngine::onRecordGroup);
 
+  connect(m_interpreter, &Interpreter::gotoCue,
+          m_dmxEngine, &DmxEngine::onGotoCue);
+
+  connect(m_interpreter, &Interpreter::gotoStep,
+          m_dmxEngine, &DmxEngine::onGotoStep);
+
+  connect(m_interpreter, &Interpreter::deleteCue,
+          m_dmxEngine, &DmxEngine::onDeleteCue);
+
+  connect(m_interpreter, &Interpreter::deleteStep,
+          m_dmxEngine, &DmxEngine::onDeleteStep);
+
+  connect(m_interpreter, &Interpreter::deleteGroup,
+          m_dmxEngine, &DmxEngine::onDeleteGroup);
 }
 
 void DmxManager::setStraightPatch(const uid t_uid)

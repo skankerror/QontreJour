@@ -19,31 +19,34 @@
 
 #include <QApplication>
 #include <QFile>
-//#include <QLocale>
-//#include <QTranslator>
+#include <QLocale>
+#include <QTranslator>
 
 
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
 
+  // qss stylesheet
   QFile file(":/qss/qss/MyStyleSheet.qss");
   file.open(QFile::ReadOnly);
   QString styleSheet = QString::fromLatin1(file.readAll());
-
   a.setStyleSheet(styleSheet);
 
-//  QTranslator translator;
-//  const QStringList uiLanguages = QLocale::system().uiLanguages();
-//  for (const QString &locale : uiLanguages)
-//  {
-//    const QString baseName = "QontreJour_" + QLocale(locale).name();
-//    if (translator.load(":/i18n/" + baseName))
-//    {
-//      a.installTranslator(&translator);
-//      break;
-//    }
-//  }
+  // translation
+  QTranslator translator;
+  const QStringList uiLanguages = QLocale::system().uiLanguages();
+  for (const QString &locale : uiLanguages)
+  {
+    const QString baseName = "QontreJour_" + QLocale(locale).name();
+    if (translator.load(":/i18n/" + baseName))
+    {
+      a.installTranslator(&translator);
+      break;
+    }
+  }
+
+  // let's go baby !
   MainWindow w;
   w.show();
   return a.exec();

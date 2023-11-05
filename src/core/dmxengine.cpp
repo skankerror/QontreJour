@@ -114,6 +114,30 @@ bool ChannelGroupEngine::modifyGroup(const id t_groupID)
   return modifyGroup(GET_CHANNEL_GROUP(t_groupID));
 }
 
+DmxChannelGroup *ChannelGroupEngine::createChannelGroup(QList<DmxChannel *> t_L_channel)
+{
+  auto newGroup = new DmxChannelGroup(ValueType::ChannelGroup);
+  newGroup->setID(m_rootChannelGroup->getL_childValueSize());
+  auto H_controledChannel_storedLevel = QHash<DmxChannel *, dmx>();
+  for (const auto item
+       : std::as_const(t_L_channel))
+  {
+    H_controledChannel_storedLevel.insert(item,
+                                          item->getLevel());
+  }
+  newGroup->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
+  m_rootChannelGroup->addChildValue(newGroup);
+
+  addNewGroup(newGroup);
+
+  return newGroup;
+}
+
+//DmxChannelGroup *ChannelGroupEngine::createChannelGroup(QList<id> t_L_channelId)
+//{
+
+//}
+
 void ChannelGroupEngine::addChannelGroup(id t_groupID,
                                          QList<Ch_Id_Dmx> t_L_id_dmx)
 {
@@ -229,6 +253,75 @@ DmxScene *CueEngine::getNextScene() const
   }
   return nullptr;
 }
+
+void CueEngine::recordNextCueInMainSeq(DmxScene *t_scene)
+{
+  auto seq = getMainSeq();
+  seq->addScene(t_scene);
+}
+
+void CueEngine::recordNextCue(DmxScene *t_scene,
+                              id t_seqId)
+{
+  auto seq = m_L_seq.at(t_seqId);
+  seq->addScene(t_scene);
+}
+
+void CueEngine::recordNewCueInMainSeq(DmxScene *t_scene,
+                                      sceneID_f t_scId)
+{
+  auto seq = getMainSeq();
+  seq->addScene(t_scene,
+                t_scId);
+}
+
+void CueEngine::recordNewCue(id t_seqId,
+                             DmxScene *t_scene,
+                             sceneID_f t_scId)
+{
+  auto seq = m_L_seq.at(t_seqId);
+  seq->addScene(t_scene,
+                t_scId);
+}
+
+void CueEngine::deleteCueInMainSeq(sceneID_f t_id)
+{
+
+}
+
+void CueEngine::deleteCue(id t_seqId, sceneID_f t_id)
+{
+
+}
+
+DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
+                                 sceneID_f t_id)
+{
+  auto newScene = new DmxScene(ValueType::MainScene);
+//  newGroup->setID(m_rootChannelGroup->getL_childValueSize());
+  auto H_controledChannel_storedLevel = QHash<DmxChannel *, dmx>();
+  for (const auto item
+       : std::as_const(t_L_channel))
+  {
+    H_controledChannel_storedLevel.insert(item,
+                                          item->getLevel());
+  }
+  newScene->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
+//  m_rootChannelGroup->addChildValue(newGroup);
+//  addNewGroup(newGroup);
+  return newScene;
+}
+
+void CueEngine::updateScene(QList<DmxChannel *> t_L_channel, sceneID_f t_id)
+{
+
+}
+
+//DmxScene *CueEngine::createScene(QList<id> t_L_channelId,
+//                                 sceneID_f t_id)
+//{
+
+//}
 
 /******************************* ChannelEngine ***********************/
 
@@ -364,6 +457,35 @@ void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
   update(t_id);
 }
 
+void ChannelEngine::onChannelLevelPlusFromDirectChannel(id t_id)
+{
+  auto channelData = m_L_channelData.at(t_id);
+  auto level = channelData->getDirectChannelLevel();
+  if (level > MAX_DMX - PLUS_DMX)
+  {
+    auto offset = channelData->getDirectChannelOffset()
+                  + level
+                  - MAX_DMX
+                  - PLUS_DMX;
+    channelData->setDirectChannelOffset(offset);
+  }
+  channelData->setDirectChannelLevel(level + PLUS_DMX);
+}
+
+void ChannelEngine::onChannelLevelMoinsFromDirectChannel(id t_id)
+{
+  auto channelData = m_L_channelData.at(t_id);
+  auto level = channelData->getDirectChannelLevel();
+  if (level - MOINS_DMX < 0)
+  {
+    auto offset = channelData->getDirectChannelOffset()
+                  + level
+                  - MOINS_DMX;
+    channelData->setDirectChannelOffset(offset);
+  }
+  channelData->setDirectChannelLevel(level - MOINS_DMX);
+}
+
 void ChannelEngine::onChannelLevelChangedFromScene(id t_id,
                                                    dmx t_level)
 {
@@ -410,6 +532,24 @@ void OutputEngine::onDirectOutputLevelChanged(Uid_Id t_uid_id,
     auto output = rootOutput->getChildValue(t_uid_id.getOutputID());
     output->setLevel(t_level);
 
+}
+
+void OutputEngine::onDirectOutputLevelPlus(Uid_Id t_uid_id)
+{
+    auto rootOutput = m_L_rootOutput.at(t_uid_id.getUniverseID());
+    auto output = rootOutput->getChildValue(t_uid_id.getOutputID());
+    int level = output->getLevel() + PLUS_DMX;
+    if (level > MAX_DMX) level = MAX_DMX;
+    output->setLevel(level);
+}
+
+void OutputEngine::onDirectOutputLevelMoins(Uid_Id t_uid_id)
+{
+    auto rootOutput = m_L_rootOutput.at(t_uid_id.getUniverseID());
+    auto output = rootOutput->getChildValue(t_uid_id.getOutputID());
+    int level = output->getLevel() - MOINS_DMX;
+    if (level < NULL_DMX) level = NULL_DMX;
+    output->setLevel(level);
 }
 
 /******************************* DmxEngine ***************************/
@@ -459,6 +599,20 @@ DmxEngine::~DmxEngine()
 void DmxEngine::setMainSeq(id t_id)
 {
   m_cueEngine->setMainSeqId(t_id);
+}
+
+QList<DmxChannel *> DmxEngine::getSelectedChannels() const
+{
+  auto rootChannel = m_channelEngine->getRootChannel();
+  auto L_channel = QList<DmxChannel *>();
+  for (qsizetype i = 0;
+       i < m_L_channelsIdSelection.size();
+       i++)
+  {
+    auto channel = qobject_cast<DmxChannel *>(rootChannel->getChildValue(i));
+    L_channel.append(channel);
+  }
+  return L_channel;
 }
 
 void DmxEngine::onAddChannelSelection(QList<id> t_L_id)
@@ -541,6 +695,7 @@ void DmxEngine::onClearChannelSelection()
 
 void DmxEngine::onClearOutputSelection()
 {
+
   m_L_outputUid_IdSelection.clear();
   m_L_outputUid_IdSelection.squeeze();
 }
@@ -594,12 +749,72 @@ void DmxEngine::onSendError_NoValueSpecified()
 
 void DmxEngine::onPlusPercent()
 {
-
+  // we have a problem
+  if (m_selType == SelectionType::UnknownSelectionType)
+  {
+    qDebug() << "error unknown selection type";
+    return;
+  }
+  // that's channel
+  if (m_selType == SelectionType::ChannelSelectionType)
+  {
+    for (qsizetype i = 0;
+         i < m_L_channelsIdSelection.size();
+         i++)
+    {
+      m_channelEngine
+          ->onChannelLevelPlusFromDirectChannel(m_L_channelsIdSelection.at(i));
+    }
+    return;
+  }
+  // that's output
+  if (m_selType == SelectionType::ChannelSelectionType)
+  {
+    for (qsizetype i = 0;
+         i < m_L_outputUid_IdSelection.size();
+         i++)
+    {
+      m_outputEngine
+          ->onDirectOutputLevelPlus(m_L_outputUid_IdSelection.at(i));
+    }
+    return;
+  }
+  return;
 }
 
 void DmxEngine::onMoinsPercent()
 {
-
+  // we have a problem
+  if (m_selType == SelectionType::UnknownSelectionType)
+  {
+    qDebug() << "error unknown selection type";
+    return;
+  }
+  // that's channel
+  if (m_selType == SelectionType::ChannelSelectionType)
+  {
+    for (qsizetype i = 0;
+         i < m_L_channelsIdSelection.size();
+         i++)
+    {
+      m_channelEngine
+          ->onChannelLevelMoinsFromDirectChannel(m_L_channelsIdSelection.at(i));
+    }
+    return;
+  }
+  // that's output
+  if (m_selType == SelectionType::ChannelSelectionType)
+  {
+    for (qsizetype i = 0;
+         i < m_L_outputUid_IdSelection.size();
+         i++)
+    {
+      m_outputEngine
+          ->onDirectOutputLevelMoins(m_L_outputUid_IdSelection.at(i));
+    }
+    return;
+  }
+  return;
 }
 
 void DmxEngine::onSetTimeIn(time_f t_time)
@@ -628,5 +843,86 @@ void DmxEngine::onSetDelayOut(time_f t_time)
   auto scene = m_cueEngine->getNextScene();
   if (scene)
     scene->setDelayOut(t_time);
+}
+
+void DmxEngine::onRecordNextCue()
+{
+  if (m_selType != SelectionType::ChannelSelectionType)
+  {
+    qDebug() << " no channels selected"; // NOTE: black scene ?
+//    return;
+  }
+  auto L_channel = getSelectedChannels();
+  m_cueEngine
+      ->recordNextCueInMainSeq(m_cueEngine
+                                  ->createScene(L_channel));
+}
+
+void DmxEngine::onRecordNewCue(sceneID_f t_id)
+{
+  if (m_selType != SelectionType::ChannelSelectionType)
+  {
+    qDebug() << " no channels selected"; // NOTE: black scene ?
+    //    return;
+  }
+  auto L_channel = getSelectedChannels();
+  m_cueEngine
+      ->recordNewCueInMainSeq(m_cueEngine
+                                  ->createScene(L_channel,
+                                                t_id),
+                              t_id);
+}
+
+void DmxEngine::onUpdateCurrentCue()
+{
+  if (m_selType != SelectionType::ChannelSelectionType)
+  {
+    qDebug() << " no channels selected"; // NOTE: black scene ?
+    //    return;
+  }
+  auto L_channel = getSelectedChannels();
+  m_cueEngine->updateScene(L_channel);
+}
+
+void DmxEngine::onUpdateCue(sceneID_f t_id)
+{
+  if (m_selType != SelectionType::ChannelSelectionType)
+  {
+    qDebug() << " no channels selected"; // NOTE: black scene ?
+    //    return;
+  }
+  auto L_channel = getSelectedChannels();
+  m_cueEngine->updateScene(L_channel,
+                           t_id);
+}
+
+void DmxEngine::onRecordGroup(id t_id)
+{
+
+}
+
+void DmxEngine::onGotoCue(sceneID_f t_id)
+{
+
+}
+
+void DmxEngine::onGotoStep(id t_id)
+{
+  
+}
+
+void DmxEngine::onDeleteCue(sceneID_f t_id)
+{
+  
+}
+
+void DmxEngine::onDeleteStep(id t_id)
+{
+  
+}
+
+void DmxEngine::onDeleteGroup(id t_id)
+{
+  
 }
 

@@ -73,17 +73,25 @@ typedef qint16 uid;
 typedef qreal sceneID_f;
 typedef qreal time_f;
 
+typedef quint8 percent;
+
 #define NO_ID -1
 #define NO_UID -1
 #define NULL_DMX 0
 #define NULL_DMX_OFFSET 0
 #define NULL_UID_ID Uid_Id(NO_UID,NO_ID)
+#define MAX_DMX 255
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_CHANNEL_NAME "CH"
 #define DEFAULT_GROUP_NAME "GROUP"
 
 #define BUTTON_WIDTH_MAX 55
+
+#define PLUS_PERCENT 5
+#define MOINS_PERCENT 5
+#define PLUS_DMX 13
+#define MOINS_DMX 13
 
 enum KeypadButton
 {
@@ -93,7 +101,7 @@ enum KeypadButton
   Record, Update, Delete,
   Patch, Unpatch,
   Plus, Moins, Clear, All, Thru,
-  Pluspc, Moinspc, Arobase,
+  Pluspc, Moinspc, ArobaseDmx, ArobasePercent,
   Step, Goto,
   Help,
   UnknownButton

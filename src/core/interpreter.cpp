@@ -57,6 +57,18 @@ void Interpreter::recieveData(KeypadButton t_button)
     return;
   }
 
+  if (t_button == KeypadButton::Record)
+  {
+    if (m_selectedCueId)
+      emit recordNewCue(m_selectedCueId);
+    else if (m_selectedGroupId != NO_ID)
+      emit recordGroup(m_selectedGroupId);
+    else
+      emit recordNextCue();
+    resetInterpreter();
+    return;
+  }
+
   if (!m_isValued
       && (t_button > KeypadButton::Dot)) // no value yet and it's not value
   {
@@ -81,7 +93,7 @@ void Interpreter::recieveData(KeypadButton t_button)
   case KeypadButton::Channel :
     if (calculateChannelId())
     {
-      clearValue();
+      resetInterpreter();
       L_channelsToSelect.append(m_lastSelectedChannelId);
       emit clearChannelSelection();
       emit addChannelSelection(L_channelsToSelect);
@@ -90,7 +102,7 @@ void Interpreter::recieveData(KeypadButton t_button)
   case KeypadButton::Output :
     if (calculateOutputUidId());
     {
-      clearValue();
+      resetInterpreter();
       L_outputsToSelect.append(m_lastSelectedOutputUidId);
       emit clearOutputSelection();
       emit addOutputSelection(L_outputsToSelect);
@@ -100,12 +112,14 @@ void Interpreter::recieveData(KeypadButton t_button)
     if (calculateCueId())
     {
       clearValue();
+      clearGroup();
     }
     break;
   case KeypadButton::Group :
     if (calculateGroupId())
     {
       clearValue();
+      clearCue();
     }
     break;
   case KeypadButton::Thru :
@@ -125,7 +139,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                i <= m_lastSelectedChannelId;
                i--)
             L_channelsToSelect.append(i);
-        clearValue();
+        resetInterpreter();
         emit addChannelSelection(L_channelsToSelect);
       }
     }
@@ -151,7 +165,7 @@ void Interpreter::recieveData(KeypadButton t_button)
                  i--)
               L_outputsToSelect.append(Uid_Id(lastSelectedOutputUidId.getUniverseID()
                                               , i));
-          clearValue();
+          resetInterpreter();
           emit addOutputSelection(L_outputsToSelect);
         }
     }
@@ -162,7 +176,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateChannelId())
       {
         L_channelsToSelect.append(m_lastSelectedChannelId);
-        clearValue();
+        resetInterpreter();
         emit addChannelSelection(L_channelsToSelect);
       }
     }
@@ -171,7 +185,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateOutputUidId())
       {
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
-        clearValue();
+        resetInterpreter();
         emit addOutputSelection(L_outputsToSelect);
       }
     }
@@ -182,7 +196,7 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateChannelId())
       {
         L_channelsToSelect.append(m_lastSelectedChannelId);
-        clearValue();
+        resetInterpreter();
         emit removeChannelSelection(L_channelsToSelect);
       }
     }
@@ -191,14 +205,18 @@ void Interpreter::recieveData(KeypadButton t_button)
       if (calculateOutputUidId())
       {
         L_outputsToSelect.append(m_lastSelectedOutputUidId);
-        clearValue();
+        resetInterpreter();
         emit removeOutputSelection(L_outputsToSelect);
       }
     }
     break;
-  case KeypadButton::Arobase :
+  case KeypadButton::ArobaseDmx :
     emit setLevel(calculateDmx());
-    clearValue();
+    resetInterpreter();
+    break;
+  case KeypadButton::ArobasePercent :
+    emit setLevel(percentToDmx(calculatePercent()));
+    resetInterpreter();
     break;
   case KeypadButton::Time :
     if (calculateFloatTime())
@@ -223,13 +241,42 @@ void Interpreter::recieveData(KeypadButton t_button)
     if (calculateFloatTime())
       emit setDelayOut(m_time);
     break;
-  case KeypadButton::Record :
   case KeypadButton::Update :
+    if (m_selectedCueId)
+      emit updateCue(m_selectedCueId);
+    else if (m_selectedGroupId != NO_ID)
+      emit recordGroup(m_selectedGroupId);
+    else
+      emit updateCurrentCue();
+    resetInterpreter();
+    break;
+  case KeypadButton::Goto :
+    if (m_isValued)
+    {
+      if (calculateCueId())
+        emit gotoCue(m_selectedCueId);
+    }
+    else if (m_selectedCueId)
+      emit gotoCue(m_selectedCueId);
+    else if (m_stepId != NO_ID)
+      emit gotoStep(m_stepId);
+    else
+      emit sendError_NoValueSpecified();
+    break;
+  case KeypadButton::Step :
+    if (calculateStepId())
+      resetInterpreter();
+    break;
   case KeypadButton::Delete :
+    if (m_selectedCueId != NO_ID)
+      emit deleteCue(m_selectedCueId);
+    else if (m_stepId > 0)
+      emit deleteStep(m_stepId);
+    else if (m_selectedGroupId != NO_ID)
+      emit deleteGroup(m_selectedGroupId);
+    break;
   case KeypadButton::Patch :
   case KeypadButton::Unpatch :
-  case KeypadButton::Step :
-  case KeypadButton::Goto :
   case KeypadButton::Help :
   default : break;
   }
@@ -431,6 +478,34 @@ dmx Interpreter::calculateDmx()
              255 :  level;
 }
 
+percent Interpreter::calculatePercent()
+{
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return NULL_DMX;
+  }
+
+  percent level = NULL_DMX;
+
+  // find first dot
+  auto i = m_L_digits.indexOf(KeypadButton::Dot);
+  if (i > -1)
+    m_L_digits.remove(i, m_L_digits.size() - i);
+
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    level += digit * qPow(10, i);
+    qDebug() << level;
+  }
+  clearValue();
+  return (level > 100) ?
+             100 :  level;
+}
+
 bool Interpreter::calculateFloatTime()
 {
   if (!m_isValued)
@@ -475,4 +550,57 @@ bool Interpreter::calculateFloatTime()
   qDebug() << m_time;
   clearValue();
   return true;
+}
+
+bool Interpreter::calculateStepId()
+{
+  if (!m_isValued)
+  {
+    emit sendError_NoValueSpecified();
+    return false;
+  }
+  // NOTE : if no value is truely specified this will be id 0 !
+  m_stepId = 0;
+
+  // find first dot
+  auto i = m_L_digits.indexOf(KeypadButton::Dot);
+  if (i > -1)
+    m_L_digits.remove(i, m_L_digits.size() - i);
+
+  for (int i = 0;
+       i < m_L_digits.size();
+       i++)
+  {
+    KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
+    m_stepId += digit * qPow(10, i);
+  }
+  m_stepId--; // human - machine translation
+  qDebug() << m_stepId;
+  clearValue();
+  clearCue();
+  return true;
+}
+
+percent Interpreter::dmxToPercent(dmx t_dLevel)
+{
+  if (t_dLevel > 255)
+    return 100;
+
+  qreal pLevel_f = float(t_dLevel) / 2.55f;
+  int floor = qFloor(pLevel_f);
+  int ceil = qCeil(pLevel_f);
+  return (pLevel_f > (float)floor + 0.5f) ?
+             ceil : floor;
+}
+
+dmx Interpreter::percentToDmx(percent t_pLevel)
+{
+  if (t_pLevel > 100)
+    return 255;
+
+  qreal dLevel_f = (float)t_pLevel * 2.55f;
+  int floor = qFloor(dLevel_f);
+  int ceil = qCeil(dLevel_f);
+  return (dLevel_f > (float)floor + 0.5f) ?
+             ceil : floor;
 }

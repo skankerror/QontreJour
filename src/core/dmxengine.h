@@ -195,6 +195,9 @@ public :
   bool modifyGroup(const DmxChannelGroup *t_group);
   bool modifyGroup(const id t_groupId);
 
+  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
+//  DmxChannelGroup *createChannelGroup(QList<id> t_L_channelId);
+
 private :
 
   void addChannelGroup(id t_groupID,
@@ -245,9 +248,28 @@ public :
   DmxScene *getSelectedScene() const;
   DmxScene *getNextScene() const;
 
-  id getSelectedCueId() const{ return m_selectedCueId; }
-  void setSelectedCueId(id t_selectedCueId)
+  sceneID_f getSelectedCueId() const{ return m_selectedCueId; }
+  void setSelectedCueId(sceneID_f t_selectedCueId)
   { m_selectedCueId = t_selectedCueId; }
+
+  void recordNextCueInMainSeq(DmxScene *t_scene);
+  void recordNextCue(DmxScene *t_scene,
+                     id t_seqId);
+  void recordNewCueInMainSeq(DmxScene *t_scene,
+                             sceneID_f t_scId);
+  void recordNewCue(id t_seqId,
+                    DmxScene *t_scene,
+                    sceneID_f t_scId);
+  void deleteCueInMainSeq(sceneID_f t_id);
+  void deleteCue(id t_seqId,
+                 sceneID_f t_id);
+
+  DmxScene *createScene(QList<DmxChannel *> t_L_channel,
+                        sceneID_f t_id = 0.0f);
+  void updateScene(QList<DmxChannel *> t_L_channel,
+                   sceneID_f t_id = 0.0f);
+//  DmxScene *createScene(QList<id> t_L_channelId,
+//                        sceneID_f t_id = 0.0f);
 
 private :
 
@@ -277,12 +299,16 @@ public :
   void removeChannelDataSelection(QList<id> t_L_id);
   void clearChannelDataSelection();
   QList<id> getSelectedChannelsId();
+  RootValue *getRootChannel() const{ return m_rootChannel; }
 
   QList<ChannelData *> getL_channelData() const
   { return m_L_channelData; }
 
   void setL_channelData(const QList<ChannelData *> &t_L_channelData)
   { m_L_channelData = t_L_channelData; }
+
+  void setRootChannel(RootValue *t_rootChannel)
+  { m_rootChannel = t_rootChannel; }
 
 private :
 
@@ -301,6 +327,8 @@ public slots :
   void onChannelLevelChangedFromDirectChannel(id t_id,
                                               dmx t_level,
                                               overdmx t_offset = NULL_DMX);
+  void onChannelLevelPlusFromDirectChannel(id t_id);
+  void onChannelLevelMoinsFromDirectChannel(id t_id);
   void onChannelLevelChangedFromScene(id t_id,
                                       dmx t_level);
   void onChannelLevelChangedFromNextScene(id t_id,
@@ -338,6 +366,9 @@ public slots :
                              dmx t_level);
   void onDirectOutputLevelChanged(Uid_Id t_uid_id,
                                   dmx t_level);
+  void onDirectOutputLevelPlus(Uid_Id t_uid_id);
+  void onDirectOutputLevelMoins(Uid_Id t_uid_id);
+
 private :
 
   QList<RootValue *> m_L_rootOutput;
@@ -371,6 +402,9 @@ public :
 
   void setMainSeq(id t_id);
 
+private :
+
+  QList<DmxChannel *> getSelectedChannels()const;
 
 signals :
 
@@ -395,6 +429,16 @@ public slots :
   void onSetTimeOut(time_f t_time);
   void onSetDelayIn(time_f t_time);
   void onSetDelayOut(time_f t_time);
+  void onRecordNextCue();
+  void onRecordNewCue(sceneID_f t_id);
+  void onUpdateCurrentCue();
+  void onUpdateCue(sceneID_f t_id);
+  void onRecordGroup(id t_id);
+  void onGotoCue(sceneID_f t_id);
+  void onGotoStep(id t_id);
+  void onDeleteCue(sceneID_f t_id);
+  void onDeleteStep(id t_id);
+  void onDeleteGroup(id t_id);
 
   // TODO : renvoyer le dernier id selectionné à l'interpreter
 private :
