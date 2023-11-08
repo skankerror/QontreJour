@@ -223,6 +223,20 @@ CueEngine::CueEngine(QList<Sequence *> t_L_seq,
     QObject(parent)
 {}
 
+bool CueEngine::setMainSeqId(id t_mainSeqId)
+{
+  if (t_mainSeqId < m_L_seq.size())
+  {
+    m_mainSeqId = t_mainSeqId;
+    return true;
+  }
+  else
+  {
+    qDebug() << "CueEngine::setMainSeqId preblem";
+    return false;
+  }
+}
+
 Sequence *CueEngine::getMainSeq() const
 {
   if (m_mainSeqId < m_L_seq.size())
@@ -252,6 +266,68 @@ DmxScene *CueEngine::getNextScene() const
     }
   }
   return nullptr;
+}
+
+bool CueEngine::setSelectedCueId(sceneID_f t_selectedCueId)
+{
+  auto seq = getMainSeq();
+  if (!seq)
+  {
+    qDebug() << "CueEngine::setSelectedCueId problem";
+    return false;
+  }
+  auto scene = seq->getScene(t_selectedCueId);
+  if (scene)
+  {
+    m_selectedCueId = t_selectedCueId;
+    // update seq for model
+    seq->setSelectedSceneId(t_selectedCueId);
+    return true;
+  }
+  else
+  {
+    qDebug() << "CueEngine::setSelectedCueId problem_";
+    return false;
+  }
+}
+
+bool CueEngine::setSelectedCueStep(id t_stepId)
+{
+  auto seq = getMainSeq();
+  if (!seq)
+  {
+    qDebug() << "CueEngine::setSelectedCueStep problem";
+    return false;
+  }
+  auto scene = seq->getScene(t_stepId);
+  if (scene)
+  {
+    m_selectedCueId = scene->getStepNumber();
+    // update seq for model
+    seq->setSelectedStepId(t_stepId);
+    return true;
+  }
+  else
+  {
+    qDebug() << "CueEngine::setSelectedCueStep problem_";
+    return false;
+  }
+}
+
+void CueEngine::setSelectedPlus()
+{
+  auto seq = getMainSeq();
+  seq
+      ->setSelectedStepId(seq
+                              ->getSelectedStepId() + 1);
+}
+
+void CueEngine::setSelectedMoins()
+{
+  auto seq = getMainSeq();
+  seq
+      ->setSelectedStepId(seq
+                              ->getSelectedStepId() - 1);
 }
 
 void CueEngine::recordNextCueInMainSeq(DmxScene *t_scene)
@@ -312,16 +388,11 @@ DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
   return newScene;
 }
 
-void CueEngine::updateScene(QList<DmxChannel *> t_L_channel, sceneID_f t_id)
+void CueEngine::updateScene(QList<DmxChannel *> t_L_channel,
+                            sceneID_f t_id)
 {
 
 }
-
-//DmxScene *CueEngine::createScene(QList<id> t_L_channelId,
-//                                 sceneID_f t_id)
-//{
-
-//}
 
 /******************************* ChannelEngine ***********************/
 

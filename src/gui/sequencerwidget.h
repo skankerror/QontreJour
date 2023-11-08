@@ -110,9 +110,14 @@ public :
   DmxValue *getDmxValue(const QModelIndex &index) const;
   Sequence *getRootItem() const{ return m_rootItem; }
 
+signals :
+
+  void viewChange();
+
 public slots :
 
   void setRootItem(Sequence *t_rootItem){ m_rootItem = t_rootItem; }
+  void updateModel(id t_selectedId);
 
 protected :
 
@@ -133,6 +138,8 @@ protected :
 protected :
 
   Sequence *m_rootItem;
+  qsizetype m_seqSize = 1;
+  id m_selectedStepId = 0;
 
 };
 

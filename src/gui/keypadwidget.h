@@ -44,10 +44,9 @@ class KeypadWidget
 {
 
   Q_OBJECT
+  Q_ENUM(KeypadButton)
 
 public:
-
-  Q_ENUM(KeypadButton)
 
   explicit KeypadWidget(QWidget *parent = nullptr);
 
@@ -71,6 +70,14 @@ class PlaybackWidget
 public :
 
   explicit PlaybackWidget(QWidget *parent = nullptr);
+
+private :
+
+  void emitSignal();
+
+signals :
+
+  void buttonClicked(PlayBackButton);
 
 private :
 

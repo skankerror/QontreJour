@@ -280,7 +280,21 @@ PlaybackWidget::PlaybackWidget(QWidget *parent)
 
   setLayout(layout);
 //  layout->setSizeConstraint(QLayout::SetMaximumSize);
+  emitSignal();
+}
 
+void PlaybackWidget::emitSignal()
+{
+  connect(m_goButton, &PushButton::clicked, [=]
+          { emit buttonClicked(GoButton); });
+  connect(m_goBackButton, &PushButton::clicked, [=]
+          { emit buttonClicked(GoBackButton); });
+  connect(m_pauseButton, &PushButton::clicked, [=]
+          { emit buttonClicked(PauseButton); });
+  connect(m_seqSupButton, &PushButton::clicked, [=]
+          { emit buttonClicked(SeqPlusButton); });
+  connect(m_seqInfButton, &PushButton::clicked, [=]
+          { emit buttonClicked(SeqMoinsButton); });
 }
 
 /****************************************************************/

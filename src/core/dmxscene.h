@@ -42,7 +42,9 @@ public :
   QList<DmxScene *> getL_childScene() const{ return m_L_childScene; }
   DmxScene *getScene(id t_step);
   DmxScene *getScene(sceneID_f t_id);
-  int getSize() const{ return m_L_childScene.size() ;}
+  qsizetype getSize() const{ return m_L_childScene.size() ;}
+  id getSelectedStepId() const;
+  sceneID_f getSelectedSceneId() const{ return m_selectedSceneId; }
 
   void addScene(DmxScene *t_scene);
   void addScene(DmxScene *t_scene,
@@ -53,10 +55,13 @@ public :
 
   void setL_childScene(const QList<DmxScene *> &t_L_childScene)
   { m_L_childScene = t_L_childScene; }
+  void setSelectedStepId(id t_selectedStepId);
+  void setSelectedSceneId(sceneID_f t_selectedSceneId)
+  { m_selectedSceneId = t_selectedSceneId; }
 
 signals :
 
-  void seqSizeChanged();
+  void seqSignalChanged(id t_id);
 
 public slots :
 
@@ -68,7 +73,8 @@ private:
 private :
 
   QList<DmxScene *> m_L_childScene;
-
+  sceneID_f m_selectedSceneId = 0.0f;
+//  id m_selectedStepId = 0;
 };
 
 /****************************** DmxScene *****************************/

@@ -108,6 +108,10 @@ void MainWindow::createDockWidgets()
 
   auto grandMasterWidget = new GrandMasterWidget(this);
   auto playbackWidget = new PlaybackWidget(this);
+  connect(playbackWidget,
+          SIGNAL(buttonClicked(PlayBackButton)),
+          manager,
+          SLOT(playBackToEngine(PlayBackButton)));
 
   auto rightDock = new QDockWidget(this);
   auto rightDockWidget = new QWidget(rightDock);

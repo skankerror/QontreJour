@@ -34,7 +34,7 @@ Sequence::Sequence(ValueType t_type,
   scene0->setStepNumber(0);
   m_L_childScene.append(scene0);
 
-//  emit seqSizeChanged();
+//  emit seqSignalChanged();
 }
 
 Sequence::~Sequence()
@@ -64,6 +64,20 @@ DmxScene *Sequence::getScene(sceneID_f t_id)
   return nullptr;
 }
 
+id Sequence::getSelectedStepId() const
+{
+//  return m_selectedStepId;
+  for (qsizetype i = 0;
+       i < m_L_childScene.size();
+       i++)
+  {
+    auto scene = m_L_childScene.at(i);
+    if (scene->getSceneID() == m_selectedSceneId)
+      return i;
+  }
+  return 0;
+}
+
 void Sequence::addScene(DmxScene *t_scene)
 {
   sceneID_f lastID = m_L_childScene.last()->getSceneID();
@@ -80,7 +94,7 @@ void Sequence::addScene(DmxScene *t_scene)
   t_scene->setStepNumber(m_L_childScene.size());
   m_L_childScene.append(t_scene);
 //  update(m_L_childScene.size() - 1);
-  emit seqSizeChanged();
+  emit seqSignalChanged(getSelectedStepId());
 }
 
 void Sequence::addScene(DmxScene *t_scene,
@@ -104,37 +118,50 @@ void Sequence::addScene(DmxScene *t_scene,
         qWarning() << "erase scene" << t_id;
         t_scene->setStepNumber(scene->getStepNumber());
         m_L_childScene[i] = t_scene;
-        emit seqSizeChanged();
+        emit seqSignalChanged(getSelectedStepId());
         return;
       }
       else if (scene->getSceneID() > t_id)
       {
         m_L_childScene.insert(i /*+ 1*/, t_scene);
         update(i /*+ 1*/);
-        emit seqSizeChanged();
+        emit seqSignalChanged(getSelectedStepId());
         return;
       }
     }
     // we're at the end, scen id is the highest of the seq
     t_scene->setStepNumber(m_L_childScene.size());
     m_L_childScene.append(t_scene);
-    emit seqSizeChanged();
+    emit seqSignalChanged(getSelectedStepId());
   }
   // TODO : ça va pas
-  emit seqSizeChanged();
+  emit seqSignalChanged(getSelectedStepId());
 }
 
 void Sequence::removeScene(id t_step)
 {
-
-  emit seqSizeChanged();
-
+  // TODO :
+  emit seqSignalChanged(getSelectedStepId());
 }
 
 void Sequence::removeScene(sceneID_f)
 {
-  emit seqSizeChanged();
+  // TODO :
 
+  emit seqSignalChanged(getSelectedStepId());
+
+}
+
+void Sequence::setSelectedStepId(id t_selectedStepId)
+{
+  if (t_selectedStepId < m_L_childScene.size()
+      && t_selectedStepId >= 0)
+  {
+    m_selectedSceneId = m_L_childScene.at(t_selectedStepId)->getSceneID();
+    emit seqSignalChanged(getSelectedStepId());
+  }
+  else
+    qDebug() << "problem in cue selection";
 }
 
 void Sequence::update(id t_step)

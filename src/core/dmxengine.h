@@ -44,7 +44,7 @@ public :
   virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
   { return (m_ID == t_id_dmx.getID()); }
 
-  // WARNING : use isBrother() before these operators
+  // NOTE : use isBrother() before these operators
   bool operator<(const Ch_Id_Dmx t_id_dmx) const
   { return (m_level < t_id_dmx.getLevel()); }
   bool operator>(const Ch_Id_Dmx t_id_dmx) const
@@ -241,16 +241,19 @@ public :
 
   QList<Sequence *> getL_seq() const{ return m_L_seq; }
 
-  void setL_seq(const QList<Sequence *> &t_L_seq){ m_L_seq = t_L_seq; }
-  void setMainSeqId(id t_mainSeqId){ m_mainSeqId = t_mainSeqId; }
+  void setL_seq(const QList<Sequence *> &t_L_seq)
+  { m_L_seq = t_L_seq; }
+  bool setMainSeqId(id t_mainSeqId);
 
   Sequence *getMainSeq() const;
   DmxScene *getSelectedScene() const;
   DmxScene *getNextScene() const;
-
   sceneID_f getSelectedCueId() const{ return m_selectedCueId; }
-  void setSelectedCueId(sceneID_f t_selectedCueId)
-  { m_selectedCueId = t_selectedCueId; }
+
+  bool setSelectedCueId(sceneID_f t_selectedCueId);
+  bool setSelectedCueStep(id t_stepId);
+  void setSelectedPlus();
+  void setSelectedMoins();
 
   void recordNextCueInMainSeq(DmxScene *t_scene);
   void recordNextCue(DmxScene *t_scene,
@@ -268,14 +271,12 @@ public :
                         sceneID_f t_id = 0.0f);
   void updateScene(QList<DmxChannel *> t_L_channel,
                    sceneID_f t_id = 0.0f);
-//  DmxScene *createScene(QList<id> t_L_channelId,
-//                        sceneID_f t_id = 0.0f);
 
 private :
 
   QList<Sequence *> m_L_seq;
-  id m_mainSeqId;
-  sceneID_f m_selectedCueId;
+  id m_mainSeqId = 0;
+  sceneID_f m_selectedCueId = 0.0f;
 
 };
 

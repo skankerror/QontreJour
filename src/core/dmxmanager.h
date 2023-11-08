@@ -136,6 +136,7 @@ public slots :
                              dmx t_level,
                              overdmx t_offset);
   void keypadToInterpreter(KeypadButton t_buttonType);
+  void playBackToEngine(PlayBackButton t_buttonType);
 
 private slots :
 

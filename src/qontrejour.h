@@ -107,6 +107,15 @@ enum KeypadButton
   UnknownButton
 };
 
+enum PlayBackButton
+{
+  GoButton,
+  GoBackButton,
+  PauseButton,
+  SeqPlusButton,
+  SeqMoinsButton
+};
+
 enum ValueType
 {
   RootOutput, // stored in universe

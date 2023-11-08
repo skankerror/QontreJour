@@ -81,7 +81,6 @@ void DmxManager::testingMethod()
   L_channel.append(channel1);
   L_channel.append(channel2);
   m_dmxEngine->getGroupEngine()->createChannelGroup(L_channel);
-//  createChannelGroup(L_channel);
 
   getChannelGroup(0)->setLevel(100);
   getChannelGroup(0)->setLevel(0);
@@ -644,6 +643,27 @@ void DmxManager::directChannelToEngine(id t_id,
 void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)
 {
   m_interpreter->recieveData(t_buttonType);
+}
+
+void DmxManager::playBackToEngine(PlayBackButton t_buttonType)
+{
+  switch(t_buttonType)
+  {
+  case GoButton :
+    break;
+  case GoBackButton :
+    break;
+  case PauseButton :
+    break;
+  case SeqPlusButton :
+    m_dmxEngine->getCueEngine()->setSelectedPlus();
+    break;
+  case SeqMoinsButton :
+    m_dmxEngine->getCueEngine()->setSelectedMoins();
+    break;
+  default :
+    break;
+  }
 }
 
 

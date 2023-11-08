@@ -44,7 +44,12 @@ SequencerWidget::SequencerWidget(Sequence *t_seq,
   setLayout(layout);
 
   connect(t_seq,
-          &Sequence::seqSizeChanged,
+          &Sequence::seqSignalChanged,
+          m_model,
+          &SequencerTreeModel::updateModel);
+
+  connect(m_model,
+          &SequencerTreeModel::viewChange,
           this,
           &SequencerWidget::updateTableViews);
 }
@@ -109,11 +114,21 @@ DmxValue *SequencerTreeModel::getDmxValue(const QModelIndex &index) const
   return nullptr;
 }
 
+void SequencerTreeModel::updateModel(id t_selectedId)
+{
+  // URGENT :
+  m_seqSize = m_rootItem->getSize();
+  if (t_selectedId < m_seqSize)
+    m_selectedStepId = t_selectedId;
+  emit viewChange();
+}
+
 
 QModelIndex SequencerTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
 //  if (!parent.isValid()) return QModelIndex();
 
+  // URGENT : c'est là que ça se joue pour les seq plus moins goto etc
   // TODO check 1ère ligne
   if (parent.isValid() && parent.column() !=0) return QModelIndex();
 
@@ -123,7 +138,13 @@ QModelIndex SequencerTreeModel::index(int row, int column, const QModelIndex &pa
   auto rootItem = qobject_cast<Sequence *>(parentValue);
   if (rootItem)
   {
-    auto childScene = m_rootItem->getScene((id)row);
+    // WARNING : trop gourmand pour index() ?
+    auto size = m_rootItem->getSize();
+    if (row >= size) return QModelIndex();
+    id stepToPass = (row
+                     + m_rootItem->getSelectedStepId())
+                    % size;
+    auto childScene = m_rootItem->getScene(/*(id)row*/ stepToPass);
     return createIndex(row,
                        column,
                        childScene);
@@ -196,7 +217,6 @@ QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
   if (role != Qt::DisplayRole && role != Qt::EditRole)
     return QVariant();
 
-
   auto scene = qobject_cast<DmxScene *>(getDmxValue(index));
 
   if (scene)
@@ -216,7 +236,6 @@ QVariant SequencerTreeModel::data(const QModelIndex &index, int role) const
     }
   }
   return QVariant();
-
 }
 
 bool SequencerTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -242,9 +261,7 @@ bool SequencerTreeModel::setData(const QModelIndex &index, const QVariant &value
   case DelayOutField : scene->setDelayOut(value.toFloat()); emit dataChanged(index,index); return true; break;
   default : break;
   }
-
   return false;
-
 }
 
 QVariant SequencerTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -307,7 +324,7 @@ Qt::ItemFlags SequencerTreeModel::flags(const QModelIndex &index) const
   auto scene = qobject_cast<DmxScene *>(getDmxValue(index));
   if (scene)
     if (scene->getStepNumber() == 0)
-      return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+      return Qt::ItemIsEnabled/* | Qt::ItemIsSelectable*/;
 
   if (index.column() == 0)
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
