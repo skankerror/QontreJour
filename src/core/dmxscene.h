@@ -75,7 +75,6 @@ private :
 
   QList<DmxScene *> m_L_childScene;
   sceneID_f m_selectedSceneId = 0.0f;
-//  id m_selectedStepId = 0;
 };
 
 /****************************** DmxScene *****************************/

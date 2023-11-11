@@ -37,6 +37,9 @@ RootValue::RootValue(ValueType t_type,
   case ValueType::RootChannelGroup :
     setName("Root Channel Group");
     break;
+  case ValueType::SequenceType :
+    setName("Sequnce");
+    break;
   default :
     break;
   }

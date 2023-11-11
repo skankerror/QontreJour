@@ -188,10 +188,6 @@ public :
       m_outputID(t_id)
   {}
 
-//  explicit Uid_Id(const DmxOutput *t_output);
-
-//  explicit Uid_Id(const QString &t_string);
-
   ~Uid_Id(){}
 
   bool operator==(const Uid_Id t_Uid_Id) const
@@ -261,6 +257,72 @@ protected :
   uid m_uid = NO_UID;
 };
 
+/****************************** Ch_Id_Dmx ********************************/
+
+class Ch_Id_Dmx
+{
+
+public :
+
+  explicit Ch_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
+      : m_ID(t_ID),
+      m_level(t_level)
+  {}
+
+  virtual ~Ch_Id_Dmx(){}
+
+  bool operator==(const Ch_Id_Dmx t_id_dmx) const
+  { return ((t_id_dmx.getid() == m_ID)
+            && (t_id_dmx.getLevel() == m_level)); }
+  virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_ID == t_id_dmx.getid()); }
+
+  // NOTE : use isBrother() before these operators
+  bool operator<(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level < t_id_dmx.getLevel()); }
+  bool operator>(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level > t_id_dmx.getLevel()); }
+  bool operator<=(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level <= t_id_dmx.getLevel()); }
+  bool operator>=(const Ch_Id_Dmx t_id_dmx) const
+  { return (m_level >= t_id_dmx.getLevel()); }
+
+
+  id getid() const{ return m_ID; }
+  dmx getLevel() const{ return m_level; }
+
+  void setID(const id t_ID){ m_ID = t_ID; }
+  void setLevel(const dmx t_level){ m_level = t_level; }
+
+  bool isValid() const{ return (m_ID > NO_ID); }
+
+private :
+
+  id m_ID = NO_ID;
+  dmx m_level = NULL_DMX;
+
+};
+
+/****************************** Gr_Id_Dmx ********************************/
+
+class Gr_Id_Dmx
+    : public Ch_Id_Dmx
+{
+
+public :
+
+  explicit Gr_Id_Dmx(const id t_ID = NO_ID,
+                     const dmx t_level = NULL_DMX)
+      : Ch_Id_Dmx(t_ID,
+                  t_level)
+  {}
+
+  ~Gr_Id_Dmx(){}
+
+  bool isBrother(const Ch_Id_Dmx t_id_dmx) const override
+  { return false; }
+};
 
 
 #endif // QONTREJOUR_H

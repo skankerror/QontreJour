@@ -137,6 +137,7 @@ public slots :
                              overdmx t_offset);
   void keypadToInterpreter(KeypadButton t_buttonType);
   void playBackToEngine(PlayBackButton t_buttonType);
+//  void sequenceToEngine(id t_seqId);
 
 private slots :
 

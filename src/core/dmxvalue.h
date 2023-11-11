@@ -132,6 +132,11 @@ public :
   RootValue *getParentValue() const{ return m_parentValue; }
   QWidget *getAssignedWidget() const{ return m_assignedWidget; }
 
+  void resetLevel()
+  {
+    setLevel(NULL_DMX); // TODO: Adapt to use your actual default value
+  }
+
 signals :
 
   void levelChanged(id t_id,
@@ -148,6 +153,15 @@ public slots :
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)
   { m_assignedWidget = t_assignedWidget; }
+
+protected:
+
+  Q_PROPERTY(dmx level
+                 READ getLevel
+                     WRITE setLevel
+                         RESET resetLevel
+                             NOTIFY levelChanged
+                                 FINAL)
 
 protected :
 

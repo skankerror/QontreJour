@@ -669,6 +669,11 @@ void DmxManager::playBackToEngine(PlayBackButton t_buttonType)
   }
 }
 
+//void DmxManager::sequenceToEngine(id t_seqId)
+//{
+//  m_dmxEngine->getCueEngine()->
+//}
+
 
 void DmxManager::onOutputRequest(uid t_uid,
                                  id t_id,
