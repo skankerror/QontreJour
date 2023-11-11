@@ -18,7 +18,6 @@
 #ifndef QONTREJOUR_H
 #define QONTREJOUR_H
 
-
 #define UNIVERSE_OUTPUT_COUNT_DEFAULT 512
 #define DEFAULT_CHANNEL_COUNT 512
 
@@ -118,7 +117,7 @@ enum PlayBackButton
 
 enum ValueType
 {
-  RootOutput, // stored in universe
+  RootOutputType, // stored in universe
   OutputType, // stored in root
   RootChannel, // stored in manager
   ChannelType, // stored in root
@@ -173,5 +172,95 @@ enum HeaderField
   DelayOutField,
   HeaderFieldCount
 };
+
+/******************************** Uid_Id *************************************/
+
+//class DmxOutput;
+
+class Uid_Id
+{
+
+public :
+
+  explicit Uid_Id(const uid t_uid = NO_UID,
+                  const id t_id = NO_ID)
+      : m_universeID(t_uid),
+      m_outputID(t_id)
+  {}
+
+//  explicit Uid_Id(const DmxOutput *t_output);
+
+//  explicit Uid_Id(const QString &t_string);
+
+  ~Uid_Id(){}
+
+  bool operator==(const Uid_Id t_Uid_Id) const
+  {
+    return ((t_Uid_Id.getUniverseID() == m_universeID)
+            && (t_Uid_Id.getOutputID() == m_outputID));
+  }
+
+  uid getUniverseID() const{ return m_universeID; }
+  id getOutputID() const{ return m_outputID; }
+
+  void setUniverseID(const uid t_universeID){ m_universeID = t_universeID; }
+  void setOutputID(const id t_outputID){ m_outputID = t_outputID; }
+
+  QString toString() const
+  {
+    return QString("%1.%2")
+        .arg(m_universeID)
+        .arg(m_outputID);
+  }
+
+  static QString UidtoString(const Uid_Id t_uid_id)
+  {
+    return QString("%1.%2")
+        .arg(t_uid_id.getUniverseID())
+        .arg(t_uid_id.getOutputID());
+  }
+
+private :
+
+  uid m_universeID = NO_UID;
+  id m_outputID = NO_ID;
+
+};
+
+class IdedValue
+{
+
+public :
+
+  IdedValue(id t_id = NO_ID)
+      : m_id(t_id)
+  {}
+
+  id getid() const{ return m_id; }
+  void setid(const id t_id){ m_id = t_id; }
+
+protected :
+
+  id m_id = NO_ID;
+};
+
+class UniversedValue
+{
+
+public :
+
+  UniversedValue(uid t_uid = NO_UID)
+      : m_uid(t_uid)
+  {}
+
+  id getuid() const{ return m_uid; }
+  void setuid(const id t_uid){ m_uid = t_uid; }
+
+protected :
+
+  uid m_uid = NO_UID;
+};
+
+
 
 #endif // QONTREJOUR_H

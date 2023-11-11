@@ -71,8 +71,8 @@ bool ChannelGroupEngine::addNewGroup(const DmxChannelGroup *t_newGroup)
 
   while (i != H_controledChannel_storedLevel.constEnd())
   {
-    addChannel(t_newGroup->getID(),
-               Ch_Id_Dmx(i.key()->getID(),
+    addChannel(t_newGroup->getid(),
+               Ch_Id_Dmx(i.key()->getid(),
                          i.value()));
     ++i;
   }
@@ -92,7 +92,7 @@ bool ChannelGroupEngine::addNewGroup(const id t_groupId)
 
 bool ChannelGroupEngine::removeGroup(const DmxChannelGroup *t_group)
 {
-  return removeChannelGroup(t_group->getID());
+  return removeChannelGroup(t_group->getid());
   disconnect(t_group,
              SIGNAL(levelChanged(id,dmx)),
              this,
@@ -117,7 +117,7 @@ bool ChannelGroupEngine::modifyGroup(const id t_groupID)
 DmxChannelGroup *ChannelGroupEngine::createChannelGroup(QList<DmxChannel *> t_L_channel)
 {
   auto newGroup = new DmxChannelGroup(ValueType::ChannelGroup);
-  newGroup->setID(m_rootChannelGroup->getL_childValueSize());
+  newGroup->setid(m_rootChannelGroup->getL_childValueSize());
   auto H_controledChannel_storedLevel = QHash<DmxChannel *, dmx>();
   for (const auto item
        : std::as_const(t_L_channel))
@@ -156,7 +156,7 @@ bool ChannelGroupEngine::removeChannelGroup(id t_groupID)
   for (const auto &item
        : std::as_const(L_Ch_Id_Dmx))
   {
-    m_M_channelLevel.remove(item.getID());
+    m_M_channelLevel.remove(item.getid());
   }
   return m_MM_totalGroup.remove(t_groupID);
 }
@@ -181,9 +181,9 @@ bool ChannelGroupEngine::addChannel(const id t_groupID,
 
   // we insert in channel level map with value 0
   // NOTE : must update level after creation
-  if (!(m_M_channelLevel.contains(t_id_dmx.getID())))
+  if (!(m_M_channelLevel.contains(t_id_dmx.getid())))
   {
-    m_M_channelLevel.insert(t_id_dmx.getID(),
+    m_M_channelLevel.insert(t_id_dmx.getid(),
                             NULL_GR_ID_DMX);
   }
   return true;
@@ -197,18 +197,18 @@ void ChannelGroupEngine::groupLevelChanged(const id t_groupID,
   for (const auto &item
        : std::as_const(L_Ch_Id_Dmx))
   {
-    auto actualCh_Id_Dmx = m_M_channelLevel.value(item.getID());
+    auto actualCh_Id_Dmx = m_M_channelLevel.value(item.getid());
     auto newLevel = (dmx)(((float)(t_level)/255.0f)
                           * item.getLevel());
 
     if (newLevel > actualCh_Id_Dmx.getLevel()
-        || t_groupID == actualCh_Id_Dmx.getID())
+        || t_groupID == actualCh_Id_Dmx.getid())
     {
-      m_M_channelLevel.insert(item.getID(),
+      m_M_channelLevel.insert(item.getid(),
                               Gr_Id_Dmx(t_groupID,
                                         newLevel));
       // emit to channel engine
-      emit channelLevelChangedFromGroup(item.getID(),
+      emit channelLevelChangedFromGroup(item.getid(),
                                         newLevel);
     }
   }
@@ -374,7 +374,6 @@ DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
                                  sceneID_f t_id)
 {
   auto newScene = new DmxScene(ValueType::MainScene);
-//  newGroup->setID(m_rootChannelGroup->getL_childValueSize());
   auto H_controledChannel_storedLevel = QHash<DmxChannel *, dmx>();
   for (const auto item
        : std::as_const(t_L_channel))
@@ -383,13 +382,27 @@ DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
                                           item->getLevel());
   }
   newScene->setH_controledChannel_storedLevel(H_controledChannel_storedLevel);
-//  m_rootChannelGroup->addChildValue(newGroup);
-//  addNewGroup(newGroup);
+  newScene->setSceneID(t_id);
   return newScene;
 }
 
 void CueEngine::updateScene(QList<DmxChannel *> t_L_channel,
                             sceneID_f t_id)
+{
+
+}
+
+void CueEngine::goGo()
+{
+
+}
+
+void CueEngine::goBack()
+{
+
+}
+
+void CueEngine::goPause()
 {
 
 }
@@ -974,12 +987,12 @@ void DmxEngine::onRecordGroup(id t_id)
 
 void DmxEngine::onGotoCue(sceneID_f t_id)
 {
-
+  m_cueEngine->setSelectedCueId(t_id);
 }
 
 void DmxEngine::onGotoStep(id t_id)
 {
-  
+  m_cueEngine->setSelectedCueStep(t_id);
 }
 
 void DmxEngine::onDeleteCue(sceneID_f t_id)

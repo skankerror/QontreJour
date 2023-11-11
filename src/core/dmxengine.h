@@ -39,10 +39,10 @@ public :
   virtual ~Ch_Id_Dmx(){}
 
   bool operator==(const Ch_Id_Dmx t_id_dmx) const
-  { return ((t_id_dmx.getID() == m_ID)
+  { return ((t_id_dmx.getid() == m_ID)
             && (t_id_dmx.getLevel() == m_level)); }
   virtual bool isBrother(const Ch_Id_Dmx t_id_dmx) const
-  { return (m_ID == t_id_dmx.getID()); }
+  { return (m_ID == t_id_dmx.getid()); }
 
   // NOTE : use isBrother() before these operators
   bool operator<(const Ch_Id_Dmx t_id_dmx) const
@@ -55,7 +55,7 @@ public :
   { return (m_level >= t_id_dmx.getLevel()); }
 
 
-  id getID() const{ return m_ID; }
+  id getid() const{ return m_ID; }
   dmx getLevel() const{ return m_level; }
 
   void setID(const id t_ID){ m_ID = t_ID; }
@@ -271,6 +271,10 @@ public :
                         sceneID_f t_id = 0.0f);
   void updateScene(QList<DmxChannel *> t_L_channel,
                    sceneID_f t_id = 0.0f);
+
+  void goGo();
+  void goBack();
+  void goPause();
 
 private :
 

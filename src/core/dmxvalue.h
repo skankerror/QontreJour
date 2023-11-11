@@ -23,60 +23,6 @@
 #include <QWidget>
 #include "../qontrejour.h"
 
-/******************************** Uid_Id *************************************/
-
-class DmxOutput;
-
-class Uid_Id
-{
-
-public :
-
-  explicit Uid_Id(const uid t_uid = NO_UID,
-                  const id t_id = NO_ID)
-    : m_universeID(t_uid),
-      m_outputID(t_id)
-  {}
-
-  explicit Uid_Id(const DmxOutput *t_output);
-
-  explicit Uid_Id(const QString &t_string);
-
-  ~Uid_Id(){}
-
-  bool operator==(const Uid_Id t_Uid_Id) const
-  {
-    return ((t_Uid_Id.getUniverseID() == m_universeID)
-            && (t_Uid_Id.getOutputID() == m_outputID));
-  }
-
-  uid getUniverseID() const{ return m_universeID; }
-  id getOutputID() const{ return m_outputID; }
-
-  void setUniverseID(const uid t_universeID){ m_universeID = t_universeID; }
-  void setOutputID(const id t_outputID){ m_outputID = t_outputID; }
-
-  QString toString() const
-  {
-    return QString("%1.%2")
-        .arg(m_universeID)
-        .arg(m_outputID);
-  }
-
-  static QString UidtoString(const Uid_Id t_uid_id)
-  {
-    return QString("%1.%2")
-        .arg(t_uid_id.getUniverseID())
-        .arg(t_uid_id.getOutputID());
-  }
-
-private :
-
-  uid m_universeID = NO_UID;
-  id m_outputID = NO_ID;
-
-};
-
 /******************************** DMXVALUE **************************************/
 
 class DmxValue
@@ -90,31 +36,25 @@ public :
   Q_ENUM(ValueType)
 
   explicit DmxValue(ValueType t_type = UnknownValueType,
-                    DmxValue *t_parent = nullptr);
+                    DmxValue *t_parent = nullptr)
+      : QObject(t_parent),
+      m_type(t_type)
+  {}
 
-  DmxValue(const DmxValue &t_value);
+  virtual ~DmxValue(){}
 
-  virtual ~DmxValue();
-
-  id getID() const{ return m_ID; }
-  uid getUniverseID() const { return m_universeID; }
   QString getName() const{ return m_name; }
   ValueType getType() const{ return m_type; }
 
-  void setID(const id t_ID){ m_ID = t_ID; }
-  void setUniverseID(const uid t_universeID) { m_universeID = t_universeID; }
   void setName(const QString &t_name) { m_name = t_name; }
   void setType(const ValueType t_type){ m_type = t_type; }
 
 protected :
 
-  id m_ID = NO_ID;
-  uid m_universeID = NO_UID;
   QString m_name = "Unknow Value";
   ValueType m_type = UnknownValueType;
-
-
 };
+
 
 /********************************* ROOTVALUE *************************************/
 
@@ -152,10 +92,28 @@ private :
 
 };
 
+/********************************* ROOTOUTPUT *************************************/
+
+class RootOutput
+    : public RootValue,
+      public UniversedValue
+{
+
+public :
+
+  RootOutput(ValueType t_type = ValueType::RootOutputType,
+             DmxValue *t_parent = nullptr)
+      : RootValue(t_type,
+                  t_parent),
+      UniversedValue()
+  {}
+};
+
 /******************************** LEVELEDVALUE **************************************/
 
 class LeveledValue
-    : public DmxValue
+    : public DmxValue,
+      public IdedValue
 {
 
   Q_OBJECT
@@ -163,11 +121,12 @@ class LeveledValue
 public :
 
   LeveledValue(ValueType t_type = UnknownValueType,
-               RootValue *t_parent = nullptr);
+               RootValue *t_parent = nullptr)  : DmxValue(t_type,
+                 t_parent),
+      IdedValue()
+  {}
 
-  LeveledValue(const LeveledValue &t_value);
-
-  virtual ~LeveledValue();
+  virtual ~LeveledValue(){}
 
   dmx getLevel() const{ return m_level; }
   RootValue *getParentValue() const{ return m_parentValue; }
@@ -180,7 +139,11 @@ signals :
 
 public slots :
 
-  virtual void setLevel(dmx t_level);
+  virtual void setLevel(dmx t_level)
+  { m_level = t_level;
+    emit levelChanged(m_id,
+                      m_level); }
+
   void setParentValue(RootValue *t_parentValue)
   { m_parentValue = t_parentValue; }
   void setAssignedWidget(QWidget *t_assignedWidget)
@@ -202,7 +165,8 @@ protected :
 class DmxChannel;
 
 class DmxOutput
-    : public LeveledValue
+    : public LeveledValue,
+      public UniversedValue
 {
 
   Q_OBJECT
@@ -210,18 +174,21 @@ class DmxOutput
 public :
 
   DmxOutput(ValueType t_type = OutputType,
-            RootValue *t_parent = nullptr);
+            RootOutput *t_parent = nullptr)
+      : LeveledValue(t_type,
+                     t_parent)
+  {
+    setName(DEFAULT_OUTPUT_NAME);
+  }
+  virtual ~DmxOutput(){}
 
-  virtual ~DmxOutput();
-
-//  uid getUniverseID() const { return m_universeID; }
   dmx getMaxLevel() const{ return m_maxLevel; }
   bool getIsParked() const{ return m_isParked; }
   DmxChannel *getChannelControler() const{ return m_channelControler; }
+  Uid_Id getUid_Id()const{ return Uid_Id(getuid(), getid()); }
 
   void setChannelControler(DmxChannel *t_channelControler)
   { m_channelControler = t_channelControler; }
-//  void setUniverseID(const uid t_universeID) { m_universeID = t_universeID; }
 
 signals :
 
@@ -240,7 +207,6 @@ private :
   dmx m_maxLevel = MAX_DMX;
   bool m_isParked;
   DmxChannel *m_channelControler = nullptr;
-//  uid m_universeID = NO_UID;
 
 };
 
@@ -255,11 +221,13 @@ class DmxChannel
 public :
 
   DmxChannel(ValueType t_type = ChannelType,
-             RootValue *t_parent = nullptr);
+             RootValue *t_parent = nullptr)
+      : LeveledValue(t_type,
+                     t_parent)
+  { setName(DEFAULT_CHANNEL_NAME); }
 
-  DmxChannel(const DmxChannel &t_channel);
 
-  ~DmxChannel();
+  ~DmxChannel(){ clearControledOutput(); }
 
   // controled values
   QList<DmxOutput *> getL_controledOutput() const{ return m_L_controledOutput; }
@@ -297,7 +265,6 @@ Q_DECLARE_METATYPE(DmxChannel)
 
 class DmxChannelGroup
     : public LeveledValue
-
 {
 
   Q_OBJECT

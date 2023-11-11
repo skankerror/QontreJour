@@ -192,9 +192,9 @@ void ValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
   editedIndexChanged();
 }
 
-QModelIndex ValueTableModel::getIndexFromValue(const DmxValue *t_value) const
+QModelIndex ValueTableModel::getIndexFromValue(const LeveledValue *t_value) const
 {
-  return getIndexFromValueId(t_value->getID());
+  return getIndexFromValueId(t_value->getid());
 }
 
 QModelIndex ValueTableModel::getIndexFromValueId(const id &t_id) const
@@ -395,7 +395,7 @@ QVariant ValueTableModel::filterData(const QModelIndex &index, int role) const
     {
     case Qt::DisplayRole :
     case Qt::EditRole :
-      return value->getID() + 1;
+      return value->getid() + 1;
       break;
     case Qt::TextAlignmentRole :
       return Qt::AlignCenter;
@@ -444,10 +444,6 @@ bool ValueTableModel::setFilterData(const QModelIndex &index, const QVariant &va
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
   auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-  // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
-//  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-//                     value.toInt());
-
   emit dataChanged(index,index);
 
   return true;
@@ -486,7 +482,7 @@ Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
 
 }
 
-DmxValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
+LeveledValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
 {
   int valueID = (((t_index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + t_index.column();
@@ -497,9 +493,9 @@ DmxValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
 
 }
 
-QList<DmxValue *> ValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
+QList<LeveledValue *> ValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
 {
-  auto L_channel = QList<DmxValue *>();
+  auto L_channel = QList<LeveledValue *>();
   for (auto item : t_L_index)
   {
     auto channel = getValueFromIndex(item);

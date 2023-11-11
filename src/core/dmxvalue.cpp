@@ -19,56 +19,6 @@
 #include "dmxmanager.h"
 #include <QDebug>
 
-/*************************** Uid_Id /************************************/
-
-Uid_Id::Uid_Id(const DmxOutput *t_output)
-{
-  if (t_output)
-  {
-    m_universeID = t_output->getUniverseID();
-    m_outputID = t_output->getID();
-  }
-}
-
-Uid_Id::Uid_Id(const QString &t_string)
-{
-  if (t_string.size() > 3
-      && t_string.at(0).isDigit())
-  {
-    auto tempFloat = t_string.toFloat();
-    m_universeID = (uid)tempFloat;
-    // TODO : implement this fucking string method
-//    for (qsizetype i = 0;
-//         i < t_string.size();
-//         i++)
-//    {
-//      auto value = t_string.at(i);
-//      if (value.isDigit())
-
-  }
-}
-
-/******************************** DMXVALUE **************************************/
-
-
-DmxValue::DmxValue(ValueType t_type,
-                   DmxValue *t_parent)
-  : QObject(t_parent),
-  m_type(t_type)
-{}
-
-DmxValue::DmxValue(const DmxValue &t_value)
-  : QObject(t_value.parent()),
-    m_type(t_value.m_type),
-    m_ID(t_value.m_ID),
-    m_universeID(t_value.m_universeID),
-    m_name(t_value.m_name)
-{}
-
-DmxValue::~DmxValue()
-{}
-
-
 /********************************* ROOTVALUE *************************************/
 
 RootValue::RootValue(ValueType t_type,
@@ -78,7 +28,7 @@ RootValue::RootValue(ValueType t_type,
 {
   switch(t_type)
   {
-  case ValueType::RootOutput :
+  case ValueType::RootOutputType :
     setName("Root Output");
     break;
   case ValueType::RootChannel :
@@ -157,79 +107,19 @@ void RootValue::removeChildValueList(const QList<id> t_L_index)
   }
 }
 
-/******************************** LEVELEDVALUE **************************************/
-
-LeveledValue::LeveledValue(ValueType t_type,
-                           RootValue *t_parent)
-  : DmxValue(t_type,
-             t_parent)
-{}
-
-LeveledValue::LeveledValue(const LeveledValue &t_value)
-  : DmxValue(t_value),
-    m_level(t_value.m_level),
-    m_parentValue(t_value.m_parentValue),
-    m_assignedWidget(t_value.m_assignedWidget)
-{}
-
-LeveledValue::~LeveledValue()
-{}
-
-void LeveledValue::setLevel(dmx t_level)
-{
-  // on l'enlève pour gérer plus facilement le blocage des sliders
-//  if (m_level == t_level)
-//    return;
-  m_level = t_level;
-  emit levelChanged(m_ID,
-                    m_level);
-}
-
 /********************************* DMXOUTPUT *************************************/
-
-DmxOutput::DmxOutput(ValueType t_type,
-                     RootValue *t_parent)
-  : LeveledValue(t_type,
-                 t_parent)
-{
-  setName(DEFAULT_OUTPUT_NAME);
-}
-
-DmxOutput::~DmxOutput()
-{}
 
 void DmxOutput::setLevel(dmx t_level)
 {
   if (m_level == t_level)
     return;
   m_level = t_level;
-  emit outputRequestUpdate(m_universeID,
-                           m_ID,
+  emit outputRequestUpdate(m_uid,
+                           m_id,
                            m_level);
-
 }
-
 
 /********************************** DMXCHANNEL ************************************/
-
-DmxChannel::DmxChannel(ValueType t_type,
-                       RootValue *t_parent)
-  : LeveledValue(t_type,
-                 t_parent)
-{
-  setName(DEFAULT_CHANNEL_NAME);
-}
-
-DmxChannel::DmxChannel(const DmxChannel &t_channel)
-  : LeveledValue(t_channel),
-    m_L_controledOutput(t_channel.m_L_controledOutput)/*,
-    m_flag(t_channel.m_flag)*/
-{}
-
-DmxChannel::~DmxChannel()
-{
-  clearControledOutput();
-}
 
 DmxOutput *DmxChannel::getControledOutput(const id t_index)
 {

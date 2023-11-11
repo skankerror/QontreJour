@@ -156,9 +156,9 @@ protected :
 
 private :
 
-  DmxValue *getValueFromIndex(const QModelIndex &t_index) const;
-  QList<DmxValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
-  QModelIndex getIndexFromValue(const DmxValue *t_value) const;
+  LeveledValue *getValueFromIndex(const QModelIndex &t_index) const;
+  QList<LeveledValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
+  QModelIndex getIndexFromValue(const LeveledValue *t_value) const;
   QModelIndex getIndexFromValueId(const id &t_id) const;
 
 protected :

@@ -127,7 +127,7 @@ public :
   virtual ~ValueSlider();
 
   LeveledValue *getDmxValue() const{ return m_dmxValue; }
-  id getID() const{ return m_ID; }
+  id getid() const{ return m_ID; }
   bool getIsConnected() const{ return m_isConnected; }
 
   void setDmxValue(LeveledValue *t_dmxValue);

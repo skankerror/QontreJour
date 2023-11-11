@@ -24,7 +24,8 @@
 Sequence::Sequence(ValueType t_type,
                    DmxValue *t_parent)
   : RootValue(t_type,
-              t_parent)
+              t_parent),
+    IdedValue()
 {
   auto scene0 = new DmxScene(ValueType::Scene0,
                              this);

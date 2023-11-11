@@ -41,7 +41,7 @@ DmxManager::DmxManager(QObject *parent)
        i++)
   {
     auto channel = new DmxChannel();
-    channel->setID(i);
+    channel->setid(i);
     m_rootChannel->addChildValue(channel);
   }
 
@@ -50,7 +50,7 @@ DmxManager::DmxManager(QObject *parent)
   setStraightPatch(0); // patch first universe
 
   auto sequence = new Sequence();
-  sequence->setID(0);
+  sequence->setid(0);
   sequence->setName("Main Sequence");
   m_L_sequence.append(sequence);
 
@@ -455,8 +455,8 @@ void DmxManager::clearPatch()
 void DmxManager::patchOutputToChannel(DmxChannel *t_channel,
                                       DmxOutput *t_output)
 {
-  auto channelID = t_channel->getID();
-  auto outputUid_Id = Uid_Id(t_output);
+  auto channelID = t_channel->getid();
+  auto outputUid_Id = t_output->getUid_Id();
   if (m_dmxPatch->addOutputToChannel(channelID,
                                      outputUid_Id))
   {
@@ -483,8 +483,8 @@ void DmxManager::patchOutputListToChannel(DmxChannel *t_channel,
 void DmxManager::unpatchOutputFromChannel(DmxChannel *t_channel,
                                           DmxOutput *t_output)
 {
-  auto channelID = t_channel->getID();
-  auto outputUid_Id = Uid_Id(t_output);
+  auto channelID = t_channel->getid();
+  auto outputUid_Id = t_output->getUid_Id();
   if (m_dmxPatch->removeOutputFromChannel(channelID,
                                           outputUid_Id))
   {
@@ -510,7 +510,7 @@ void DmxManager::unpatchOutputListFromChannel(DmxChannel *t_channel,
 
 void DmxManager::unpatchOutput(DmxOutput *t_output)
 {
-  auto outputUid_Id = Uid_Id(t_output);
+  auto outputUid_Id = t_output->getUid_Id();
   if (m_dmxPatch->removeOutput(outputUid_Id))
   {
     auto channel = t_output->getChannelControler();
@@ -534,7 +534,7 @@ void DmxManager::unpatchOutputList(QList<DmxOutput *> t_L_output)
 
 void DmxManager::clearChannelPatch(DmxChannel *t_channel)
 {
-  if (m_dmxPatch->clearChannel(t_channel->getID()))
+  if (m_dmxPatch->clearChannel(t_channel->getid()))
   {
     auto L_output = t_channel->getL_controledOutput();
     for (const auto &item
@@ -650,10 +650,13 @@ void DmxManager::playBackToEngine(PlayBackButton t_buttonType)
   switch(t_buttonType)
   {
   case GoButton :
+    m_dmxEngine->getCueEngine()->goGo();
     break;
   case GoBackButton :
+    m_dmxEngine->getCueEngine()->goBack();
     break;
   case PauseButton :
+    m_dmxEngine->getCueEngine()->goPause();
     break;
   case SeqPlusButton :
     m_dmxEngine->getCueEngine()->setSelectedPlus();

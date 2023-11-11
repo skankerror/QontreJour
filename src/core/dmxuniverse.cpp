@@ -25,9 +25,10 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     m_ID(t_universeID), // first universe will have id 0
     m_outputCount(t_outputCount),
     m_isConnected(false),
-    m_rootOutput(new RootValue(ValueType::RootOutput))
+    m_rootOutput(new RootOutput(ValueType::RootOutputType))
 {
-  m_rootOutput->setUniverseID(m_ID);
+
+  m_rootOutput->setuid(m_ID);
 
   for (int i = 0;
        i < m_outputCount;
@@ -36,8 +37,8 @@ DmxUniverse::DmxUniverse(uid t_universeID,
     // create output
     auto dmxOutput = new DmxOutput(ValueType::OutputType,
                                    m_rootOutput);
-    dmxOutput->setUniverseID(m_ID);
-    dmxOutput->setID(i);
+    dmxOutput->setuid(m_ID);
+    dmxOutput->setid(i);
 
     m_rootOutput->addChildValue(dmxOutput);
   }

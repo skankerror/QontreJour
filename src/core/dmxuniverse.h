@@ -38,10 +38,10 @@ public :
   ~DmxUniverse();
 
   // getters
-  uid getID() const { return m_ID; }
+  uid getid() const { return m_ID; }
   int getOutputCount() const { return m_outputCount; }
   bool isConnected() const { return m_isConnected; }
-  RootValue *getRootOutput() const{ return m_rootOutput; }
+  RootOutput *getRootOutput() const{ return m_rootOutput; }
 
   // setters
   void setID(uid t_ID) { m_ID = t_ID; }
@@ -55,7 +55,7 @@ private :
 
   bool m_isConnected;
 
-  RootValue *m_rootOutput;
+  RootOutput *m_rootOutput;
 
 };
 

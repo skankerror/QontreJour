@@ -116,7 +116,6 @@ DmxValue *SequencerTreeModel::getDmxValue(const QModelIndex &index) const
 
 void SequencerTreeModel::updateModel(id t_selectedId)
 {
-  // URGENT :
   m_seqSize = m_rootItem->getSize();
   if (t_selectedId < m_seqSize)
     m_selectedStepId = t_selectedId;
@@ -126,10 +125,6 @@ void SequencerTreeModel::updateModel(id t_selectedId)
 
 QModelIndex SequencerTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
-//  if (!parent.isValid()) return QModelIndex();
-
-  // URGENT : c'est là que ça se joue pour les seq plus moins goto etc
-  // TODO check 1ère ligne
   if (parent.isValid() && parent.column() !=0) return QModelIndex();
 
   auto parentValue = getDmxValue(parent);
@@ -138,13 +133,11 @@ QModelIndex SequencerTreeModel::index(int row, int column, const QModelIndex &pa
   auto rootItem = qobject_cast<Sequence *>(parentValue);
   if (rootItem)
   {
-    // WARNING : trop gourmand pour index() ?
-    auto size = m_rootItem->getSize();
-    if (row >= size) return QModelIndex();
+    if (row >= m_seqSize) return QModelIndex();
     id stepToPass = (row
-                     + m_rootItem->getSelectedStepId())
-                    % size;
-    auto childScene = m_rootItem->getScene(/*(id)row*/ stepToPass);
+                     + m_selectedStepId)
+                    % m_seqSize;
+    auto childScene = m_rootItem->getScene(stepToPass);
     return createIndex(row,
                        column,
                        childScene);

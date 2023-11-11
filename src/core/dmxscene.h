@@ -27,7 +27,8 @@
 class DmxScene;
 
 class Sequence :
-    public RootValue
+    public RootValue,
+                 public IdedValue
 {
 
   Q_OBJECT
@@ -109,7 +110,7 @@ public :
   time_f getTimeOut() const{ return m_timeOut; }
   time_f getDelayIn() const{ return m_delayIn; }
   time_f getDelayOut() const{ return m_delayOut; }
-  id getStepNumber() const{ return LeveledValue::getID(); }
+  id getStepNumber() const{ return LeveledValue::getid(); }
   sceneID_f getSceneID() const{ return m_sceneID; }
   Sequence *getSequence() const{ return m_sequence; }
   QList<SubScene *> getL_subScene() const{ return m_L_subScene; }
@@ -121,7 +122,7 @@ public :
   void setDelayIn(time_f t_delayIn){ m_delayIn = t_delayIn; }
   void setDelayOut(time_f t_delayOut){ m_delayOut = t_delayOut; }
   void setSceneID(sceneID_f t_sceneID){ m_sceneID = t_sceneID; }
-  void setStepNumber(id t_stepNumber){ LeveledValue::setID(t_stepNumber); }
+  void setStepNumber(id t_stepNumber){ LeveledValue::setid(t_stepNumber); }
   void setSequence(Sequence *t_sequence){ m_sequence = t_sequence; }
   void setL_subScene(const QList<SubScene *> &t_L_subScene)
   { m_L_subScene = t_L_subScene; }
