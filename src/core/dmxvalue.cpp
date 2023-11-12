@@ -18,6 +18,7 @@
 #include "dmxvalue.h"
 #include "dmxmanager.h"
 #include <QDebug>
+#include <QtMath>
 
 /********************************* ROOTVALUE *************************************/
 
@@ -325,106 +326,262 @@ void DmxChannelGroup::clearControledChannel()
   m_H_controledChannel_storedLevel.clear();
 }
 
-/******************************** DmxPatch *******************************/
+/****************************** RootScene ****************************/
 
-void DmxPatch::clearPatch()
+Sequence::Sequence(ValueType t_type,
+                   DmxValue *t_parent)
+    : RootValue(t_type,
+                t_parent),
+    IdedValue()
 {
-  m_MM_patch.clear();
+  auto scene0 = new DmxScene(ValueType::Scene0,
+                             this);
+  scene0->setNotes("Blank");
+  scene0->setName("0");
+  scene0->setSceneID(0.0f);
+  scene0->setStepNumber(0);
+  m_L_childScene.append(scene0);
 }
 
-bool DmxPatch::clearChannel(const id t_channelID)
+Sequence::~Sequence()
 {
-  return m_MM_patch.remove(t_channelID);
+  m_L_childScene.clear();
+  m_L_childScene.squeeze();
 }
 
-bool DmxPatch::addOutputToChannel(const id t_channelID,
-                                  const Uid_Id t_outputUid_Id)
+DmxScene *Sequence::getScene(id t_step)
 {
-  // check if it's not yet in the key
-  auto L_Uid_Id = m_MM_patch.values(t_channelID);
-  if (L_Uid_Id.contains(t_outputUid_Id))
+  if (t_step < m_L_childScene.size())
+    return m_L_childScene.at(t_step);
+
+  return nullptr;
+}
+
+DmxScene *Sequence::getScene(sceneID_f t_id)
+{
+  for (qsizetype i = 0;
+       i < m_L_childScene.size();
+       i++)
   {
-    qWarning() << "output already in the patch map";
-    return false;
+    auto scene = m_L_childScene.at(i);
+    if (t_id == scene->getSceneID())
+      return scene;
   }
-
-  // check if it's not in another key
-  L_Uid_Id = m_MM_patch.values();
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    removeOutput(t_outputUid_Id);
-  }
-  m_MM_patch.insert(t_channelID,
-                    t_outputUid_Id);
-  return true;
+  return nullptr;
 }
 
-void DmxPatch::addOutputListToChannel(const id t_channelId,
-                                      const QList<Uid_Id> t_L_outputUid_Id)
+id Sequence::getSelectedStepId() const
 {
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
+  for (qsizetype i = 0;
+       i < m_L_childScene.size();
+       i++)
   {
-    addOutputToChannel(t_channelId,
-                       item);
+    auto scene = m_L_childScene.at(i);
+    if (scene->getSceneID() == m_selectedSceneId)
+      return i;
   }
+  return 0;
 }
 
-bool DmxPatch::removeOutput(const Uid_Id t_outputUid_Id)
+void Sequence::addScene(DmxScene *t_scene)
 {
-  // check if it's in the map
-  auto L_Uid_Id = m_MM_patch.values();
-  if (L_Uid_Id.contains(t_outputUid_Id))
+  sceneID_f lastID = m_L_childScene.last()->getSceneID();
+  auto intIndex = qCeil(lastID);
+  if (intIndex <10)
+    t_scene->setSceneID(10.0f);
+  else
   {
-    auto i = m_MM_patch.constBegin();
-    while (i != m_MM_patch.constEnd())
+    int newId = intIndex / 10; // on garde les dizaines
+    newId++; // on ajoute 1
+    newId *= 10; // on multiplie par 10
+    t_scene->setSceneID(newId);
+  }
+  id size = getSize();
+  t_scene->setStepNumber(size);
+  m_L_childScene.append(t_scene);
+  // we set to 0 selected scene
+  auto scene = getScene(m_selectedSceneId);
+  if (scene) scene->setLevel(NULL_DMX);
+  auto newScene = getScene(size);
+  // we set to 255 new scene
+  if (newScene)
+  {
+    newScene->setLevel(MAX_DMX);
+    m_selectedSceneId = newScene->getSceneID();
+  }
+  emit seqSignalChanged(getSelectedStepId());
+}
+
+void Sequence::addScene(DmxScene *t_scene,
+                        sceneID_f t_id)
+{
+  // to be sure
+  t_scene->setSceneID(t_id);
+
+  auto index = m_L_childScene.indexOf(t_scene);
+  if (index == -1) // ID is not in seq
+  {
+    for (qsizetype i = 0;
+         i < m_L_childScene.size();
+         i++)
     {
-      if (i.value() == t_outputUid_Id)
+      auto scene = m_L_childScene.at(i);
+      if (scene->getSceneID() == t_id)
       {
-        m_MM_patch.remove(i.key(), i.value());
-        break;
+        // TODO : ouvrir une fenetre pour confirmer
+        // la scene d'avant est pas détruite
+        qWarning() << "erase scene" << t_id;
+        t_scene->setStepNumber(scene->getStepNumber());
+        m_L_childScene[i] = t_scene;
+        t_scene->setLevel(NULL_DMX);
+        t_scene->setLevel(MAX_DMX);
+        emit seqSignalChanged(getSelectedStepId());
+        return;
       }
-      ++i;
+      else if (scene->getSceneID() > t_id)
+      {
+        // we set to 0 selected scene
+        auto scene = getScene(m_selectedSceneId);
+        if (scene) scene->setLevel(NULL_DMX);
+        // we set to 255 new scene
+        t_scene->setLevel(MAX_DMX);
+        m_selectedSceneId = t_scene->getSceneID();
+        m_L_childScene.insert(i, t_scene);
+        update(i);
+        emit seqSignalChanged(getSelectedStepId());
+        return;
+      }
     }
-    return true;
+    // we're at the end, scen id is the highest of the seq
+    t_scene->setStepNumber(m_L_childScene.size());
+    // we set to 0 selected scene
+    auto scene = getScene(m_selectedSceneId);
+    if (scene) scene->setLevel(NULL_DMX);
+    // we set to 255 new scene
+    t_scene->setLevel(MAX_DMX);
+    m_selectedSceneId = t_scene->getSceneID();
+    m_L_childScene.append(t_scene);
+    emit seqSignalChanged(getSelectedStepId());
+    return;
   }
-  qWarning() << "can't remove output from channel";
-  return false;
+  // TODO : ça va pas
+  emit seqSignalChanged(getSelectedStepId());
 }
 
-void DmxPatch::removeOutputList(const QList<Uid_Id> t_L_outputUid_Id)
+void Sequence::removeScene(id t_step)
 {
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
-  {
-    removeOutput(item);
-  }
-
+  // TODO :
+  emit seqSignalChanged(getSelectedStepId());
 }
 
-bool DmxPatch::removeOutputFromChannel(const id t_channelID,
-                                       const Uid_Id t_outputUid_Id)
+void Sequence::removeScene(sceneID_f)
 {
-  // choper les values de la key, vérifier et remove
-  auto L_Uid_Id = m_MM_patch.values(t_channelID);
-  if (L_Uid_Id.contains(t_outputUid_Id))
-  {
-    m_MM_patch.remove(t_channelID,
-                      t_outputUid_Id);
-    return true;
-  }
-  qWarning() << "can't remove output from channel";
-  return false;
+  // TODO :
+
+  emit seqSignalChanged(getSelectedStepId());
+
 }
 
-void DmxPatch::removeOutputListFromChannel(const id t_channelID,
-                                           const QList<Uid_Id> t_L_outputUid_Id)
+void Sequence::setSelectedStepId(id t_selectedStepId)
 {
-  for (const auto &item
-       : std::as_const(t_L_outputUid_Id))
+  if (t_selectedStepId < m_L_childScene.size()
+      && t_selectedStepId >= 0)
   {
-    removeOutputFromChannel(t_channelID,
-                            item);
+    // we set to 0 selected scene
+    auto scene = getScene(m_selectedSceneId);
+    if (scene) scene->setLevel(NULL_DMX);
+    auto newScene = getScene(t_selectedStepId);
+    // we set to 255 new scene
+    if (newScene)
+    {
+      newScene->setLevel(MAX_DMX);
+      m_selectedSceneId = newScene->getSceneID();
+    }
+    emit seqSignalChanged(getSelectedStepId());
+  }
+  else
+    qDebug() << "problem in cue selection";
+}
+
+void Sequence::update(id t_step)
+{
+  if (t_step >= m_L_childScene.size())
+  {
+    qDebug() << "problem in Sequence::update";
+    return;
+  }
+  for (qsizetype i = t_step;
+       i < m_L_childScene.size();
+       i++)
+  {
+    auto scene = m_L_childScene.at(i);
+    scene->setStepNumber(i);
   }
 }
+
+/****************************** DmxScene *****************************/
+
+DmxScene::DmxScene(ValueType t_type,
+                   Sequence *t_parent)
+    : DmxChannelGroup(t_type,
+                      t_parent),
+    m_sequence(t_parent)
+{}
+
+DmxScene::DmxScene(DmxScene &t_scene)
+    : DmxChannelGroup(t_scene.getType(),
+                      t_scene.getSequence()),
+    m_sequence(t_scene.getSequence())
+{}
+
+DmxScene::~DmxScene()
+{}
+
+bool DmxScene::operator <(const DmxScene &t_scene) const
+{
+  return getSceneID() < t_scene.getSceneID() ?
+             true : false;
+}
+
+bool DmxScene::operator >(const DmxScene &t_scene) const
+{
+  return getSceneID() > t_scene.getSceneID() ?
+             true : false;
+
+}
+
+bool DmxScene::operator <=(const DmxScene &t_scene) const
+{
+  return getSceneID() <= t_scene.getSceneID() ?
+             true : false;
+}
+
+bool DmxScene::operator >=(const DmxScene &t_scene) const
+{
+  return getSceneID() >= t_scene.getSceneID() ?
+             true : false;
+}
+
+void DmxScene::addSubScene(SubScene *t_subScene)
+{
+  // TODO : vérifier, lui donner une id...
+  m_L_subScene.append(t_subScene);
+}
+void DmxScene::setLevel(dmx t_level)
+{
+  m_level = t_level;
+  emit sceneLevelChanged(m_sceneID,
+                         m_level);
+}
+
+/*************************** DmxSubScene *******************************/
+
+SubScene::SubScene(ValueType t_type,
+                   DmxScene *t_parent)
+    : DmxScene(t_type,
+               t_parent->getSequence())
+{
+  setParentScene(t_parent);
+}
+
 

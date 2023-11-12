@@ -422,15 +422,6 @@ bool ValueTableModel::setData(const QModelIndex &index,
 
   int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
       + index.column();
-//  auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
-//  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-  // NOTE : it's ok for the moment, but if we create widget with channelgroup ?
-//  dmxValue->setLevel(DmxValue::DirectChannelEditSender,
-//                     value.toInt());
-
-//  MANAGER->directChannelToEngine(valueID,
-//                                 value.toInt());
-
   emit dataChanged(index,index);
 
   return true;

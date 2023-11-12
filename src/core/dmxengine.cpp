@@ -18,45 +18,6 @@
 #include "dmxengine.h"
 #include <QDebug>
 
-/******************************** ChannelData *****************************/
-
-void ChannelData::clearChannel()
-{
-  m_directChannelLevel = NULL_DMX;
-  m_directChannelOffset = NULL_DMX_OFFSET;
-  m_sceneLevel = NULL_DMX;
-  m_nextSceneLevel = NULL_DMX;
-  // TODO : gerer le flag
-}
-
-void ChannelData::update()
-{
-  setFlag(ChannelDataFlag::UnknownFlag);
-  if (m_channelGroupLevel >= m_directChannelLevel)
-  {
-    m_actual_Level = m_channelGroupLevel;
-    if (m_actual_Level)
-      setFlag(ChannelDataFlag::ChannelGroupFlag);
-    if (m_sceneLevel >= m_actual_Level)
-    {
-      m_actual_Level = m_sceneLevel;
-      if (m_actual_Level)
-        setFlag(ChannelDataFlag::SelectedSceneFlag);
-    }
-  }
-  else
-  {
-    m_actual_Level = m_directChannelLevel;
-    setFlag(ChannelDataFlag::DirectChannelFlag);
-    if (m_sceneLevel >= m_actual_Level)
-    {
-      m_actual_Level = m_sceneLevel;
-      setFlag(ChannelDataFlag::SelectedSceneFlag);
-    }
-  }
-  // TODO : développer, gérer l'offset,etc...
-}
-
 /****************************** ChannelGroupEngine ***********************/
 
 #define GET_CHANNEL_GROUP(x) static_cast<DmxChannelGroup*>(m_rootChannelGroup->getChildValue(x))
@@ -419,7 +380,6 @@ void CueEngine::recordNewCueInMainSeq(DmxScene *t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
-//  sendNewCueSelected();
 }
 
 void CueEngine::recordNewCue(id t_seqId,
@@ -438,14 +398,12 @@ void CueEngine::recordNewCue(id t_seqId,
 void CueEngine::deleteCueInMainSeq(sceneID_f t_id)
 {
 
-//  sendNewCueSelected();
 }
 
 void CueEngine::deleteCue(id t_seqId,
                           sceneID_f t_id)
 {
 
-//  sendNewCueSelected();
 }
 
 DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
@@ -467,7 +425,6 @@ DmxScene *CueEngine::createScene(QList<DmxChannel *> t_L_channel,
 void CueEngine::updateScene(QList<DmxChannel *> t_L_channel,
                             sceneID_f t_id)
 {
-//  sendNewCueSelected();
 
 }
 
@@ -518,7 +475,6 @@ void CueEngine::onSeqChanged(id t_seqId)
   {
     if (t_seqId == m_mainSeqId)
       m_selectedCueId = seq->getSelectedSceneId();
-//    sendNewCueSelected();
   }
 }
 
@@ -539,9 +495,11 @@ ChannelEngine::~ChannelEngine()
   for (const auto &item
        : std::as_const(m_L_channelData))
   {
-    item->deleteLater();
+    delete item;
+//    item = nullptr;
   }
   m_L_channelData.clear();
+  m_L_channelData.squeeze();
 }
 
 QList<id> ChannelEngine::selectNonNullChannels()
@@ -621,11 +579,6 @@ void ChannelEngine::createDatas(int t_channelCount)
   {
     auto channelData = new ChannelData(i);
     m_L_channelData.append(channelData);
-    auto channel = m_rootChannel->getChildValue(i);
-    connect(channelData,
-            SIGNAL(blockChannelSlider(dmx)),
-            channel,
-            SLOT(setLevel(dmx)));
   }
 }
 
@@ -692,7 +645,6 @@ void ChannelEngine::onChannelLevelChangedFromScene(sceneID_f t_sceneid,
                                                    dmx t_level,
                                                    CueRole t_role)
 {
-//  Q_UNUSED(t_seqid) // NOTE : pour plus tard...
   auto channelData = m_L_channelData.at(t_channelid);
   channelData->setSceneLevel(t_level);
   update(t_channelid);
@@ -1134,3 +1086,105 @@ void DmxEngine::onDeleteGroup(id t_id)
   
 }
 
+/******************************** DmxPatch *******************************/
+
+void DmxPatch::clearPatch()
+{
+  m_MM_patch.clear();
+}
+
+bool DmxPatch::clearChannel(const id t_channelID)
+{
+  return m_MM_patch.remove(t_channelID);
+}
+
+bool DmxPatch::addOutputToChannel(const id t_channelID,
+                                  const Uid_Id t_outputUid_Id)
+{
+  // check if it's not yet in the key
+  auto L_Uid_Id = m_MM_patch.values(t_channelID);
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    qWarning() << "output already in the patch map";
+    return false;
+  }
+
+  // check if it's not in another key
+  L_Uid_Id = m_MM_patch.values();
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    removeOutput(t_outputUid_Id);
+  }
+  m_MM_patch.insert(t_channelID,
+                    t_outputUid_Id);
+  return true;
+}
+
+void DmxPatch::addOutputListToChannel(const id t_channelId,
+                                      const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    addOutputToChannel(t_channelId,
+                       item);
+  }
+}
+
+bool DmxPatch::removeOutput(const Uid_Id t_outputUid_Id)
+{
+  // check if it's in the map
+  auto L_Uid_Id = m_MM_patch.values();
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    auto i = m_MM_patch.constBegin();
+    while (i != m_MM_patch.constEnd())
+    {
+      if (i.value() == t_outputUid_Id)
+      {
+        m_MM_patch.remove(i.key(), i.value());
+        break;
+      }
+      ++i;
+    }
+    return true;
+  }
+  qWarning() << "can't remove output from channel";
+  return false;
+}
+
+void DmxPatch::removeOutputList(const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    removeOutput(item);
+  }
+
+}
+
+bool DmxPatch::removeOutputFromChannel(const id t_channelID,
+                                       const Uid_Id t_outputUid_Id)
+{
+  // choper les values de la key, vérifier et remove
+  auto L_Uid_Id = m_MM_patch.values(t_channelID);
+  if (L_Uid_Id.contains(t_outputUid_Id))
+  {
+    m_MM_patch.remove(t_channelID,
+                      t_outputUid_Id);
+    return true;
+  }
+  qWarning() << "can't remove output from channel";
+  return false;
+}
+
+void DmxPatch::removeOutputListFromChannel(const id t_channelID,
+                                           const QList<Uid_Id> t_L_outputUid_Id)
+{
+  for (const auto &item
+       : std::as_const(t_L_outputUid_Id))
+  {
+    removeOutputFromChannel(t_channelID,
+                            item);
+  }
+}

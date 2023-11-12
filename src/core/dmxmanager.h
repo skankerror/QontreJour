@@ -23,12 +23,11 @@
 #include "qdmxlib/QDmxManager"
 #include "../qontrejour.h"
 #include "dmxvalue.h"
-#include "dmxscene.h"
-#include "dmxuniverse.h"
 #include "dmxengine.h"
 #include "interpreter.h"
 
 class DmxPatch;
+class DmxUniverse;
 
 class DmxManager
     : public QObject
@@ -137,7 +136,6 @@ public slots :
                              overdmx t_offset);
   void keypadToInterpreter(KeypadButton t_buttonType);
   void playBackToEngine(PlayBackButton t_buttonType);
-//  void sequenceToEngine(id t_seqId);
 
 private slots :
 
@@ -157,6 +155,46 @@ private :
   RootValue *m_rootChannelGroup;
   QList<Sequence *> m_L_sequence;
   id m_mainSeq = 0;
+
+};
+
+/***********************************DmxUniverse********************************/
+
+class DmxUniverse
+    : public QObject
+{
+
+  Q_OBJECT
+
+public :
+
+  // cstr
+  explicit DmxUniverse(uid t_universeID,
+                       int t_outputCount = UNIVERSE_OUTPUT_COUNT_DEFAULT,
+                       QObject *parent = nullptr);
+
+  //destr
+  ~DmxUniverse();
+
+  // getters
+  uid getid() const { return m_ID; }
+  int getOutputCount() const { return m_outputCount; }
+  bool isConnected() const { return m_isConnected; }
+  RootOutput *getRootOutput() const{ return m_rootOutput; }
+
+  // setters
+  void setID(uid t_ID) { m_ID = t_ID; }
+  void setConnected(bool t_isConnected) { m_isConnected = t_isConnected; }
+  void setOutputCount(int t_outputCount){ m_outputCount = t_outputCount; }
+
+private :
+
+  uid m_ID;
+  int m_outputCount;
+
+  bool m_isConnected;
+
+  RootOutput *m_rootOutput;
 
 };
 

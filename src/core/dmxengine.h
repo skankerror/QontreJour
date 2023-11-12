@@ -21,91 +21,6 @@
 #include <QObject>
 #include "../qontrejour.h"
 #include "dmxvalue.h"
-#include "dmxscene.h"
-
-/******************************* ChannelData ***********************/
-
-class ChannelData
-    : public QObject
-{
-
-  Q_OBJECT
-
-public :
-
-  Q_ENUM(ChannelDataFlag)
-
-  explicit ChannelData(id t_id = NO_ID,
-                       dmx t_channelGroupLevel = NULL_DMX,
-                       dmx t_directChannelLevel = NULL_DMX,
-                       overdmx t_directChannelOffset = NULL_DMX_OFFSET,
-                       dmx t_sceneLevel = NULL_DMX,
-                       dmx t_nextSceneLevel = NULL_DMX,
-                       QObject *parent = nullptr)
-      : QObject(parent),
-      m_channelID(t_id),
-      m_channelGroupLevel(t_channelGroupLevel),
-      m_directChannelLevel(t_directChannelLevel),
-      m_directChannelOffset(t_directChannelOffset),
-      m_sceneLevel(t_sceneLevel),
-      m_nextSceneLevel(t_nextSceneLevel)
-  {}
-
-  ~ChannelData(){}
-
-  dmx getChannelGroupLevel() const{ return m_channelGroupLevel; }
-  dmx getDirectChannelLevel() const{ return m_directChannelLevel; }
-  overdmx getDirectChannelOffset() const{ return m_directChannelOffset; }
-  dmx getSceneLevel() const{ return m_sceneLevel; }
-  dmx getNextSceneLevel() const{ return m_nextSceneLevel; }
-  dmx getActual_Level() const{ return m_actual_Level; }
-  ChannelDataFlag getFlag() const{ return m_flag; }
-  id getChannelID() const{ return m_channelID; }
-  bool getIsSelected() const{ return m_isSelected; }
-
-  void setChannelGroupLevel(dmx t_channelGroupLevel)
-  { m_channelGroupLevel = t_channelGroupLevel; }
-  void setDirectChannelLevel(dmx t_directChannelLevel)
-  { m_directChannelLevel = t_directChannelLevel; }
-  void setDirectChannelOffset(overdmx t_directChannelOffset)
-  { m_directChannelOffset = t_directChannelOffset; }
-  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
-  void setNextSceneLevel(dmx t_nextSceneLevel)
-  { m_nextSceneLevel = t_nextSceneLevel; }
-  void setChannelID(id t_channelID){ m_channelID = t_channelID; }
-  void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
-  void setIsSelected(bool t_isSelected)
-  {
-    m_isSelected = t_isSelected;
-    if (!t_isSelected) clearOverdmx();
-  }
-
-  void clearChannel();
-  void clearOverdmx(){ m_directChannelOffset = NULL_DMX_OFFSET; }
-  void update();
-
-private :
-
-  void setFlag(ChannelDataFlag t_flag){ m_flag = t_flag; }
-
-signals :
-
-  void blockChannelSlider(dmx t_actualLevel);
-
-private :
-
-  id m_channelID = NO_ID;
-  dmx m_channelGroupLevel = NULL_DMX;
-  dmx m_directChannelLevel = NULL_DMX;
-  overdmx m_directChannelOffset = NULL_DMX_OFFSET;
-  dmx m_sceneLevel = NULL_DMX;
-  dmx m_nextSceneLevel = NULL_DMX;
-  ChannelDataFlag m_flag = UnknownFlag;
-  bool m_isSelected;
-
-  dmx m_actual_Level = NULL_DMX;
-
-};
 
 /****************************** ChannelGroupEngine ***********************/
 
@@ -211,10 +126,6 @@ public :
   void goBack();
   void goPause();
 
-//private :
-
-//  void sendNewCueSelected();
-
 signals :
 
   void channelLevelChangedFromCue(sceneID_f t_sceneid,
@@ -304,20 +215,17 @@ public slots :
                                       id t_channelid,
                                       dmx t_level,
                                       CueRole t_role);
-//  void onChannelLevelChangedFromNextScene(id t_id,
-//                                          dmx t_level);
-//  void onResetCue(id t_seqid);
 
 private :
 
   RootValue *m_rootChannel;
 
   QList<ChannelData *> m_L_channelData;
-
-
 };
 
 /****************************** OutputEngine *****************************/
+
+class DmxPatch;
 
 class OutputEngine
     : public QObject
@@ -427,6 +335,44 @@ private :
   SelectionType m_selType = SelectionType::UnknownSelectionType;
 
 };
+
+/****************************** DmxPatch ******************************/
+
+class DmxPatch
+{
+
+public :
+
+  explicit DmxPatch(){}
+
+  ~DmxPatch(){}
+
+  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
+  QList<Uid_Id> getL_Uid_Id(id t_channelID)
+  { return m_MM_patch.values(t_channelID); }
+
+  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
+  { m_MM_patch = t_MM_patch; }
+
+  void clearPatch();
+  bool clearChannel(const id t_channelID);
+  bool addOutputToChannel(const id t_channelID,
+                          const Uid_Id t_outputUid_Id);
+  void addOutputListToChannel(const id t_channelId,
+                              const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutput(const Uid_Id t_outputUid_Id);
+  void removeOutputList(const QList<Uid_Id> t_L_outputUid_Id);
+  bool removeOutputFromChannel(const id t_channelID,
+                               const Uid_Id t_outputUid_Id);
+  void removeOutputListFromChannel(const id t_channelID,
+                                   const QList<Uid_Id> t_L_outputUid_Id);
+
+private :
+
+  QMultiMap<id, Uid_Id> m_MM_patch;
+
+};
+
 
 #endif // DMXENGINE_H
 

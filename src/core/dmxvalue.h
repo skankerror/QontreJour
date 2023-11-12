@@ -320,41 +320,154 @@ private :
 
 };
 
-/****************************** DmxPatch ******************************/
+/****************************** Sequence ****************************/
 
-class DmxPatch
+class DmxScene;
+
+class Sequence :
+                 public RootValue,
+                 public IdedValue
 {
+
+  Q_OBJECT
 
 public :
 
-  explicit DmxPatch(){}
+  explicit Sequence(ValueType t_type = ValueType::SequenceType,
+                    DmxValue *t_parent = nullptr);
 
-  ~DmxPatch(){}
+  ~Sequence();
 
-  QMultiMap<id, Uid_Id> getMM_patch() const{ return m_MM_patch; }
-  QList<Uid_Id> getL_Uid_Id(id t_channelID)
-  { return m_MM_patch.values(t_channelID); }
+  QList<DmxScene *> getL_childScene() const{ return m_L_childScene; }
+  DmxScene *getScene(id t_step);
+  DmxScene *getScene(sceneID_f t_id);
+  qsizetype getSize() const{ return m_L_childScene.size() ;}
+  id getSelectedStepId() const;
+  sceneID_f getSelectedSceneId() const{ return m_selectedSceneId; }
 
-  void setMM_patch(const QMultiMap<id, Uid_Id> &t_MM_patch)
-  { m_MM_patch = t_MM_patch; }
+  void addScene(DmxScene *t_scene);
+  void addScene(DmxScene *t_scene,
+                sceneID_f t_id);
 
-  void clearPatch();
-  bool clearChannel(const id t_channelID);
-  bool addOutputToChannel(const id t_channelID,
-                          const Uid_Id t_outputUid_Id);
-  void addOutputListToChannel(const id t_channelId,
-                              const QList<Uid_Id> t_L_outputUid_Id);
-  bool removeOutput(const Uid_Id t_outputUid_Id);
-  void removeOutputList(const QList<Uid_Id> t_L_outputUid_Id);
-  bool removeOutputFromChannel(const id t_channelID,
-                               const Uid_Id t_outputUid_Id);
-  void removeOutputListFromChannel(const id t_channelID,
-                                   const QList<Uid_Id> t_L_outputUid_Id);
+  void removeScene(id t_step);
+  void removeScene(sceneID_f);
+
+  void setL_childScene(const QList<DmxScene *> &t_L_childScene)
+  { m_L_childScene = t_L_childScene; }
+  void setSelectedStepId(id t_selectedStepId);
+  void setSelectedSceneId(sceneID_f t_selectedSceneId)
+  { m_selectedSceneId = t_selectedSceneId; }
+
+signals :
+
+  void seqSignalChanged(id t_id);
+
+public slots :
+
+private:
+
+  // update from t_step till end
+  void update(id t_step);
 
 private :
 
-  QMultiMap<id, Uid_Id> m_MM_patch;
-
+  QList<DmxScene *> m_L_childScene;
+  sceneID_f m_selectedSceneId = 0.0f;
 };
+
+/****************************** DmxScene *****************************/
+
+class SubScene;
+
+class DmxScene :
+                 public DmxChannelGroup
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit DmxScene(ValueType t_type = ValueType::MainScene,
+                    Sequence *t_parent = nullptr);
+
+  explicit DmxScene(DmxScene &t_scene);
+
+  virtual ~DmxScene();
+
+  bool operator <(const DmxScene &t_scene)const;
+  bool operator >(const DmxScene &t_scene)const;
+  bool operator <=(const DmxScene &t_scene)const;
+  bool operator >=(const DmxScene &t_scene)const;
+
+  void addSubScene(SubScene *t_subScene);
+
+  // getters
+  QString getNotes() const{ return m_notes; }
+  time_f getTimeIn() const{ return m_timeIn; }
+  time_f getTimeOut() const{ return m_timeOut; }
+  time_f getDelayIn() const{ return m_delayIn; }
+  time_f getDelayOut() const{ return m_delayOut; }
+  id getStepNumber() const{ return LeveledValue::getid(); }
+  sceneID_f getSceneID() const{ return m_sceneID; }
+  Sequence *getSequence() const{ return m_sequence; }
+  QList<SubScene *> getL_subScene() const{ return m_L_subScene; }
+
+  // setters
+  void setNotes(const QString &t_notes){ m_notes = t_notes; }
+  void setTimeIn(time_f t_timeIn){ m_timeIn = t_timeIn; }
+  void setTimeOut(time_f t_timeOut){ m_timeOut = t_timeOut; }
+  void setDelayIn(time_f t_delayIn){ m_delayIn = t_delayIn; }
+  void setDelayOut(time_f t_delayOut){ m_delayOut = t_delayOut; }
+  void setSceneID(sceneID_f t_sceneID){ m_sceneID = t_sceneID; }
+  void setStepNumber(id t_stepNumber){ LeveledValue::setid(t_stepNumber); }
+  void setSequence(Sequence *t_sequence){ m_sequence = t_sequence; }
+  void setL_subScene(const QList<SubScene *> &t_L_subScene)
+  { m_L_subScene = t_L_subScene; }
+
+protected :
+
+  sceneID_f m_sceneID;
+  QString m_notes;
+  time_f m_timeIn = 5.0f;
+  time_f m_timeOut = 5.0f;
+  time_f m_delayIn = 0.0f;
+  time_f m_delayOut = 0.0f;
+
+  Sequence *m_sequence;
+  QList<SubScene *> m_L_subScene;
+
+signals :
+
+  void sceneLevelChanged(sceneID_f t_sceneid,
+                         dmx t_level);
+
+public slots:
+
+  virtual void setLevel(dmx t_level) override;
+};
+
+/*************************** DmxSubScene *******************************/
+
+class SubScene :
+                 public DmxScene
+{
+  Q_OBJECT
+
+public :
+
+  explicit SubScene(ValueType t_type = ValueType::SubSceneType,
+                    DmxScene *t_parent = nullptr);
+
+  DmxScene *getParentScene() const
+  { return m_parentScene; }
+
+  void setParentScene(DmxScene *t_parentScene)
+  { m_parentScene = t_parentScene; }
+
+protected :
+
+  DmxScene *m_parentScene;
+};
+
 
 #endif // DMXVALUE_H

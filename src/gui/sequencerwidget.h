@@ -22,7 +22,7 @@
 #include <QTreeWidget>
 #include <QTreeView>
 #include <QAbstractItemModel>
-#include "../core/dmxscene.h"
+#include "../core/dmxvalue.h"
 
 
 /********************** SequencerWidget ****************************/

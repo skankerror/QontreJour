@@ -669,12 +669,6 @@ void DmxManager::playBackToEngine(PlayBackButton t_buttonType)
   }
 }
 
-//void DmxManager::sequenceToEngine(id t_seqId)
-//{
-//  m_dmxEngine->getCueEngine()->
-//}
-
-
 void DmxManager::onOutputRequest(uid t_uid,
                                  id t_id,
                                  dmx t_level)
@@ -687,5 +681,38 @@ void DmxManager::onOutputRequest(uid t_uid,
            << "id :" << t_id
            << "level :" << t_level;
 
+}
+
+/***********************************DmxUniverse********************************/
+
+DmxUniverse::DmxUniverse(uid t_universeID,
+                         int t_outputCount/* = 512 */,
+                         QObject *parent)
+    : QObject(parent),
+    m_ID(t_universeID), // first universe will have id 0
+    m_outputCount(t_outputCount),
+    m_isConnected(false),
+    m_rootOutput(new RootOutput(ValueType::RootOutputType))
+{
+
+  m_rootOutput->setuid(m_ID);
+
+  for (int i = 0;
+       i < m_outputCount;
+       i++)
+  {
+    // create output
+    auto dmxOutput = new DmxOutput(ValueType::OutputType,
+                                   m_rootOutput);
+    dmxOutput->setuid(m_ID);
+    dmxOutput->setid(i);
+
+    m_rootOutput->addChildValue(dmxOutput);
+  }
+}
+
+DmxUniverse::~DmxUniverse()
+{
+  m_rootOutput->deleteLater();
 }
 

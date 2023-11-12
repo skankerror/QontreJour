@@ -42,12 +42,10 @@ set(DATA_FILES README.md TODO LICENSE)
 set(PROJECT_SOURCES
         src/main.cpp
         src/qontrejour.h
-        src/core/dmxuniverse.h
-        src/core/dmxuniverse.cpp
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-        src/core/dmxscene.h
-        src/core/dmxscene.cpp
+#        src/core/dmxscene.h
+#        src/core/dmxscene.cpp
         src/core/dmxmanager.h
         src/core/dmxmanager.cpp
         src/core/dmxengine.h
