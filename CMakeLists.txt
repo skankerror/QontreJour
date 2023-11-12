@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
 
-project(QontreJour VERSION 0.1 LANGUAGES CXX)
+project(QontreJour VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -29,13 +29,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #add_subdirectory(libs/QEnttecPro)
 add_subdirectory(libs/QDmxLib)
 
+#add_subdirectory(src)
+
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network SerialPort REQUIRED)
 #find_package(ossia REQUIRED)
 
 set(TS_FILES QontreJour_fr_GF.ts)
 
-set(DATA_FILES README.md TODO)
+set(DATA_FILES README.md TODO LICENSE)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -68,6 +70,7 @@ set(PROJECT_SOURCES
         src/gui/keypadwidget.cpp
         ${TS_FILES}
         ${DATA_FILES}
+#        ${BASIC_SOURCES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -173,6 +173,13 @@ enum HeaderField
   HeaderFieldCount
 };
 
+enum CueRole
+{
+  OutingCue,
+  InningCue,
+  UnknownRole
+};
+
 /******************************** Uid_Id *************************************/
 
 //class DmxOutput;

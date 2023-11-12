@@ -1,0 +1,14 @@
+set(GUI_SOURCES
+  mainwindow.h
+  mainwindow.cpp
+  universewidget.h
+  universewidget.cpp
+  sequencerwidget.h
+  sequencerwidget.cpp
+  valuetablewidget.h
+  valuetablewidget.cpp
+  valuesliderswidget.h
+  valuesliderswidget.cpp
+  keypadwidget.h
+  keypadwidget.cpp
+)

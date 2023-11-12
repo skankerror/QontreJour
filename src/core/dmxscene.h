@@ -138,6 +138,14 @@ protected :
   Sequence *m_sequence;
   QList<SubScene *> m_L_subScene;
 
+signals :
+
+  void sceneLevelChanged(sceneID_f t_sceneid,
+                         dmx t_level);
+
+public slots:
+
+  virtual void setLevel(dmx t_level) override;
 };
 
 /*************************** DmxSubScene *******************************/

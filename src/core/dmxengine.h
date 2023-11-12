@@ -211,16 +211,29 @@ public :
   void goBack();
   void goPause();
 
-private :
+//private :
 
-  void sendNewCueSelected(id t_seqid);
+//  void sendNewCueSelected();
 
 signals :
 
-  void channelLevelChangedFromCue(id t_seqid,
+  void channelLevelChangedFromCue(sceneID_f t_sceneid,
                                   id t_channelid,
-                                  dmx t_level);
-  void resetCue(id t_seqid);
+                                  dmx t_level,
+                                  CueRole t_role = CueRole::UnknownRole);
+
+//  void channelLevelChangedFromOutingCue(sceneID_f t_sceneid,
+//                                        id t_channelid,
+//                                        dmx t_level);
+
+//  void channelLevelChangedFromInningCue(sceneID_f t_sceneid,
+//                                        id t_channelid,
+//                                        dmx t_level);
+
+public slots :
+
+  void cueLevelChanged(sceneID_f t_sceneid,
+                       dmx t_level);
 
 private slots :
 
@@ -231,6 +244,9 @@ private :
   QList<Sequence *> m_L_seq;
   id m_mainSeqId = 0;
   sceneID_f m_selectedCueId = 0.0f;
+
+  // channel Id , Gr_Id_Dmx : higher Group Id _ actual htp level
+  QMap<id, Gr_Id_Dmx> m_M_channelLevel;
 
 };
 
@@ -284,12 +300,13 @@ public slots :
                                               overdmx t_offset = NULL_DMX);
   void onChannelLevelPlusFromDirectChannel(id t_id);
   void onChannelLevelMoinsFromDirectChannel(id t_id);
-  void onChannelLevelChangedFromScene(id t_seqid,
-                                      id t_id,
-                                      dmx t_level);
-  void onChannelLevelChangedFromNextScene(id t_id,
-                                          dmx t_level);
-  void onResetCue(id t_seqid);
+  void onChannelLevelChangedFromScene(sceneID_f t_sceneid,
+                                      id t_channelid,
+                                      dmx t_level,
+                                      CueRole t_role);
+//  void onChannelLevelChangedFromNextScene(id t_id,
+//                                          dmx t_level);
+//  void onResetCue(id t_seqid);
 
 private :
 

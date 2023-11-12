@@ -1,0 +1,12 @@
+set(CORE_SOURCES
+  dmxuniverse.h
+  dmxuniverse.cpp
+  dmxvalue.h
+  dmxvalue.cpp
+  dmxscene.h
+  dmxscene.cpp
+  dmxmanager.h
+  dmxmanager.cpp
+  dmxengine.h
+  dmxengine.cpp
+)

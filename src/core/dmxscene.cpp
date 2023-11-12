@@ -92,9 +92,19 @@ void Sequence::addScene(DmxScene *t_scene)
     newId *= 10; // on multiplie par 10
     t_scene->setSceneID(newId);
   }
-  t_scene->setStepNumber(m_L_childScene.size());
+  id size = getSize();
+  t_scene->setStepNumber(size);
   m_L_childScene.append(t_scene);
-//  update(m_L_childScene.size() - 1);
+  // we set to 0 selected scene
+  auto scene = getScene(m_selectedSceneId);
+  if (scene) scene->setLevel(NULL_DMX);
+  auto newScene = getScene(size);
+  // we set to 255 new scene
+  if (newScene)
+  {
+    newScene->setLevel(MAX_DMX);
+    m_selectedSceneId = newScene->getSceneID();
+  }
   emit seqSignalChanged(getSelectedStepId());
 }
 
@@ -119,21 +129,36 @@ void Sequence::addScene(DmxScene *t_scene,
         qWarning() << "erase scene" << t_id;
         t_scene->setStepNumber(scene->getStepNumber());
         m_L_childScene[i] = t_scene;
+        t_scene->setLevel(NULL_DMX);
+        t_scene->setLevel(MAX_DMX);
         emit seqSignalChanged(getSelectedStepId());
         return;
       }
       else if (scene->getSceneID() > t_id)
       {
-        m_L_childScene.insert(i /*+ 1*/, t_scene);
-        update(i /*+ 1*/);
+        // we set to 0 selected scene
+        auto scene = getScene(m_selectedSceneId);
+        if (scene) scene->setLevel(NULL_DMX);
+        // we set to 255 new scene
+        t_scene->setLevel(MAX_DMX);
+        m_selectedSceneId = t_scene->getSceneID();
+        m_L_childScene.insert(i, t_scene);
+        update(i);
         emit seqSignalChanged(getSelectedStepId());
         return;
       }
     }
     // we're at the end, scen id is the highest of the seq
     t_scene->setStepNumber(m_L_childScene.size());
+    // we set to 0 selected scene
+    auto scene = getScene(m_selectedSceneId);
+    if (scene) scene->setLevel(NULL_DMX);
+    // we set to 255 new scene
+    t_scene->setLevel(MAX_DMX);
+    m_selectedSceneId = t_scene->getSceneID();
     m_L_childScene.append(t_scene);
     emit seqSignalChanged(getSelectedStepId());
+    return;
   }
   // TODO : ça va pas
   emit seqSignalChanged(getSelectedStepId());
@@ -158,7 +183,16 @@ void Sequence::setSelectedStepId(id t_selectedStepId)
   if (t_selectedStepId < m_L_childScene.size()
       && t_selectedStepId >= 0)
   {
-    m_selectedSceneId = m_L_childScene.at(t_selectedStepId)->getSceneID();
+    // we set to 0 selected scene
+    auto scene = getScene(m_selectedSceneId);
+    if (scene) scene->setLevel(NULL_DMX);
+    auto newScene = getScene(t_selectedStepId);
+    // we set to 255 new scene
+    if (newScene)
+    {
+      newScene->setLevel(MAX_DMX);
+      m_selectedSceneId = newScene->getSceneID();
+    }
     emit seqSignalChanged(getSelectedStepId());
   }
   else
@@ -229,6 +263,12 @@ void DmxScene::addSubScene(SubScene *t_subScene)
   // TODO : vérifier, lui donner une id...
   m_L_subScene.append(t_subScene);
 }
+void DmxScene::setLevel(dmx t_level)
+{
+  m_level = t_level;
+  emit sceneLevelChanged(m_sceneID,
+                         m_level);
+}
 
 /*************************** DmxSubScene *******************************/
 
@@ -239,3 +279,5 @@ SubScene::SubScene(ValueType t_type,
 {
   setParentScene(t_parent);
 }
+
+
