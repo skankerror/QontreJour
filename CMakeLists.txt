@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #    endif()
 #endif()
 
-#add_subdirectory(libs/QMidi)
+add_subdirectory(libs/QMidi)
 #add_subdirectory(libs/QOSC)
 #add_subdirectory(libs/QEnttecPro)
 add_subdirectory(libs/QDmxLib)
@@ -44,8 +44,6 @@ set(PROJECT_SOURCES
         src/qontrejour.h
         src/core/dmxvalue.h
         src/core/dmxvalue.cpp
-#        src/core/dmxscene.h
-#        src/core/dmxscene.cpp
         src/core/dmxmanager.h
         src/core/dmxmanager.cpp
         src/core/dmxengine.h

@@ -351,35 +351,34 @@ void CueEngine::setSelectedMoins()
 void CueEngine::recordNextCueInMainSeq(DmxScene *t_scene)
 {
   auto seq = getMainSeq();
-  seq->addScene(t_scene);
   connect(t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
-
+  seq->addScene(t_scene);
 }
 
 void CueEngine::recordNextCue(DmxScene *t_scene,
                               id t_seqId)
 {
   auto seq = m_L_seq.at(t_seqId);
-  seq->addScene(t_scene);
   connect(t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
+  seq->addScene(t_scene);
 }
 
 void CueEngine::recordNewCueInMainSeq(DmxScene *t_scene,
                                       sceneID_f t_scId)
 {
   auto seq = getMainSeq();
-  seq->addScene(t_scene,
-                t_scId);
   connect(t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
+  seq->addScene(t_scene,
+                t_scId);
 }
 
 void CueEngine::recordNewCue(id t_seqId,
@@ -387,12 +386,12 @@ void CueEngine::recordNewCue(id t_seqId,
                              sceneID_f t_scId)
 {
   auto seq = m_L_seq.at(t_seqId);
-  seq->addScene(t_scene,
-                t_scId);
   connect(t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
+  seq->addScene(t_scene,
+                t_scId);
 }
 
 void CueEngine::deleteCueInMainSeq(sceneID_f t_id)

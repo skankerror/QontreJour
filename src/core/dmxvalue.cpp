@@ -418,6 +418,7 @@ void Sequence::addScene(DmxScene *t_scene,
   // to be sure
   t_scene->setSceneID(t_id);
 
+  // BUG : ça va pas il faut vérifier l'id plutôt
   auto index = m_L_childScene.indexOf(t_scene);
   if (index == -1) // ID is not in seq
   {

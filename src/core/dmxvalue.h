@@ -266,7 +266,6 @@ public :
   void removeOutputList(const QList<Uid_Id> t_L_Uid_Id);
   void clearControledOutput();
 
-
 private :
 
   QList<DmxOutput *>m_L_controledOutput;

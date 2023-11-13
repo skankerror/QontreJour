@@ -391,7 +391,8 @@ public :
   }
 
   void clearOverdmx(){ m_directChannelOffset = NULL_DMX_OFFSET; }
-  void update(){
+  void update()
+  {
     setFlag(ChannelDataFlag::UnknownFlag);
     if (m_channelGroupLevel >= m_directChannelLevel)
     {
