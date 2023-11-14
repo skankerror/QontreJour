@@ -622,14 +622,14 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
   return driver->availableDevices();
 }
 
-void DmxManager::submasterToEngine(id t_id,
+void DmxManager::submasterSliderToEngine(id t_id,
                                    dmx t_level)
 {
   m_dmxEngine->getGroupEngine()->groupLevelChanged(t_id,
                                                    t_level);
 }
 
-void DmxManager::directChannelToEngine(id t_id,
+void DmxManager::directChannelWidgetsToEngine(id t_id,
                                        dmx t_level,
                                        overdmx t_offset)
 {

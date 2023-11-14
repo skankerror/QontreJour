@@ -104,7 +104,6 @@ private :
 
   // create everything we need
   bool createUniverse(uid t_universeID);
-//  DmxChannelGroup *createChannelGroup(QList<DmxChannel *> t_L_channel);
 
   QList<QDmxDriver *> getAvailableDrivers() const;
   QList<QDmxDevice *> getAvailableDevices(const QString &t_driverString);
@@ -129,9 +128,9 @@ signals :
 
 public slots :
 
-  void submasterToEngine(id t_id,
+  void submasterSliderToEngine(id t_id,
                          dmx t_level);
-  void directChannelToEngine(id t_id,
+  void directChannelWidgetsToEngine(id t_id,
                              dmx t_level,
                              overdmx t_offset);
   void keypadToInterpreter(KeypadButton t_buttonType);

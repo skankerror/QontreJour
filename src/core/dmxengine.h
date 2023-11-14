@@ -126,20 +126,19 @@ public :
   void goBack();
   void goPause();
 
+private :
+
+  void setSelectedSceneToNullDmx();
+  void setSelectedSceneToMaxDmx();
+  void freeL_activeCuesFromSelectedCue();
+  void addSceneToL_activeCues(DmxScene *t_scene);
+  void newSceneSelected(sceneID_f t_id);
+
 signals :
 
-  void channelLevelChangedFromCue(sceneID_f t_sceneid,
-                                  id t_channelid,
+  void channelLevelChangedFromCue(id t_channelid,
                                   dmx t_level,
                                   CueRole t_role = CueRole::UnknownRole);
-
-//  void channelLevelChangedFromOutingCue(sceneID_f t_sceneid,
-//                                        id t_channelid,
-//                                        dmx t_level);
-
-//  void channelLevelChangedFromInningCue(sceneID_f t_sceneid,
-//                                        id t_channelid,
-//                                        dmx t_level);
 
 public slots :
 
@@ -156,9 +155,12 @@ private :
   id m_mainSeqId = 0;
   sceneID_f m_selectedCueId = 0.0f;
 
-  // channel Id , Gr_Id_Dmx : higher Group Id _ actual htp level
-  QMap<id, Gr_Id_Dmx> m_M_channelLevel;
+  // id : channel id , Ch_Id_Dmx : channelId _ stored level
+//  QMultiMap<SeqId_SceneId, id> m_MM_activeCues;
 
+  QList<SeqId_SceneId> m_L_activeCues;
+  // channel Id , Sceneid_Dmx : higher scene Id _ actual htp level
+  QMap<id, Sceneid_Dmx> m_M_channelMaxLevel;
 };
 
 /******************************* ChannelEngine ***********************/
@@ -201,7 +203,6 @@ signals :
 
   void selectionChanged(QList<id> t_L_id);
 
-
 public slots :
 
   void onChannelLevelChangedFromGroup(id t_id,
@@ -211,16 +212,17 @@ public slots :
                                               overdmx t_offset = NULL_DMX);
   void onChannelLevelPlusFromDirectChannel(id t_id);
   void onChannelLevelMoinsFromDirectChannel(id t_id);
-  void onChannelLevelChangedFromScene(sceneID_f t_sceneid,
-                                      id t_channelid,
+  void onChannelLevelChangedFromScene(id t_channelid,
                                       dmx t_level,
-                                      CueRole t_role);
+                                      CueRole t_role = CueRole::UnknownRole);
 
 private :
 
   RootValue *m_rootChannel;
 
   QList<ChannelData *> m_L_channelData;
+
+
 };
 
 /****************************** OutputEngine *****************************/

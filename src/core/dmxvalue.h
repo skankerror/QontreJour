@@ -313,7 +313,7 @@ public :
   void removeChannelList(const QList<id> t_L_id);
   void clearControledChannel();
 
-private :
+protected :
 
   QHash<DmxChannel *,dmx> m_H_controledChannel_storedLevel;
 
@@ -323,9 +323,9 @@ private :
 
 class DmxScene;
 
-class Sequence :
-                 public RootValue,
-                 public IdedValue
+class Sequence
+    : public RootValue,
+      public IdedValue
 {
 
   Q_OBJECT
@@ -378,8 +378,8 @@ private :
 
 class SubScene;
 
-class DmxScene :
-                 public DmxChannelGroup
+class DmxScene
+    : public DmxChannelGroup
 {
 
   Q_OBJECT
@@ -447,8 +447,8 @@ public slots:
 
 /*************************** DmxSubScene *******************************/
 
-class SubScene :
-                 public DmxScene
+class SubScene
+    : public DmxScene
 {
   Q_OBJECT
 

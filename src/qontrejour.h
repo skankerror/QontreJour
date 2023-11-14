@@ -331,6 +331,94 @@ public :
   { return false; }
 };
 
+/****************************** Sceneid_Id_Dmx ********************************/
+
+class Sceneid_Dmx
+{
+
+public :
+
+  explicit Sceneid_Dmx(const sceneID_f t_ID = 0,
+                       const dmx t_level = NULL_DMX)
+      : m_ID(t_ID),
+      m_level(t_level)
+  {}
+
+  ~Sceneid_Dmx(){}
+
+  bool operator==(const Sceneid_Dmx t_id_dmx) const
+  { return ((t_id_dmx.getid() == m_ID)
+            && (t_id_dmx.getLevel() == m_level)); }
+  virtual bool isBrother(const Sceneid_Dmx t_id_dmx) const
+  { return (m_ID == t_id_dmx.getid()); }
+
+  // NOTE : use isBrother() before these operators
+  bool operator<(const Sceneid_Dmx t_id_dmx) const
+  { return (m_level < t_id_dmx.getLevel()); }
+  bool operator>(const Sceneid_Dmx t_id_dmx) const
+  { return (m_level > t_id_dmx.getLevel()); }
+  bool operator<=(const Sceneid_Dmx t_id_dmx) const
+  { return (m_level <= t_id_dmx.getLevel()); }
+  bool operator>=(const Sceneid_Dmx t_id_dmx) const
+  { return (m_level >= t_id_dmx.getLevel()); }
+
+
+  sceneID_f getid() const{ return m_ID; }
+  dmx getLevel() const{ return m_level; }
+
+  void setID(const sceneID_f t_ID){ m_ID = t_ID; }
+  void setLevel(const dmx t_level){ m_level = t_level; }
+
+  bool isValid() const{ return (m_ID > 0); }
+
+private :
+
+  sceneID_f m_ID = 0;
+  dmx m_level = NULL_DMX;
+
+};
+
+/****************************** SeqId_SceneId ********************************/
+
+class SeqId_SceneId
+{
+public :
+
+  explicit SeqId_SceneId(id t_seqid = NO_ID,
+                         sceneID_f t_sceneid = 0.0f)
+      : m_seqId(t_seqid),
+      m_sceneId(t_sceneid)
+  {}
+
+  bool operator==(const SeqId_SceneId t_id_sceneid) const
+  { return ((t_id_sceneid.getid() == m_seqId)
+            && (t_id_sceneid.getSceneId() == m_sceneId)); }
+
+  virtual bool isBrother(const SeqId_SceneId t_id_sceneid) const
+  { return (m_seqId == t_id_sceneid.getid()); }
+
+  // NOTE : use isBrother() before these operators
+  bool operator<(const SeqId_SceneId t_id_sceneid) const
+  { return (m_sceneId < t_id_sceneid.getSceneId()); }
+  bool operator>(const SeqId_SceneId t_id_sceneid) const
+  { return (m_sceneId > t_id_sceneid.getSceneId()); }
+  bool operator<=(const SeqId_SceneId t_id_sceneid) const
+  { return (m_sceneId <= t_id_sceneid.getSceneId()); }
+  bool operator>=(const SeqId_SceneId t_id_sceneid) const
+  { return (m_sceneId >= t_id_sceneid.getSceneId()); }
+
+  id getid() const{ return m_seqId; }
+  void setid(id t_seqId){ m_seqId = t_seqId; }
+
+  sceneID_f getSceneId() const{ return m_sceneId; }
+  void setSceneId(sceneID_f t_sceneId){ m_sceneId = t_sceneId; }
+
+private :
+
+  id m_seqId;
+  sceneID_f m_sceneId;
+};
+
 /******************************* ChannelData ***********************/
 
 class ChannelData
@@ -388,6 +476,13 @@ public :
     m_sceneLevel = NULL_DMX;
     m_nextSceneLevel = NULL_DMX;
     // TODO : gerer le flag
+  }
+
+  void clearDirectChannel()
+  {
+    m_directChannelLevel = NULL_DMX;
+    m_directChannelOffset = NULL_DMX_OFFSET;
+    m_sceneLevel = NULL_DMX;
   }
 
   void clearOverdmx(){ m_directChannelOffset = NULL_DMX_OFFSET; }

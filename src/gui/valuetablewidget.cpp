@@ -175,7 +175,7 @@ void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
   else if (t_value < 0) value = 0;
   else value = t_value;
   over = t_value - value;
-  MANAGER->directChannelToEngine(valueID,
+  MANAGER->directChannelWidgetsToEngine(valueID,
                                  value,
                                  over);
 }

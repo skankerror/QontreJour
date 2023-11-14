@@ -103,11 +103,6 @@ DmxChannelGroup *ChannelGroupEngine::createChannelGroup(QList<DmxChannel *> t_L_
   return newGroup;
 }
 
-//DmxChannelGroup *ChannelGroupEngine::createChannelGroup(QList<id> t_L_channelId)
-//{
-
-//}
-
 void ChannelGroupEngine::addChannelGroup(id t_groupID,
                                          QList<Ch_Id_Dmx> t_L_id_dmx)
 {
@@ -221,6 +216,8 @@ bool CueEngine::setMainSeqId(id t_mainSeqId)
                    this,
                    &CueEngine::cueLevelChanged);
       }
+      setSelectedSceneToNullDmx();
+      freeL_activeCuesFromSelectedCue();
     }
     // connect cues of new seq
     m_mainSeqId = t_mainSeqId;
@@ -236,6 +233,11 @@ bool CueEngine::setMainSeqId(id t_mainSeqId)
                 this,
                 &CueEngine::cueLevelChanged);
       }
+      m_L_activeCues.clear();
+      // TODO : clear direct channel
+      auto scene = getSelectedScene();
+      addSceneToL_activeCues(scene);
+      setSelectedSceneToMaxDmx();
       return true;
     }
     qDebug() << "CueEngine::setMainSeqId preblem";
@@ -297,7 +299,11 @@ bool CueEngine::setSelectedCueId(sceneID_f t_selectedCueId)
   auto scene = seq->getScene(t_selectedCueId);
   if (scene)
   {
+    setSelectedSceneToNullDmx();
+    freeL_activeCuesFromSelectedCue();
     m_selectedCueId = t_selectedCueId;
+    addSceneToL_activeCues(scene);
+    setSelectedSceneToMaxDmx();
     // update seq for model
     seq->setSelectedSceneId(t_selectedCueId);
     return true;
@@ -320,7 +326,11 @@ bool CueEngine::setSelectedCueStep(id t_stepId)
   auto scene = seq->getScene(t_stepId);
   if (scene)
   {
-    m_selectedCueId = scene->getStepNumber();
+    setSelectedSceneToNullDmx();
+    freeL_activeCuesFromSelectedCue();
+    m_selectedCueId = scene->getSceneID();
+    addSceneToL_activeCues(scene);
+    setSelectedSceneToMaxDmx();
     // update seq for model
     seq->setSelectedStepId(t_stepId);
     return true;
@@ -335,17 +345,23 @@ bool CueEngine::setSelectedCueStep(id t_stepId)
 void CueEngine::setSelectedPlus()
 {
   auto seq = getMainSeq();
-  seq
-      ->setSelectedStepId(seq
-                              ->getSelectedStepId() + 1);
+  if (seq)
+  {
+    id stepId = seq->getSelectedStepId() + 1;
+    seq->setSelectedStepId(stepId);
+    setSelectedCueStep(stepId);
+  }
 }
 
 void CueEngine::setSelectedMoins()
 {
   auto seq = getMainSeq();
-  seq
-      ->setSelectedStepId(seq
-                              ->getSelectedStepId() - 1);
+  if (seq)
+  {
+    id stepId = seq->getSelectedStepId() -1;
+    seq->setSelectedStepId(stepId);
+    setSelectedCueStep(stepId);
+  }
 }
 
 void CueEngine::recordNextCueInMainSeq(DmxScene *t_scene)
@@ -356,6 +372,11 @@ void CueEngine::recordNextCueInMainSeq(DmxScene *t_scene)
           this,
           &CueEngine::cueLevelChanged);
   seq->addScene(t_scene);
+  setSelectedSceneToNullDmx();
+  freeL_activeCuesFromSelectedCue();
+  setSelectedCueId(t_scene->getSceneID());
+  setSelectedSceneToMaxDmx();
+  addSceneToL_activeCues(t_scene);
 }
 
 void CueEngine::recordNextCue(DmxScene *t_scene,
@@ -366,6 +387,7 @@ void CueEngine::recordNextCue(DmxScene *t_scene,
           &DmxScene::sceneLevelChanged,
           this,
           &CueEngine::cueLevelChanged);
+  // TODO : faut voir ça, pls sequences qui agissent...
   seq->addScene(t_scene);
 }
 
@@ -379,6 +401,11 @@ void CueEngine::recordNewCueInMainSeq(DmxScene *t_scene,
           &CueEngine::cueLevelChanged);
   seq->addScene(t_scene,
                 t_scId);
+  setSelectedSceneToNullDmx();
+  freeL_activeCuesFromSelectedCue();
+  setSelectedCueId(t_scene->getSceneID());
+  setSelectedSceneToMaxDmx();
+  addSceneToL_activeCues(t_scene);
 }
 
 void CueEngine::recordNewCue(id t_seqId,
@@ -392,6 +419,11 @@ void CueEngine::recordNewCue(id t_seqId,
           &CueEngine::cueLevelChanged);
   seq->addScene(t_scene,
                 t_scId);
+  setSelectedSceneToNullDmx();
+  freeL_activeCuesFromSelectedCue();
+  setSelectedCueId(t_scene->getSceneID());
+  setSelectedSceneToMaxDmx();
+  addSceneToL_activeCues(t_scene);
 }
 
 void CueEngine::deleteCueInMainSeq(sceneID_f t_id)
@@ -442,9 +474,64 @@ void CueEngine::goPause()
 
 }
 
+void CueEngine::setSelectedSceneToNullDmx()
+{
+  auto scene = getSelectedScene();
+  if (scene) scene->setLevel(NULL_DMX);
+}
+
+void CueEngine::setSelectedSceneToMaxDmx()
+{
+  auto scene = getSelectedScene();
+  if (scene) scene->setLevel(MAX_DMX);
+}
+
+void CueEngine::freeL_activeCuesFromSelectedCue()
+{
+  SeqId_SceneId id_sceneid(m_mainSeqId,
+                           m_selectedCueId);
+  auto index = m_L_activeCues.indexOf(id_sceneid);
+  if (index != -1)
+  {
+    m_L_activeCues.remove(index);
+    m_L_activeCues.squeeze();
+  }
+}
+
+void CueEngine::addSceneToL_activeCues(DmxScene *t_scene)
+{
+//  auto H_controledChannel = t_scene->getH_controledChannel_storedLevel();
+//  for (auto i = H_controledChannel.cbegin(),
+//       end = H_controledChannel.cend();
+//       i != end;
+//       ++i)
+//  {
+//    auto channel = i.key();
+//    m_L_activeCues.insert(SeqId_SceneId(t_scene->getSequence()->getid(),
+//                                         t_scene->getSceneID()),
+//                           channel->getid());
+//  }
+  // BUG : t_scene n'a pas de sequence encore...
+  id seqId = t_scene->getSequence()->getid();
+  sceneID_f sceneid= t_scene->getSceneID();
+  SeqId_SceneId id_sceneid(seqId,
+                           sceneid);
+  auto index = m_L_activeCues.indexOf(id_sceneid);
+  if (index = -1)
+  {
+    m_L_activeCues.append(id_sceneid);
+  }
+}
+
+void CueEngine::newSceneSelected(sceneID_f t_id)
+{
+
+}
+
 void CueEngine::cueLevelChanged(sceneID_f t_sceneid,
                                 dmx t_level)
 {
+  // URGENT : vérifier si elle est ds la L
   auto scene = getMainSeq()->getScene(t_sceneid);
   if (scene)
   {
@@ -460,8 +547,8 @@ void CueEngine::cueLevelChanged(sceneID_f t_sceneid,
       auto newLevel = (dmx)(((float)(t_level)/255.0f)
                              * level);
 
-      emit channelLevelChangedFromCue(t_sceneid,
-                                      channel->getid(),
+      // URGENT : update la map puis éventuellement ça :
+      emit channelLevelChangedFromCue(channel->getid(),
                                       newLevel);
     }
   }
@@ -639,12 +726,12 @@ void ChannelEngine::onChannelLevelMoinsFromDirectChannel(id t_id)
   update(t_id);
 }
 
-void ChannelEngine::onChannelLevelChangedFromScene(sceneID_f t_sceneid,
-                                                   id t_channelid,
+void ChannelEngine::onChannelLevelChangedFromScene(id t_channelid,
                                                    dmx t_level,
                                                    CueRole t_role)
 {
   auto channelData = m_L_channelData.at(t_channelid);
+  channelData->clearDirectChannel();
   channelData->setSceneLevel(t_level);
   update(t_channelid);
 }
