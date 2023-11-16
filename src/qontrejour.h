@@ -177,6 +177,7 @@ enum CueRole
 {
   OutingCue,
   InningCue,
+  NewSelectRole,
   UnknownRole
 };
 
@@ -482,7 +483,7 @@ public :
   {
     m_directChannelLevel = NULL_DMX;
     m_directChannelOffset = NULL_DMX_OFFSET;
-    m_sceneLevel = NULL_DMX;
+//    m_sceneLevel = NULL_DMX;
   }
 
   void clearOverdmx(){ m_directChannelOffset = NULL_DMX_OFFSET; }

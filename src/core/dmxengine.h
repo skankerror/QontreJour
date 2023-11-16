@@ -128,8 +128,7 @@ public :
 
 private :
 
-  void setSelectedSceneToNullDmx();
-  void setSelectedSceneToMaxDmx();
+  void setSelectedSceneLevel(dmx t_level);
   void freeL_activeCuesFromSelectedCue();
   void addSceneToL_activeCues(DmxScene *t_scene);
   void newSceneSelected(sceneID_f t_id);
@@ -197,6 +196,9 @@ public :
 private :
 
   void createDatas(int t_channelCount);
+  void addToL_directChannelIds(id t_id);
+  void removeFromL_directChannelIds(id t_id);
+  void clearL_directChannelIds();
   void update(id t_id);
 
 signals :
@@ -214,13 +216,14 @@ public slots :
   void onChannelLevelMoinsFromDirectChannel(id t_id);
   void onChannelLevelChangedFromScene(id t_channelid,
                                       dmx t_level,
-                                      CueRole t_role = CueRole::UnknownRole);
+                                      CueRole t_role = CueRole::NewSelectRole);
 
 private :
 
   RootValue *m_rootChannel;
 
   QList<ChannelData *> m_L_channelData;
+  QList<id> m_L_directChannelId;
 
 
 };
