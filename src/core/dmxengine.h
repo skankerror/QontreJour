@@ -224,8 +224,6 @@ private :
 
   QList<ChannelData *> m_L_channelData;
   QList<id> m_L_directChannelId;
-
-
 };
 
 /****************************** OutputEngine *****************************/

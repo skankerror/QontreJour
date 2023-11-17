@@ -351,7 +351,8 @@ Sequence::~Sequence()
 
 DmxScene *Sequence::getScene(id t_step)
 {
-  if (t_step < m_L_childScene.size())
+  if (t_step < m_L_childScene.size()
+      && t_step > -1)
     return m_L_childScene.at(t_step);
 
   return nullptr;

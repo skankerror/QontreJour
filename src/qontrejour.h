@@ -452,6 +452,7 @@ public :
   ChannelDataFlag getFlag() const{ return m_flag; }
   id getChannelID() const{ return m_channelID; }
   bool getIsSelected() const{ return m_isSelected; }
+  bool getIsDirectChannel() const{ return m_isDirectChannel; }
 
   void setChannelGroupLevel(dmx t_channelGroupLevel)
   { m_channelGroupLevel = t_channelGroupLevel; }
@@ -465,10 +466,10 @@ public :
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
   void setActual_Level(dmx t_actual_Level){ m_actual_Level = t_actual_Level; }
   void setIsSelected(bool t_isSelected)
-  {
-    m_isSelected = t_isSelected;
-    if (!t_isSelected) clearOverdmx();
-  }
+  { m_isSelected = t_isSelected;
+    if (!t_isSelected) clearOverdmx(); }
+  void setIsDirectChannel(bool t_isDirectChannel)
+  { m_isDirectChannel = t_isDirectChannel; }
 
   void clearChannel()
   {
@@ -483,6 +484,7 @@ public :
   {
     m_directChannelLevel = NULL_DMX;
     m_directChannelOffset = NULL_DMX_OFFSET;
+    m_isDirectChannel = false;
 //    m_sceneLevel = NULL_DMX;
   }
 
@@ -495,6 +497,7 @@ public :
       m_actual_Level = m_channelGroupLevel;
       if (m_actual_Level)
         setFlag(ChannelDataFlag::ChannelGroupFlag);
+      if (m_isDirectChannel) return;// on s'en fout de scene level
       if (m_sceneLevel >= m_actual_Level)
       {
         m_actual_Level = m_sceneLevel;
@@ -506,6 +509,7 @@ public :
     {
       m_actual_Level = m_directChannelLevel;
       setFlag(ChannelDataFlag::DirectChannelFlag);
+      if (m_isDirectChannel) return;// on s'en fout de scene level
       if (m_sceneLevel >= m_actual_Level)
       {
         m_actual_Level = m_sceneLevel;
@@ -528,10 +532,10 @@ private :
   dmx m_sceneLevel = NULL_DMX;
   dmx m_nextSceneLevel = NULL_DMX;
   ChannelDataFlag m_flag = UnknownFlag;
-  bool m_isSelected;
 
   dmx m_actual_Level = NULL_DMX;
-
+  bool m_isSelected = false;
+  bool m_isDirectChannel = false;
 };
 
 

@@ -593,7 +593,7 @@ QList<id> ChannelEngine::selectNonNullChannels()
       item->setIsSelected(true);
     }
   }
-  qDebug() << L_selectedId;
+//  qDebug() << L_selectedId;
   return L_selectedId;
 }
 
@@ -712,6 +712,7 @@ void ChannelEngine::onChannelLevelChangedFromDirectChannel(id t_id,
   channelData->setDirectChannelLevel(t_level);
   channelData->setDirectChannelOffset(t_offset);
   addToL_directChannelIds(t_id);
+  channelData->setIsDirectChannel(true);
   update(t_id);
 }
 
@@ -729,6 +730,7 @@ void ChannelEngine::onChannelLevelPlusFromDirectChannel(id t_id)
   }
   channelData->setDirectChannelLevel(level + PLUS_DMX);
   addToL_directChannelIds(t_id);
+  channelData->setIsDirectChannel(true);
   update(t_id);
 }
 
@@ -745,15 +747,18 @@ void ChannelEngine::onChannelLevelMoinsFromDirectChannel(id t_id)
   }
   channelData->setDirectChannelLevel(level - MOINS_DMX);
   addToL_directChannelIds(t_id);
+  channelData->setIsDirectChannel(true);
   update(t_id);
 }
 
 void ChannelEngine::onChannelLevelChangedFromScene(id t_channelid,
                                                    dmx t_level,
-                                                   CueRole t_role)
+                                                   CueRole t_role /*= CueRole::NewSelectRole*/)
 {
+  Q_UNUSED(t_role) // NOTE : pour plus tard
   auto channelData = m_L_channelData.at(t_channelid);
-//  channelData->clearDirectChannel();
+  channelData->clearDirectChannel();
+  removeFromL_directChannelIds(t_channelid);
   channelData->setSceneLevel(t_level);
   update(t_channelid);
 }
@@ -774,7 +779,7 @@ OutputEngine::~OutputEngine()
 void OutputEngine::onChannelLevelChanged(id t_channelId,
                                          dmx t_level)
 {
-  qDebug() << "channel id" << t_channelId << "level" << t_level;
+//  qDebug() << "channel id" << t_channelId << "level" << t_level;
   auto L_Uid_Id = m_patch->getL_Uid_Id(t_channelId);
   for (const auto &i
        : std::as_const(L_Uid_Id))

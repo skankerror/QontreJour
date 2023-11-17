@@ -677,7 +677,7 @@ void DmxManager::onOutputRequest(uid t_uid,
                          t_id,
                          t_level);
 
-  qDebug() << "write uid :"  << t_uid
+  qDebug() << "uid :"  << t_uid
            << "id :" << t_id
            << "level :" << t_level;
 

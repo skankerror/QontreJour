@@ -351,7 +351,7 @@ bool Interpreter::calculateOutputUidId()
       universeId += digit * qPow(10, i);
     }
     universeId--; // human - machine translation
-    qDebug() << "uid" << universeId;
+//    qDebug() << "uid" << universeId;
     // now we erase dot and following digits
     m_L_digits.remove(index,
                       m_L_digits.size() - index);
@@ -369,7 +369,7 @@ bool Interpreter::calculateOutputUidId()
     outputId += digit * qPow(10, i);
   }
   outputId--; // human - machine translation
-  qDebug() << outputId;
+//  qDebug() << outputId;
   m_lastSelectedOutputUidId.setOutputID(outputId);
 
   clearValue();
@@ -399,7 +399,7 @@ bool Interpreter::calculateGroupId()
     m_selectedGroupId += digit * qPow(10, i);
   }
   m_selectedGroupId--; // human - machine translation
-  qDebug() << m_selectedGroupId;
+//  qDebug() << m_selectedGroupId;
   clearValue();
   return true;
 }
@@ -445,7 +445,7 @@ bool Interpreter::calculateCueId()
     KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
     m_selectedCueId += digit * qPow(10, i);
   }
-  qDebug() << m_selectedCueId;
+//  qDebug() << m_selectedCueId;
   clearValue();
   return true;
 }
@@ -471,7 +471,7 @@ dmx Interpreter::calculateDmx()
   {
     KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
     level += digit * qPow(10, i);
-    qDebug() << level;
+//    qDebug() << level;
   }
   clearValue();
   return (level > 255) ?
@@ -499,7 +499,7 @@ percent Interpreter::calculatePercent()
   {
     KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
     level += digit * qPow(10, i);
-    qDebug() << level;
+//    qDebug() << level;
   }
   clearValue();
   return (level > 100) ?
@@ -547,7 +547,7 @@ bool Interpreter::calculateFloatTime()
     KeypadButton digit = m_L_digits.at(m_L_digits.size() - 1 - i);
     m_time += digit * qPow(10, i);
   }
-  qDebug() << m_time;
+//  qDebug() << m_time;
   clearValue();
   return true;
 }
@@ -575,7 +575,7 @@ bool Interpreter::calculateStepId()
     m_stepId += digit * qPow(10, i);
   }
   m_stepId--; // human - machine translation
-  qDebug() << m_stepId;
+//  qDebug() << m_stepId;
   clearValue();
   clearCue();
   return true;
