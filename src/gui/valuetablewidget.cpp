@@ -33,9 +33,10 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_model(new ValueTableModel(this)),
     m_channelDelegate(new ChannelDelegate(this))
 {
-  setL_channelData(MANAGER
-                       ->getDmxEngine()
-                       ->getChannelEngine()
+  auto channelEngine = MANAGER
+                           ->getDmxEngine()
+                           ->getChannelEngine();
+  setL_channelData(channelEngine
                        ->getL_channelData());
 
   auto totalLayout = new QVBoxLayout();
@@ -55,6 +56,11 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
 
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
+
+  connect(channelEngine,
+          &ChannelEngine::selectionChanged,
+          this,
+          &ValueTableWidget::repaintTableView);
 }
 
 ValueTableWidget::~ValueTableWidget()
@@ -203,244 +209,11 @@ void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
 
 void ValueTableModel::onSelectionChanged(QList<id> L_id)
 {
-  QModelIndexList indexlist = QModelIndexList();
-  for (const auto &item
-       : std::as_const(L_id))
-  {
-    auto index = getIndexFromValueId(item);
-    indexlist.append(index);
-  }
-  m_editedIndexes = indexlist;
-  editedIndexChanged();
-}
-
-//void ValueTableModel::setEditedIndexes(const QModelIndexList &t_editedIndexes)
-//{
-//  m_editedIndexes = t_editedIndexes;
-//  editedIndexChanged();
-//}
-
-//void ValueTableModel::addEditedIndex(QModelIndex &t_editedIndexes)
-//{
-//  m_editedIndexes.append(t_editedIndexes);
-//  editedIndexChanged();
-//}
-
-QModelIndex ValueTableModel::getIndexFromValue(const LeveledValue *t_value) const
-{
-  return getIndexFromValueId(t_value->getid());
-}
-
-QModelIndex ValueTableModel::getIndexFromValueId(const id &t_id) const
-{
-//  return index((2 * (t_id / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT)) + 1,
-//               t_id % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT);
-  return index(t_id / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT,
-               t_id % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT);
-}
-
-QVariant ValueTableModel::oldDdata(const QModelIndex &index, int role) const
-{
-  if (!index.isValid())
-    return QVariant();
-
-  if (!m_rootValue)
-    return QVariant();
-
-  if (index.flags().testFlag(Qt::ItemIsEditable))
-  {
-    int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-                  + index.column();
-    if (valueID < 0 || valueID >= m_rootValue->getL_childValueSize())
-      return QVariant();
-
-    auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-    ChannelDataFlag flag = static_cast<DmxChannel *>(dmxValue)->getChannelDataFlag();
-
-    switch(role)
-    {
-    case Qt::DisplayRole :
-    case Qt::EditRole :
-      return dmxValue->getLevel();
-      break;
-    case Qt::TextAlignmentRole :
-      return Qt::AlignCenter;
-      break;
-    case Qt::BackgroundRole:
-      return QBrush(QColor(BLACK_COLOR));
-      break;
-    case Qt::ForegroundRole :
-      switch(flag)
-      {
-      case ChannelDataFlag::SelectedSceneFlag :
-        return QBrush(QColor(LIGHT_GREEN_COLOR));
-        break;
-      case ChannelDataFlag::DirectChannelFlag :
-        return QBrush(QColor(LIGHT_YELLOW_COLOR));
-        break;
-      case ChannelDataFlag::ChannelGroupFlag :
-        return QBrush(QColor(LIGHT_BLUE_COLOR));
-        break;
-      case ChannelDataFlag::ParkedFlag :
-        return QBrush(QColor(RED_COLOR));
-        break;
-      case ChannelDataFlag::IndependantFlag :
-        return QBrush(QColor(PURPLE_COLOR));
-        break;
-      case ChannelDataFlag::UnknownFlag :
-        return QBrush(QColor(LIGHT_GREY_COLOR));
-        break;
-      default:
-        break;
-      }
-    default:
-      return QVariant();
-      break;
-    }
-  }
-  else
-  {
-    int ret = ((index.row() / 2 ) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-              + index.column() + 1;
-    auto relatedIndex = QAbstractTableModel::index(index.row() + 1,
-                                                   index.column());
-    switch(role)
-    {
-    case Qt::DisplayRole :
-    case Qt::EditRole :
-      return ret > 512 ? QVariant() : ret;
-      break;
-    case Qt::TextAlignmentRole :
-      return Qt::AlignCenter;
-      break;
-    case Qt::BackgroundRole :
-      if ((m_editedIndexes.size() == 0)
-          || (m_editedIndexes.indexOf(relatedIndex) == -1))
-        return QBrush(LIGHT_BLUE_COLOR);
-      else
-        return QBrush(LIGHT_YELLOW_COLOR);
-      break;
-    default:
-      return QVariant();
-      break;
-    }
-  }
-}
-
-QVariant ValueTableModel::showAllData(const QModelIndex &index, int role) const
-{
-//  if (!index.isValid())
-//    return QVariant();
-
-  if (!m_rootValue)
-  {
-    qDebug() << "ValueTableModel::showAllData no rootvalue !";
-    return QVariant();
-  }
-
-  if (!(index.flags().testFlag(Qt::ItemIsEnabled)))
-    return QVariant();
-
-  int valueID = ((index.row() * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-                 + index.column());
-  if (valueID < 0 || valueID >= m_L_channelData.size())
-  {
-    qDebug() << "ValueTableModel::showAllData id outta range !";
-    return QVariant();
-  }
-
-//  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-//  ChannelDataFlag flag = static_cast<DmxChannel *>(dmxValue)->getChannelDataFlag();
-  auto channelData = m_L_channelData.at(valueID);
-  ChannelDataFlag flag = channelData->getFlag();
-
-  QVariant varRet;
-
-  switch(role)
-    {
-    case Qt::DisplayRole :
-//    case Qt::EditRole :
-    varRet.setValue(channelData);
-//    return QVariant::fromValue(channelData);
-    return varRet;
-      break;
-    case Qt::TextAlignmentRole :
-      return Qt::AlignCenter;
-      break;
-    case Qt::BackgroundRole:
-      return QBrush(QColor(BLACK_COLOR));
-      break;
-    case Qt::ForegroundRole :
-      switch(flag)
-      {
-      case ChannelDataFlag::SelectedSceneFlag :
-        return QBrush(QColor(LIGHT_GREEN_COLOR));
-        break;
-      case ChannelDataFlag::DirectChannelFlag :
-        return QBrush(QColor(LIGHT_YELLOW_COLOR));
-        break;
-      case ChannelDataFlag::ChannelGroupFlag :
-        return QBrush(QColor(LIGHT_BLUE_COLOR));
-        break;
-      case ChannelDataFlag::ParkedFlag :
-        return QBrush(QColor(RED_COLOR));
-        break;
-      case ChannelDataFlag::IndependantFlag :
-        return QBrush(QColor(PURPLE_COLOR));
-        break;
-      case ChannelDataFlag::UnknownFlag :
-        return QBrush(QColor(LIGHT_GREY_COLOR));
-        break;
-      default:
-        break;
-      }
-    default:
-      return QVariant();
-      break;
-    }
-//    int ret = ((index.row() / 2 ) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-//              + index.column() + 1;
-//    auto relatedIndex = QAbstractTableModel::index(index.row() + 1,
-//                                                   index.column());
-//    switch(role)
-//    {
-//    case Qt::DisplayRole :
-//    case Qt::EditRole :
-//      return ret > 512 ? QVariant() : ret;
-//      break;
-//    case Qt::TextAlignmentRole :
-//      return Qt::AlignCenter;
-//      break;
-//    case Qt::BackgroundRole :
-//      if ((m_editedIndexes.size() == 0)
-//          || (m_editedIndexes.indexOf(relatedIndex) == -1))
-//        return QBrush(LIGHT_BLUE_COLOR);
-//      else
-//        return QBrush(LIGHT_YELLOW_COLOR);
-//      break;
-//    default:
-//      return QVariant();
-//      break;
-//    }
-//  }
-}
-
-QVariant ValueTableModel::showFilteredData(const QModelIndex &index, int role) const
-{
-
-}
-
-void ValueTableModel::editedIndexChanged()
-{
-  // we try to change the background of selected channels
-  for (const auto &item
-       : std::as_const(m_editedIndexes))
-  {
-    auto myIndex = index(item.row() - 1,
-                         item.column());
-    emit dataChanged(myIndex,
-                     myIndex);
-  }
+  auto topLeft = index(0,0);
+  auto bottomRight = index(DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT - 1,
+                           DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT - 1);
+  emit dataChanged(topLeft,
+                   bottomRight);
 }
 
 int ValueTableModel::rowCount(const QModelIndex &parent) const
@@ -456,133 +229,18 @@ int ValueTableModel::columnCount(const QModelIndex &parent) const
 QVariant ValueTableModel::data(const QModelIndex &index,
                                int role) const
 {
-//  return oldDdata(index,
-//                  role);
-//  return showAllData(index,
-//                      role);
   return QVariant();
-}
-
-QVariant ValueTableModel::filterData(const QModelIndex &index, int role) const
-{
-  if (!index.isValid())
-    return QVariant();
-
-  if (!m_rootValue)
-    return QVariant();
-
-  if (!(m_editedIndexes.size()))
-    return QVariant();
-
-  if (index.flags().testFlag(Qt::ItemIsEditable))
-  {
-    int valueID = (((index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-        + index.column();
-    if (valueID < 0 || valueID >= m_editedIndexes.size())
-      return QVariant();
-
-    auto dmxValue = getValueFromIndex(m_editedIndexes.at(valueID));
-    ChannelDataFlag flag = static_cast<DmxChannel *>(dmxValue)->getChannelDataFlag();
-
-    switch(role)
-    {
-    case Qt::DisplayRole :
-    case Qt::EditRole :
-      return static_cast<LeveledValue *>(dmxValue)->getLevel();
-      break;
-    case Qt::TextAlignmentRole :
-      return Qt::AlignCenter;
-      break;
-    case Qt::BackgroundRole:
-      return QBrush(QColor(BLACK_COLOR));
-      break;
-    case Qt::ForegroundRole :
-      switch(flag)
-      {
-      case ChannelDataFlag::SelectedSceneFlag :
-        return QBrush(QColor(LIGHT_GREEN_COLOR));
-        break;
-      case ChannelDataFlag::DirectChannelFlag :
-        return QBrush(QColor(LIGHT_YELLOW_COLOR));
-        break;
-      case ChannelDataFlag::ChannelGroupFlag :
-        return QBrush(QColor(LIGHT_BLUE_COLOR));
-        break;
-      case ChannelDataFlag::ParkedFlag :
-        return QBrush(QColor(RED_COLOR));
-        break;
-      case ChannelDataFlag::IndependantFlag :
-        return QBrush(QColor(PURPLE_COLOR));
-        break;
-      case ChannelDataFlag::UnknownFlag :
-        return QBrush(QColor(LIGHT_GREY_COLOR));
-        break;
-      default:
-        break;
-      }
-    default:
-      return QVariant();
-      break;
-    }
-  }
-  else
-  {
-    int ret = ((index.row() / 2 ) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-        + index.column()/* + 1*/;
-    if (ret >= m_editedIndexes.size())
-      return QVariant();
-    auto index = m_editedIndexes.at(ret);
-    auto value = getValueFromIndex(index);
-
-    switch(role)
-    {
-    case Qt::DisplayRole :
-    case Qt::EditRole :
-      return value->getid() + 1;
-      break;
-    case Qt::TextAlignmentRole :
-      return Qt::AlignCenter;
-      break;
-    case Qt::BackgroundRole :
-        return QBrush(LIGHT_YELLOW_COLOR);
-      break;
-    default:
-      return QVariant();
-      break;
-    }
-  }
-
 }
 
 bool ValueTableModel::setData(const QModelIndex &index,
                               const QVariant &value,
                               int role)
 {
-//  Q_UNUSED(role)
+  Q_UNUSED(index)
+  Q_UNUSED(value)
+  Q_UNUSED(role)
 
-//  if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
-//    return false;
-
-//  int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-//      + index.column();
-//  emit dataChanged(index,index);
-
-//  return true;
   return false;
-}
-
-bool ValueTableModel::setFilterData(const QModelIndex &index, const QVariant &value, int role)
-{
-  if (!index.isValid() || !(index.flags().testFlag(Qt::ItemIsEditable)))
-    return false;
-
-  int valueID = (((index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-      + index.column();
-  auto dmxValue = m_rootValue->getL_childValue().at(valueID);
-  emit dataChanged(index,index);
-
-  return true;
-
 }
 
 QVariant ValueTableModel::headerData(int section,
@@ -618,36 +276,19 @@ Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
 
 }
 
-LeveledValue *ValueTableModel::getValueFromIndex(const QModelIndex &t_index) const
-{
-  int valueID = (((t_index.row() -1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-      + t_index.column();
-  if (valueID < 0 || valueID >= m_rootValue->getL_childValueSize())
-    return nullptr;
-
-  return m_rootValue->getL_childValue().at(valueID);
-
-}
-
-QList<LeveledValue *> ValueTableModel::getValuesFromIndexList(const QModelIndexList &t_L_index) const
-{
-  auto L_channel = QList<LeveledValue *>();
-  for (auto item : t_L_index)
-  {
-    auto channel = getValueFromIndex(item);
-    if (channel)
-      L_channel.append(channel);
-  }
-  return L_channel;
-}
-
 /************************* ChannelDelegate ******************************/
 
 ChannelDelegate::ChannelDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
-{}
-
-
+{
+  auto channelEngine = MANAGER
+                           ->getDmxEngine()
+                           ->getChannelEngine();
+  connect(channelEngine,
+          &ChannelEngine::selectionChanged,
+          this,
+          &ChannelDelegate::onSelectionChanged);
+}
 
 void ChannelDelegate::paint(QPainter *painter,
                             const QStyleOptionViewItem &option,
@@ -685,8 +326,12 @@ void ChannelDelegate::paint(QPainter *painter,
     break;
   }
 
+  QColor backGroundColor(Qt::black);
+  if (channelData->getIsSelected())
+    backGroundColor = DARK_ORANGE_COLOR;
+
   painter->save();
-  painter->fillRect(option.rect, Qt::black);
+  painter->fillRect(option.rect, /*Qt::black*/ backGroundColor);
   painter->restore();
 
   painter->save();
@@ -695,7 +340,6 @@ void ChannelDelegate::paint(QPainter *painter,
   painter->setPen(dmxPen);
   QTextOption textOption;
   textOption.setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
-//  painter->drawRect(option.rect);
   painter->drawText(option.rect,
                     QString::number(channelData->getActual_Level()),
                     textOption);
@@ -710,7 +354,6 @@ void ChannelDelegate::paint(QPainter *painter,
                     QString::number(channelData->getChannelID() + 1),
                     textOption);
   painter->restore();
-
 }
 
 QSize ChannelDelegate::sizeHint(const QStyleOptionViewItem &option,
@@ -719,3 +362,19 @@ QSize ChannelDelegate::sizeHint(const QStyleOptionViewItem &option,
   return QStyledItemDelegate::sizeHint(option,
                                        index);
 }
+
+//QModelIndex ChannelDelegate::getIndexFromValueId(const id &t_id) const
+//{
+//  return QModelIndex(t_id / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT,
+//                     t_id % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT,);
+//}
+
+void ChannelDelegate::onSelectionChanged(QList<id> L_id)
+{
+  m_L_directChannelId = L_id;
+}
+
+//void ChannelDelegate::editedIndexChanged()
+//{
+
+//}

@@ -133,11 +133,11 @@ public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
 
-//  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
-//  void addEditedIndex(QModelIndex &t_editedIndexes);
+////  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
+////  void addEditedIndex(QModelIndex &t_editedIndexes);
   void onSelectionChanged(QList<id> L_id);
-  //public because we need this edit widgets
-  void editedIndexChanged();
+//  //public because we need this edit widgets
+//  void editedIndexChanged();
 
 protected :
 
@@ -158,25 +158,25 @@ protected :
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
   // to show only non 0 values
-  QVariant filterData(const QModelIndex &index,
-                      int role) const;
-  bool setFilterData(const QModelIndex &index,
-                     const QVariant &value,
-                     int role);
+//  QVariant filterData(const QModelIndex &index,
+//                      int role) const;
+//  bool setFilterData(const QModelIndex &index,
+//                     const QVariant &value,
+//                     int role);
 
 
 private :
 
-  LeveledValue *getValueFromIndex(const QModelIndex &t_index) const;
-  QList<LeveledValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
-  QModelIndex getIndexFromValue(const LeveledValue *t_value) const;
-  QModelIndex getIndexFromValueId(const id &t_id) const;
-  QVariant oldDdata(const QModelIndex &index,
-                    int role) const;
-  QVariant showAllData(const QModelIndex &index,
-                       int role) const;
-  QVariant showFilteredData(const QModelIndex &index,
-                            int role) const;
+//  LeveledValue *getValueFromIndex(const QModelIndex &t_index) const;
+//  QList<LeveledValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
+//  QModelIndex getIndexFromValue(const LeveledValue *t_value) const;
+//  QModelIndex getIndexFromValueId(const id &t_id) const;
+//  QVariant oldDdata(const QModelIndex &index,
+//                    int role) const;
+//  QVariant showAllData(const QModelIndex &index,
+//                       int role) const;
+//  QVariant showFilteredData(const QModelIndex &index,
+//                            int role) const;
 
 
 protected :
@@ -204,7 +204,7 @@ public:
   RootValue *getRootValue() const{ return m_rootValue; }
   QList<ChannelData *> getL_channelData() const{ return m_L_channelData; }
 
-  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
+//  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
   void setL_channelData(const QList<ChannelData *> &t_L_channelData)
   { m_L_channelData = t_L_channelData; }
 
@@ -215,11 +215,31 @@ public:
   virtual QSize sizeHint(const QStyleOptionViewItem &option,
                          const QModelIndex &index) const override;
 
+  QList<id> getL_directChannelId() const
+  { return m_L_directChannelId; }
+  void setL_directChannelId(const QList<id> &t_L_directChannelId)
+  { m_L_directChannelId = t_L_directChannelId; }
+
+private :
+
+//  QModelIndex getIndexFromValueId(const id &t_id) const;
+
+public slots :
+
+  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
+
+  //  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
+  //  void addEditedIndex(QModelIndex &t_editedIndexes);
+  void onSelectionChanged(QList<id> L_id);
+  //public because we need this edit widgets
+//  void editedIndexChanged();
+
 private :
 
   RootValue *m_rootValue;
 
   QList<ChannelData *> m_L_channelData;
+  QList<id> m_L_directChannelId;
 
 };
 

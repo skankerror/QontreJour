@@ -181,7 +181,6 @@ public :
   void addChannelDataSelection(QList<id> t_L_id);
   void removeChannelDataSelection(QList<id> t_L_id);
   void clearChannelDataSelection();
-  QList<id> getSelectedChannelsId();
   RootValue *getRootChannel() const{ return m_rootChannel; }
 
   QList<ChannelData *> getL_channelData() const
@@ -199,6 +198,9 @@ private :
   void addToL_directChannelIds(id t_id);
   void removeFromL_directChannelIds(id t_id);
   void clearL_directChannelIds();
+  void addToL_selectedChannelId(id t_id);
+  void removeFromL_selectedChannelId(id t_id);
+  void clearL_selectedChannelIds();
   void update(id t_id);
 
 signals :
@@ -224,6 +226,8 @@ private :
 
   QList<ChannelData *> m_L_channelData;
   QList<id> m_L_directChannelId;
+  // URGENT : gérer ça
+  QList<id> m_L_selectedChannelId;
 };
 
 /****************************** OutputEngine *****************************/
