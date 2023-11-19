@@ -93,7 +93,7 @@ void MainWindow::createDockWidgets()
   addDockWidget(Qt::TopDockWidgetArea, topDock);
 
   auto bottomDock = new QDockWidget();
-  m_channelTableWidget->setRootValue(MANAGER->getRootChannel());
+//  m_channelTableWidget->setRootValue(MANAGER->getRootChannel());
   bottomDock->setAllowedAreas(Qt::BottomDockWidgetArea);
   bottomDock->setWidget(m_channelTableWidget);
   bottomDock->setFeatures(QDockWidget::DockWidgetFloatable);

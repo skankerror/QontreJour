@@ -24,12 +24,14 @@
 #include <QPushButton>
 #include <QTableView>
 #include <QAbstractTableModel>
+#include <QStyledItemDelegate>
 #include <QEvent>
 #include "../core/dmxvalue.h"
 
 
 class ValueTableView;
 class ValueTableModel;
+class ChannelDelegate;
 
 class ValueTableWidget
     : public QWidget
@@ -45,12 +47,15 @@ public :
 
   ValueTableModel *getModel() const{ return m_model; }
 
-signals :
+private :
 
+  void setRootValue(RootValue *t_rootValue);
+
+signals :
 
 public slots :
 
-  void setRootValue(RootValue *t_rootValue);
+  void setL_channelData(QList<ChannelData *> t_L_channelData);
 
 protected slots :
 
@@ -60,6 +65,7 @@ protected :
 
   ValueTableView *m_tableView;
   ValueTableModel *m_model;
+  ChannelDelegate *m_channelDelegate;
 
 };
 
@@ -112,19 +118,24 @@ public :
 
   virtual ~ValueTableModel();
 
-  DmxValue *getRootValue() const{ return m_rootValue; }
+//  DmxValue *getRootValue() const{ return m_rootValue; }
   QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
+  QList<ChannelData *> getL_channelData() const
+  { return m_L_channelData; }
 
   void recieveValueFromMouse(const QModelIndex &t_index,
                              const int t_value);
 
+  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
+  { m_L_channelData = t_L_channelData; }
+
 public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
 
-  void addEditedIndex(QModelIndex &t_editedIndexes);
-
+//  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
+//  void addEditedIndex(QModelIndex &t_editedIndexes);
+  void onSelectionChanged(QList<id> L_id);
   //public because we need this edit widgets
   void editedIndexChanged();
 
@@ -160,14 +171,56 @@ private :
   QList<LeveledValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
   QModelIndex getIndexFromValue(const LeveledValue *t_value) const;
   QModelIndex getIndexFromValueId(const id &t_id) const;
+  QVariant oldDdata(const QModelIndex &index,
+                    int role) const;
+  QVariant showAllData(const QModelIndex &index,
+                       int role) const;
+  QVariant showFilteredData(const QModelIndex &index,
+                            int role) const;
+
 
 protected :
 
   RootValue *m_rootValue;
+
+  QList<ChannelData *> m_L_channelData;
   QModelIndexList m_editedIndexes;
+
 
 };
 
+/************************* ChannelDelegate ******************************/
 
+class ChannelDelegate
+    : public QStyledItemDelegate
+{
+
+  Q_OBJECT
+
+public:
+
+  explicit ChannelDelegate(QObject *parent = nullptr);
+
+  RootValue *getRootValue() const{ return m_rootValue; }
+  QList<ChannelData *> getL_channelData() const{ return m_L_channelData; }
+
+  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
+  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
+  { m_L_channelData = t_L_channelData; }
+
+  // QAbstractItemDelegate interface
+  virtual void paint(QPainter *painter,
+                     const QStyleOptionViewItem &option,
+                     const QModelIndex &index) const override;
+  virtual QSize sizeHint(const QStyleOptionViewItem &option,
+                         const QModelIndex &index) const override;
+
+private :
+
+  RootValue *m_rootValue;
+
+  QList<ChannelData *> m_L_channelData;
+
+};
 
 #endif // VALUETABLEWIDGET_H

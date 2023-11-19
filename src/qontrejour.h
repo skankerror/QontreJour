@@ -18,19 +18,24 @@
 #ifndef QONTREJOUR_H
 #define QONTREJOUR_H
 
+#include <QObject>
+
 #define UNIVERSE_OUTPUT_COUNT_DEFAULT 512
 #define DEFAULT_CHANNEL_COUNT 512
 
 #define SUBMASTER_SLIDERS_COUNT_PER_PAGE 20
 #define SUBMASTER_SLIDERS_PAGE_COUNT 10
 
-#define DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT 32
+//#define DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT 32
+#define DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT 16
 #define DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT 32
 
 #define MAIN_WINDOW_WIDTH 1280
 #define MAIN_WINDOW_HEIGHT 720
 
 #define SLIDERS_PER_PAGE 32
+
+#define CHANNEL_TABLE_ITEM_SIZE 43
 
 #define DEFAULT_IN_TIME 5.0f
 #define DEFAULT_OUT_TIME 5.0f
@@ -423,7 +428,10 @@ private :
 /******************************* ChannelData ***********************/
 
 class ChannelData
+    : public QObject
 {
+
+  Q_OBJECT
 
 public :
 
@@ -432,14 +440,41 @@ public :
                        dmx t_directChannelLevel = NULL_DMX,
                        overdmx t_directChannelOffset = NULL_DMX_OFFSET,
                        dmx t_sceneLevel = NULL_DMX,
-                       dmx t_nextSceneLevel = NULL_DMX)
-      : m_channelID(t_id),
+                       dmx t_nextSceneLevel = NULL_DMX,
+                       QObject *parent = nullptr)
+      : QObject(parent),
+      m_channelID(t_id),
       m_channelGroupLevel(t_channelGroupLevel),
       m_directChannelLevel(t_directChannelLevel),
       m_directChannelOffset(t_directChannelOffset),
       m_sceneLevel(t_sceneLevel),
       m_nextSceneLevel(t_nextSceneLevel)
   {}
+
+  ChannelData(const ChannelData &channel)
+      : QObject(channel.parent())/*,
+      m_channelID(channel.getChannelID()),
+      m_channelGroupLevel(channel.getChannelGroupLevel()),
+      m_directChannelLevel(channel.getDirectChannelLevel()),
+      m_directChannelOffset(channel.getDirectChannelOffset()),
+      m_sceneLevel(channel.getSceneLevel()),
+      m_nextSceneLevel(channel.getNextSceneLevel()),
+      m_flag(channel.getFlag()),
+      m_actual_Level(channel.getActual_Level()),
+      m_isDirectChannel(channel.getIsDirectChannel()),
+      m_isSelected(channel.getIsSelected())*/
+  {
+    m_channelID = channel.getChannelID();
+    m_channelGroupLevel = channel.getChannelGroupLevel();
+    m_directChannelLevel = channel.getDirectChannelLevel();
+    m_directChannelOffset = channel.getDirectChannelOffset();
+    m_sceneLevel = channel.getSceneLevel();
+    m_nextSceneLevel = channel.getNextSceneLevel();
+    m_flag = channel.getFlag();
+    m_actual_Level = channel.getActual_Level();
+    m_isDirectChannel = channel.getIsDirectChannel();
+    m_isSelected = channel.getIsSelected();
+  }
 
   ~ChannelData(){}
 
@@ -537,6 +572,7 @@ private :
   bool m_isSelected = false;
   bool m_isDirectChannel = false;
 };
+Q_DECLARE_METATYPE(ChannelData)
 
 
 #endif // QONTREJOUR_H

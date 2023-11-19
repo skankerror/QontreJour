@@ -37,60 +37,60 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Seri
 
 set(TS_FILES QontreJour_fr_GF.ts)
 
+set(RES_FILES resources/resources.qrc)
+
 set(DATA_FILES README.md TODO LICENSE)
 
 set(PROJECT_SOURCES
-        src/main.cpp
-        src/qontrejour.h
-        src/core/dmxvalue.h
-        src/core/dmxvalue.cpp
-        src/core/dmxmanager.h
-        src/core/dmxmanager.cpp
-        src/core/dmxengine.h
-        src/core/dmxengine.cpp
-        src/core/interpreter.h
-        src/core/interpreter.cpp
-        src/gui/mainwindow.h
-        src/gui/mainwindow.cpp
-        src/gui/universewidget.h
-        src/gui/universewidget.cpp
-        src/gui/sequencerwidget.h
-        src/gui/sequencerwidget.cpp
-        src/gui/valuetablewidget.h
-        src/gui/valuetablewidget.cpp
-        src/gui/valuesliderswidget.h
-        src/gui/valuesliderswidget.cpp
-#        src/gui/valueeditwidget.h
-#        src/gui/valueeditwidget.cpp
-        src/gui/keypadwidget.h
-        src/gui/keypadwidget.cpp
-        ${TS_FILES}
-        ${DATA_FILES}
-#        ${BASIC_SOURCES}
+  src/main.cpp
+  src/qontrejour.h
+  src/core/dmxvalue.h
+  src/core/dmxvalue.cpp
+  src/core/dmxmanager.h
+  src/core/dmxmanager.cpp
+  src/core/dmxengine.h
+  src/core/dmxengine.cpp
+  src/core/interpreter.h
+  src/core/interpreter.cpp
+  src/gui/mainwindow.h
+  src/gui/mainwindow.cpp
+  src/gui/universewidget.h
+  src/gui/universewidget.cpp
+  src/gui/sequencerwidget.h
+  src/gui/sequencerwidget.cpp
+  src/gui/valuetablewidget.h
+  src/gui/valuetablewidget.cpp
+  src/gui/valuesliderswidget.h
+  src/gui/valuesliderswidget.cpp
+  #        src/gui/valueeditwidget.h
+  #        src/gui/valueeditwidget.cpp
+  src/gui/keypadwidget.h
+  src/gui/keypadwidget.cpp
+  ${TS_FILES}
+  ${RES_FILES}
+  ${DATA_FILES}
+  #        ${BASIC_SOURCES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(QontreJour
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        src/gui/keypadwidget.h src/gui/keypadwidget.cpp
-        src/core/interpreter.h src/core/interpreter.cpp
-        resources/resources.qrc
-    )
+  qt_add_executable(QontreJour
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+  )
 
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
-    if(ANDROID)
-        add_library(QontreJour SHARED
-            ${PROJECT_SOURCES}
-        )
-    else()
-        add_executable(QontreJour
-            ${PROJECT_SOURCES}
-        )
-    endif()
+  if(ANDROID)
+    add_library(QontreJour SHARED
+      ${PROJECT_SOURCES}
+    )
+else()
+  add_executable(QontreJour
+    ${PROJECT_SOURCES}
+  )
+endif()
 
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
 target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
@@ -99,12 +99,12 @@ target_link_libraries(QontreJour PRIVATE Qt${QT_VERSION_MAJOR}::SerialPort)
 #target_link_libraries(QontreJour PRIVATE ossia)
 target_link_libraries(QontreJour PUBLIC #[[QMidi QOSC QEnttecPro]] QDmxLib)
 
-set_target_properties(QontreJour PROPERTIES
+  set_target_properties(QontreJour PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
+  )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(QontreJour)
+  qt_finalize_executable(QontreJour)
 endif()

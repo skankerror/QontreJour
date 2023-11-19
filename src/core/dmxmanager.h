@@ -64,7 +64,6 @@ public :
   DmxScene *getScene(sceneID_f t_sceneID); // automatically from mainseq
   DmxScene *getScene(sceneID_f t_sceneID,
                      id t_SeqId);
-
   // patch interface
   void setStraightPatch(const uid t_uid); // one universe
   void setStraightPatch(const QList<uid> t_L_uid); // several universes
@@ -97,6 +96,8 @@ public :
                             int t_widgetID,
                             ValueType t_valueType,
                             id t_valueID);
+
+  DmxEngine *getDmxEngine() const{ return m_dmxEngine; }
 
 private :
 

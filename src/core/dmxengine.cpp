@@ -569,7 +569,7 @@ ChannelEngine::~ChannelEngine()
   for (const auto &item
        : std::as_const(m_L_channelData))
   {
-    delete item;
+    item->deleteLater();
 //    item = nullptr;
   }
   m_L_channelData.clear();
@@ -593,6 +593,7 @@ QList<id> ChannelEngine::selectNonNullChannels()
       item->setIsSelected(true);
     }
   }
+  emit selectionChanged(getSelectedChannelsId());
 //  qDebug() << L_selectedId;
   return L_selectedId;
 }
