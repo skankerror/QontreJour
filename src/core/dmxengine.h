@@ -19,6 +19,8 @@
 #define DMXENGINE_H
 
 #include <QObject>
+#include <QParallelAnimationGroup>
+#include <QEasingCurve>
 #include "../qontrejour.h"
 #include "dmxvalue.h"
 
@@ -75,6 +77,34 @@ private :
   QMap<id, Gr_Id_Dmx> m_M_channelLevel;
 };
 
+/******************************* GoEngine *****************************/
+
+class GoEngine
+    : public QParallelAnimationGroup
+{
+
+  Q_OBJECT
+
+public :
+
+  explicit GoEngine(RootValue *t_rootValue,
+                    QObject *parent = nullptr);
+
+  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
+
+  void letsGo(QList<Ch_Id_Dmx> &t_fromL_channelid,
+              QEasingCurve &t_outCurve,
+              QList<Ch_Id_Dmx> &t_toL_channelid,
+              QEasingCurve &t_inCurve);
+  void letsPause();
+  void letsGoBack();
+
+private :
+
+  RootValue *m_rootValue;
+
+};
+
 /******************************* CueEngine ****************************/
 
 class CueEngine :
@@ -85,7 +115,8 @@ class CueEngine :
 
 public :
 
-  explicit CueEngine(QList<Sequence *> t_L_seq,
+  explicit CueEngine(RootValue *t_rootValue,
+                     QList<Sequence *> t_L_seq,
                      QObject *parent = nullptr);
 
   QList<Sequence *> getL_seq() const{ return m_L_seq; }
@@ -150,6 +181,8 @@ private slots :
 
 private :
 
+  GoEngine *m_goEngine;
+
   QList<Sequence *> m_L_seq;
   id m_mainSeqId = 0;
   sceneID_f m_selectedCueId = 0.0f;
@@ -180,17 +213,20 @@ public :
   QList<id> selectNonNullChannels();
   void addChannelDataSelection(QList<id> t_L_id);
   void removeChannelDataSelection(QList<id> t_L_id);
-  void clearChannelDataSelection();
   RootValue *getRootChannel() const{ return m_rootChannel; }
+  QList<id> getL_selectedChannelId() const{ return m_L_selectedChannelId; }
 
   QList<ChannelData *> getL_channelData() const
   { return m_L_channelData; }
 
   void setL_channelData(const QList<ChannelData *> &t_L_channelData)
   { m_L_channelData = t_L_channelData; }
-
   void setRootChannel(RootValue *t_rootChannel)
   { m_rootChannel = t_rootChannel; }
+//  void setL_selectedChannelId(const QList<id> &t_L_selectedChannelId)
+//  { m_L_selectedChannelId = t_L_selectedChannelId; }
+
+  void addToL_selectedChannelId(id t_id);
 
 private :
 
@@ -198,7 +234,6 @@ private :
   void addToL_directChannelIds(id t_id);
   void removeFromL_directChannelIds(id t_id);
   void clearL_directChannelIds();
-  void addToL_selectedChannelId(id t_id);
   void removeFromL_selectedChannelId(id t_id);
   void clearL_selectedChannelIds();
   void update(id t_id);
@@ -214,11 +249,16 @@ public slots :
   void onChannelLevelChangedFromDirectChannel(id t_id,
                                               dmx t_level,
                                               overdmx t_offset = NULL_DMX);
+  void onSelectedChannelListAtLevel(dmx t_level);
+  void onSelectedChannelListPlusLevel();
+  void onSelectedChannelListMoinsLevel();
   void onChannelLevelPlusFromDirectChannel(id t_id);
   void onChannelLevelMoinsFromDirectChannel(id t_id);
   void onChannelLevelChangedFromScene(id t_channelid,
                                       dmx t_level,
                                       CueRole t_role = CueRole::NewSelectRole);
+
+  void clearChannelDataSelection();
 
 private :
 
@@ -226,7 +266,6 @@ private :
 
   QList<ChannelData *> m_L_channelData;
   QList<id> m_L_directChannelId;
-  // URGENT : gérer ça
   QList<id> m_L_selectedChannelId;
 };
 
@@ -294,10 +333,6 @@ private :
 
   QList<DmxChannel *> getSelectedChannels()const;
 
-signals :
-
-  void channelSelectionChanged();
-
 public slots :
 
   // connected to interpreter
@@ -306,7 +341,7 @@ public slots :
   void onAddOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void onRemoveOutputSelection(QList<Uid_Id> t_L_Uid_Id);
   void onSelectAll();
-  void onClearChannelSelection();
+//  void onClearChannelSelection();
   void onClearOutputSelection();
   void onSetLevel(dmx t_level);
   void onSendError();
@@ -322,8 +357,8 @@ public slots :
   void onUpdateCurrentCue();
   void onUpdateCue(sceneID_f t_id);
   void onRecordGroup(id t_id);
-  void onGotoCue(sceneID_f t_id);
-  void onGotoStep(id t_id);
+//  void onGotoCue(sceneID_f t_id);
+//  void onGotoStep(id t_id);
   void onDeleteCue(sceneID_f t_id);
   void onDeleteStep(id t_id);
   void onDeleteGroup(id t_id);
@@ -337,9 +372,8 @@ private :
   OutputEngine *m_outputEngine;
 
   // members for interpreter
-  QList<id> m_L_channelsIdSelection;
   QList<Uid_Id> m_L_outputUid_IdSelection;
-  SelectionType m_selType = SelectionType::UnknownSelectionType;
+  SelectionType m_selType = SelectionType::ChannelSelectionType;
 
 };
 

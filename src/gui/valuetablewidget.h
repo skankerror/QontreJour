@@ -204,7 +204,6 @@ public:
   RootValue *getRootValue() const{ return m_rootValue; }
   QList<ChannelData *> getL_channelData() const{ return m_L_channelData; }
 
-//  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
   void setL_channelData(const QList<ChannelData *> &t_L_channelData)
   { m_L_channelData = t_L_channelData; }
 
@@ -220,6 +219,8 @@ public:
   void setL_directChannelId(const QList<id> &t_L_directChannelId)
   { m_L_directChannelId = t_L_directChannelId; }
 
+  void recieveValueFromMouse(const int t_value);
+
 private :
 
 //  QModelIndex getIndexFromValueId(const id &t_id) const;
@@ -227,12 +228,7 @@ private :
 public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-
-  //  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
-  //  void addEditedIndex(QModelIndex &t_editedIndexes);
   void onSelectionChanged(QList<id> L_id);
-  //public because we need this edit widgets
-//  void editedIndexChanged();
 
 private :
 

@@ -276,6 +276,8 @@ void DmxManager::connectOutputs()
 
 void DmxManager::connectInterpreterToEngine()
 {
+  auto channelEngine = m_dmxEngine->getChannelEngine();
+  auto cueEngine  = m_dmxEngine->getCueEngine();
   connect(m_interpreter, &Interpreter::addChannelSelection,
           m_dmxEngine, &DmxEngine::onAddChannelSelection);
 
@@ -292,7 +294,7 @@ void DmxManager::connectInterpreterToEngine()
           m_dmxEngine, &DmxEngine::onSelectAll);
 
   connect(m_interpreter, &Interpreter::clearChannelSelection,
-          m_dmxEngine, &DmxEngine::onClearChannelSelection);
+          channelEngine, &ChannelEngine::clearChannelDataSelection);
 
   connect(m_interpreter, &Interpreter::clearOutputSelection,
           m_dmxEngine, &DmxEngine::onClearOutputSelection);
@@ -340,10 +342,10 @@ void DmxManager::connectInterpreterToEngine()
           m_dmxEngine, &DmxEngine::onRecordGroup);
 
   connect(m_interpreter, &Interpreter::gotoCue,
-          m_dmxEngine, &DmxEngine::onGotoCue);
+          cueEngine, &CueEngine::setSelectedCueId);
 
   connect(m_interpreter, &Interpreter::gotoStep,
-          m_dmxEngine, &DmxEngine::onGotoStep);
+          cueEngine, &CueEngine::setSelectedCueStep);
 
   connect(m_interpreter, &Interpreter::deleteCue,
           m_dmxEngine, &DmxEngine::onDeleteCue);
