@@ -251,6 +251,19 @@ dmx DmxChannelGroup::getControledChannelStoredLevel(/*const */DmxChannel *m_chan
   return m_H_controledChannel_storedLevel.value(m_channel);
 }
 
+QList<id> DmxChannelGroup::getL_channelId()
+{
+  QList<id> L_return;
+  for (auto i = m_H_controledChannel_storedLevel.cbegin(),
+       end = m_H_controledChannel_storedLevel.cend();
+       i != end; ++i)
+  {
+    id channelId = i.key()->getid();
+    L_return.append(channelId);
+  }
+  return L_return;
+}
+
 // NOTE : this method modifies level if channel was already in group
 void DmxChannelGroup::addChannel(DmxChannel *t_dmxChannel,
                                  const dmx t_storedLevel)
@@ -532,7 +545,9 @@ DmxScene::DmxScene(ValueType t_type,
     : DmxChannelGroup(t_type,
                       t_parent),
     m_sequence(t_parent)
-{}
+{
+  setName(DEFAULT_SCENE_NAME);
+}
 
 DmxScene::DmxScene(DmxScene &t_scene)
     : DmxChannelGroup(t_scene.getType(),

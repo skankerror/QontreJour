@@ -17,6 +17,7 @@
 
 #include "dmxengine.h"
 #include <QDebug>
+#include <QPropertyAnimation>
 
 /****************************** ChannelGroupEngine ***********************/
 
@@ -192,9 +193,93 @@ GoEngine::GoEngine(RootValue *t_rootValue,
 {}
 
 void GoEngine::letsGo(id t_fromSceneStep,
-                      id t_toSceneStep)
+                      id t_toSceneStep,
+                      id t_seqid)
 {
+  DmxScene *fromScene = m_L_seq.at(t_seqid)->getScene(t_fromSceneStep);
+  DmxScene *toScene = m_L_seq.at(t_seqid)->getScene(t_toSceneStep);
+  QList<id> L_fromChannelId = fromScene->getL_channelId();
+  QList<id> L_toChannelId = toScene->getL_channelId();
+  QList<id> L_directChannelId = m_channelDataEngine->getL_directChannelId();
 
+  for (qsizetype i = 0;
+       i < L_fromChannelId.size();
+       i++)
+  {
+    id channelId = L_fromChannelId.at(i);
+    ChannelData *channelData = m_channelDataEngine->getChannelData(channelId);
+    dmx startingDmx = channelData->getSceneLevel();
+    auto index = L_directChannelId.indexOf(channelId);
+    if (index != -1) // that's direct channel
+    {
+      startingDmx = channelData->getDirectChannelLevel();
+      L_directChannelId.remove(index);
+    }
+    dmx endingDmx = NULL_DMX;
+    index = L_toChannelId.indexOf(channelId);
+    if (index != -1)
+    {
+      endingDmx = toScene->getControledChannelStoredLevel(L_toChannelId.at(index));
+      L_toChannelId.remove(index);
+    }
+    // create animation for channel data
+    auto anim = new QPropertyAnimation(channelData,
+                                       "sceneLevel",
+                                       this);
+    anim->setStartValue(startingDmx);
+    anim->setEndValue(endingDmx);
+    if (endingDmx == 0)
+      anim->setCurrentTime(toScene->getTimeOut());
+    else
+      anim->setCurrentTime(toScene->getTimeIn());
+    addAnimation(anim);
+  }
+
+  for (qsizetype i = 0;
+       i < L_directChannelId.size();
+       i++)
+  {
+    id channelId = L_directChannelId.at(i);
+    ChannelData *channelData = m_channelDataEngine->getChannelData(channelId);
+    dmx startingDmx = m_channelDataEngine->getChannelData(channelId)->getDirectChannelLevel();
+    dmx endingDmx = NULL_DMX;
+    auto index = L_toChannelId.indexOf(channelId);
+    if (index != -1)
+    {
+      endingDmx = toScene->getControledChannelStoredLevel(L_toChannelId.at(index));
+      L_toChannelId.remove(index);
+    }
+    // create animation for channel data
+    auto anim = new QPropertyAnimation(channelData,
+                                       "sceneLevel",
+                                       this);
+    anim->setStartValue(startingDmx);
+    anim->setEndValue(endingDmx);
+    if (endingDmx == 0)
+      anim->setCurrentTime(toScene->getTimeOut());
+    else
+      anim->setCurrentTime(toScene->getTimeIn());
+    addAnimation(anim);
+  }
+
+  for (qsizetype i = 0;
+       i < L_toChannelId.size();
+       i++)
+  {
+    id channelId = L_toChannelId.at(i);
+    ChannelData *channelData = m_channelDataEngine->getChannelData(channelId);
+    dmx startingDmx = NULL_DMX;
+    dmx endingDmx = toScene->getControledChannelStoredLevel(channelId);
+    // create animation for channel data
+    auto anim = new QPropertyAnimation(channelData,
+                                       "sceneLevel",
+                                       this);
+    anim->setStartValue(startingDmx);
+    anim->setEndValue(endingDmx);
+    anim->setCurrentTime(toScene->getTimeIn());
+    addAnimation(anim);
+  }
+  start();
 }
 
 void GoEngine::letsPause()
@@ -500,7 +585,10 @@ void CueEngine::updateScene(QList<DmxChannel *> t_L_channel,
 
 void CueEngine::goGo()
 {
-
+  id selectStep = getSelectedCueStep();
+  m_goEngine->letsGo(selectStep,
+                     selectStep + 1,
+                     m_mainSeqId);
 }
 
 void CueEngine::goBack()

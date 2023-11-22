@@ -190,6 +190,19 @@ void ChannelDataEngine::clearSelection()
   emit sigToUpdateChannelView();
 }
 
+void ChannelDataEngine::clearDirectChannel()
+{
+  for (qsizetype i = 0;
+       i < m_L_directChannelId.size();
+       i++)
+  {
+    auto channelData = getChannelData(m_L_directChannelId.at(i));
+    channelData->clearDirectChannel();
+  }
+  m_L_directChannelId.clear();
+  m_L_directChannelId.squeeze();
+}
+
 void ChannelDataEngine::createDatas(int t_channelCount)
 {
   {

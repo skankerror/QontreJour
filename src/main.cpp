@@ -15,13 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "src/gui/mainwindow.h"
-
 #include <QApplication>
 #include <QFile>
 #include <QLocale>
 #include <QTranslator>
-
+#include "src/gui/mainwindow.h"
 
 int main(int argc, char *argv[])
 {

@@ -295,6 +295,7 @@ public :
   { return m_H_controledChannel_storedLevel.size(); }
   QHash<DmxChannel *, dmx> getH_controledChannel_storedLevel() const
   { return m_H_controledChannel_storedLevel; }
+  QList<id> getL_channelId();
 
   // setters
   void setH_controledChannel_storedLevel(const QHash<DmxChannel *, dmx> &t_H_controledChannel_storedLevel)

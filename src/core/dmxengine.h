@@ -96,7 +96,8 @@ public :
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
 
   void letsGo(id t_fromSceneStep,
-              id t_toSceneStep);
+              id t_toSceneStep,
+              id t_seqid = 0);
   void letsPause();
   void letsGoBack();
 
@@ -134,6 +135,9 @@ public :
   DmxScene *getSelectedScene() const;
   DmxScene *getNextScene() const;
   sceneID_f getSelectedCueId() const{ return m_selectedCueId; }
+  id getSelectedCueStep() const
+  { return getSelectedScene()->getStepNumber(); }
+
 
   bool setSelectedCueId(sceneID_f t_selectedCueId);
   bool setSelectedCueStep(id t_stepId);

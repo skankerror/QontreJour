@@ -58,6 +58,7 @@ public :
 
   void selectNonNullChannels();
   void clearSelection();
+  void clearDirectChannel();
 
 private :
 
@@ -134,7 +135,7 @@ public :
   { m_directChannelLevel = t_directChannelLevel; }
   void setDirectChannelOffset(overdmx t_directChannelOffset)
   { m_directChannelOffset = t_directChannelOffset; }
-  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; }
+  void setSceneLevel(dmx t_sceneLevel){ m_sceneLevel = t_sceneLevel; update(); }
   void setNextSceneLevel(dmx t_nextSceneLevel)
   { m_nextSceneLevel = t_nextSceneLevel; }
   void setChannelID(id t_channelID){ m_channelID = t_channelID; }
@@ -168,6 +169,14 @@ public :
 private :
 
   void setFlag(ChannelDataFlag t_flag){ m_flag = t_flag; }
+
+  Q_PROPERTY(dmx sceneLevel
+                 READ getSceneLevel
+                     WRITE setSceneLevel
+/*                         RESET resetLevel
+                             NOTIFY levelChanged
+                                 FINAL*/)
+
 
 private :
 

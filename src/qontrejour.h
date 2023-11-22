@@ -90,6 +90,7 @@ typedef quint8 percent;
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_CHANNEL_NAME "CH"
 #define DEFAULT_GROUP_NAME "GROUP"
+#define DEFAULT_SCENE_NAME "SCENE"
 
 #define BUTTON_WIDTH_MAX 55
 
