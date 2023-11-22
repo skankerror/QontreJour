@@ -131,9 +131,8 @@ public slots :
 
   void submasterSliderToEngine(id t_id,
                          dmx t_level);
-  void directChannelWidgetsToEngine(id t_id,
-                             dmx t_level,
-                             overdmx t_offset);
+  void directChannelSlidersToEngine(id t_id,
+                                    dmx t_level);
   void keypadToInterpreter(KeypadButton t_buttonType);
   void playBackToEngine(PlayBackButton t_buttonType);
 

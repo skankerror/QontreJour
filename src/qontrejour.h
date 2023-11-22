@@ -18,7 +18,7 @@
 #ifndef QONTREJOUR_H
 #define QONTREJOUR_H
 
-#include <QObject>
+#include <QModelIndex>
 
 #define UNIVERSE_OUTPUT_COUNT_DEFAULT 512
 #define DEFAULT_CHANNEL_COUNT 512
@@ -97,6 +97,9 @@ typedef quint8 percent;
 #define MOINS_PERCENT 5
 #define PLUS_DMX 13
 #define MOINS_DMX 13
+
+#define DMX_INCREMENT_MIN 1
+#define DMX_INCREMENT_DEFAULT 13
 
 enum KeypadButton
 {
@@ -425,5 +428,8 @@ private :
   id m_seqId;
   sceneID_f m_sceneId;
 };
+
+/******************************* static methods *******************************/
+
 
 #endif // QONTREJOUR_H

@@ -228,22 +228,15 @@ private :
 
   void update(id t_id);
 
-//signals :
-
-//  void selectionChanged(QList<id> t_L_id);
-
 public slots :
 
   void onChannelLevelChangedFromGroup(id t_id,
                                       dmx t_level);
-  void onChannelLevelChangedFromDirectChannel(id t_id,
-                                              dmx t_level,
-                                              overdmx t_offset = NULL_DMX);
+  void onChannelLevelChangedFromSliderChannel(id t_id,
+                                              dmx t_level);
+  void onChannelLevelPlusFromDirectChannel(const bool t_isPlus,
+                                           const int t_increment = DMX_INCREMENT_MIN);
   void onSelectedChannelListAtLevel(dmx t_level);
-  void onSelectedChannelListPlusLevel();
-  void onSelectedChannelListMoinsLevel();
-  void onChannelLevelPlusFromDirectChannel(id t_id);
-  void onChannelLevelMoinsFromDirectChannel(id t_id);
   void onChannelLevelChangedFromScene(id t_channelid,
                                       dmx t_level,
                                       CueRole t_role = CueRole::NewSelectRole);

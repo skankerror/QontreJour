@@ -625,21 +625,19 @@ QList<QDmxDevice *> DmxManager::getAvailableDevices(const QString &t_driverStrin
 }
 
 void DmxManager::submasterSliderToEngine(id t_id,
-                                   dmx t_level)
+                                         dmx t_level)
 {
   m_dmxEngine->getGroupEngine()->groupLevelChanged(t_id,
                                                    t_level);
 }
 
-void DmxManager::directChannelWidgetsToEngine(id t_id,
-                                       dmx t_level,
-                                       overdmx t_offset)
+void DmxManager::directChannelSlidersToEngine(id t_id,
+                                              dmx t_level)
 {
   m_dmxEngine
       ->getChannelEngine()
-      ->onChannelLevelChangedFromDirectChannel(t_id,
-                                               t_level,
-                                               t_offset);
+      ->onChannelLevelChangedFromSliderChannel(t_id,
+                                               t_level);
 }
 
 void DmxManager::keypadToInterpreter(KeypadButton t_buttonType)

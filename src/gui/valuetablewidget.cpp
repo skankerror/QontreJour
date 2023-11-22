@@ -69,9 +69,6 @@ void ValueTableWidget::setRootValue(RootValue *t_rootValue)
 {
   // we connect to update views
   auto L_dmxChannel = t_rootValue->getL_childValue();
-//  m_model->setRootValue(t_rootValue);
-  m_channelDelegate->setRootValue(t_rootValue);
-
   for (const auto &item
        : std::as_const(L_dmxChannel))
   {
@@ -85,6 +82,7 @@ void ValueTableWidget::setRootValue(RootValue *t_rootValue)
 void ValueTableWidget::setChannelDataEngine(ChannelDataEngine *t_cdEngine)
 {
   m_channelDelegate->setChannelDataEngine(t_cdEngine);
+  m_tableView->setChannelDataEngine(t_cdEngine);
 }
 
 void ValueTableWidget::repaintTableView()
@@ -92,11 +90,10 @@ void ValueTableWidget::repaintTableView()
   emit m_model->layoutChanged();
 }
 
-
 /************************* ValueTableView ******************************/
 
 ValueTableView::ValueTableView(QWidget *parent)
-  :QTableView(parent)
+    :QTableView(parent)
 {}
 
 ValueTableView::~ValueTableView()
@@ -104,64 +101,37 @@ ValueTableView::~ValueTableView()
 
 void ValueTableView::mousePressEvent(QMouseEvent *event)
 {
-//  if (event->button() == Qt::LeftButton)
-//  {
-//    auto index = indexAt(event->pos());
-//    if (index.flags().testFlag(Qt::ItemIsEditable))
-//    {
-//      auto myModel = static_cast<ValueTableModel *>(model());
-//      auto indexList = myModel->getEditedIndexes();
-//      m_isEditing = true;
-//      m_originEditingPoint = event->pos();
-//      // NOTE : voir ça avec ctrl ou shift ?
-////      if (indexList.indexOf(index) == -1) // si l'index n'est pas ds la selection
-////      {
-//////        myModel->clearSelectionList(); // on clear
-////        myModel->addEditedIndex(index); // on ajoute notre index
-////      }
-//      return;
-//    }
-//  }
-
   if (event->button() == Qt::LeftButton)
   {
-    auto index = indexAt(event->pos());
-    int valueID = ((index.row()
-                    * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-                   + index.column());
-    if (valueID < 0 || valueID >= 512)
-    {
-      qDebug() << "bluk !";
-//      return;
-    }
-    else
-    {
-//      auto channelengine = MANAGER
-//                              ->getDmxEngine()
-//                              ->getChannelEngine();
-//      channelengine->addToL_selectedChannelId(valueID);
-    }
     m_isEditing = true;
     m_originEditingPoint = event->pos();
     return;
   }
-
-
+  if (event->button() == Qt::RightButton)
+  {
+    int valueID = getChannelIdFromIndex(indexAt(event->pos()));
+    if (valueID < 0 || valueID >= 512)
+    {
+      qDebug() << "bluk !";
+      return;
+    }
+    else
+    {
+      auto channelData = m_channelDataEngine->getChannelData(valueID);
+      if (channelData->getIsSelected())
+        m_channelDataEngine->removeIdFromL_select(valueID);
+      else
+        m_channelDataEngine->addIdToL_select(valueID);
+      return;
+    }
+  }
   QTableView::mousePressEvent(event);
 }
 
 void ValueTableView::mouseReleaseEvent(QMouseEvent *event)
 {
   if (m_isEditing)
-  {
     m_isEditing = false;
-  }
-  else
-  {
-//    event->pos
-//    this->widg
-  }
-
   QTableView::mouseReleaseEvent(event);
 }
 
@@ -172,46 +142,27 @@ void ValueTableView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ValueTableView::mouseMoveEvent(QMouseEvent *event)
 {
-//  if (m_isEditing)
-//  {
-//    auto myModel = static_cast<ValueTableModel *>(model());
-//    auto indexList = myModel->getEditedIndexes();
-
-//    for (const auto &item
-//         : std::as_const(indexList))
-//    {
-//      auto value = item.data().toInt();
-//      auto yValue = event->pos().y()
-//          - m_originEditingPoint.y();
-//      value -= yValue;
-////      if (value > 255)
-////      {
-////        value = 255;
-////      }
-////      if (value < 0)
-////      {
-////        value = 0;
-////      }
-////      model()->setData(item,
-////                       value,
-////                       Qt::EditRole);
-//      myModel->recieveValueFromMouse(item,
-//                                     value);
-//    }
-//    m_originEditingPoint = event->pos();
-//    return;
-//}
-
   if (m_isEditing)
   {
     auto channelDelegate = static_cast<ChannelDelegate*>(itemDelegate());
     auto yValue = event->pos().y()
                   - m_originEditingPoint.y();
-    channelDelegate->recieveValueFromMouse(yValue);
+    if (yValue > 0)
+      channelDelegate->recieveValuePlusFromMouse(false);
+    else if (yValue < 0)
+      channelDelegate->recieveValuePlusFromMouse(true);
     m_originEditingPoint = event->pos();
     return;
   }
   QTableView::mouseMoveEvent(event);
+}
+
+int ValueTableView::getChannelIdFromIndex(QModelIndex t_index)
+{
+  int valueID = ((t_index.row()
+                  * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+                 + t_index.column());
+  return valueID;
 }
 
 /************************* ChannelDelegate ******************************/
@@ -296,8 +247,9 @@ QSize ChannelDelegate::sizeHint(const QStyleOptionViewItem &option,
                                        index);
 }
 
-void ChannelDelegate::recieveValueFromMouse(const int t_value)
+void ChannelDelegate::recieveValuePlusFromMouse(const bool t_isPlus)
 {
-
+//  qDebug() << "yvalue" << t_isPlus;
+//  auto
 }
 

@@ -46,13 +46,9 @@ public :
 
   virtual ~ValueTableWidget();
 
-  ValueTableModel *getModel() const{ return m_model; }
-
 private :
 
   void setRootValue(RootValue *t_rootValue);
-
-signals :
 
 public slots :
 
@@ -84,12 +80,19 @@ public :
 
   virtual ~ValueTableView();
 
+  void setChannelDataEngine(ChannelDataEngine *t_channelDataEngine)
+  { m_channelDataEngine = t_channelDataEngine; }
+
 protected :
 
   virtual void mousePressEvent(QMouseEvent *event) override;
   virtual void mouseReleaseEvent(QMouseEvent *event) override;
   virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
+
+private :
+
+  int getChannelIdFromIndex(QModelIndex t_index);
 
 signals :
 
@@ -99,8 +102,11 @@ signals :
 
 protected :
 
+  ChannelDataEngine *m_channelDataEngine;
+
   bool m_isEditing = false;
   QPoint m_originEditingPoint;
+  id m_channelIdEdited = NO_ID;
 
 };
 
@@ -144,7 +150,7 @@ protected :
                      Qt::Orientation orientation,
                      const QVariant &value,
                      int role) override
-  { return true; }
+  { return false; }
 
   Qt::ItemFlags flags(const QModelIndex &index) const override
   { if (!index.isValid()) return Qt::NoItemFlags;
@@ -163,26 +169,18 @@ public:
 
   explicit ChannelDelegate(QObject *parent = nullptr);
 
-  RootValue *getRootValue() const{ return m_rootValue; }
-
   virtual void paint(QPainter *painter,
                      const QStyleOptionViewItem &option,
                      const QModelIndex &index) const override;
   virtual QSize sizeHint(const QStyleOptionViewItem &option,
                          const QModelIndex &index) const override;
 
-  void recieveValueFromMouse(const int t_value);
+  void recieveValuePlusFromMouse(const bool t_isPlus);
 
   void setChannelDataEngine(ChannelDataEngine *t_channelDataEngine)
   { m_channelDataEngine = t_channelDataEngine; }
 
-public slots :
-
-  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-
 private :
-
-  RootValue *m_rootValue;
 
   ChannelDataEngine *m_channelDataEngine;
 };
