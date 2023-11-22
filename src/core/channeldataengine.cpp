@@ -131,7 +131,7 @@ void ChannelDataEngine::addIdToL_select(const id &t_id)
     m_L_channelData.at(t_id)->setIsSelected(true);
     m_L_selectedChannelId.append(t_id);
   }
-  emit selectionChanged(m_L_selectedChannelId);
+  emit sigToUpdateChannelView();
 }
 
 void ChannelDataEngine::removeL_idFromL_select(const QList<id> &t_L_id)
@@ -153,7 +153,7 @@ void ChannelDataEngine::removeIdFromL_select(const id &t_id)
     m_L_directChannelId.remove(index);
     m_L_channelData.at(t_id)->setIsSelected(false);
   }
-  emit selectionChanged(m_L_selectedChannelId);
+  emit sigToUpdateChannelView();
 }
 
 void ChannelDataEngine::selectNonNullChannels()
@@ -174,7 +174,6 @@ void ChannelDataEngine::selectNonNullChannels()
       item->setIsSelected(true);
     }
   }
-//  emit selectionChanged(m_L_selectedChannelId);
 }
 
 void ChannelDataEngine::clearSelection()
@@ -183,12 +182,12 @@ void ChannelDataEngine::clearSelection()
        i < m_L_selectedChannelId.size();
        i++)
   {
-    auto channelData = m_L_channelData.at(m_L_selectedChannelId.at(i));
+    auto channelData = getChannelData(m_L_selectedChannelId.at(i));
     channelData->setIsSelected(false);
   }
   m_L_selectedChannelId.clear();
   m_L_selectedChannelId.squeeze();
-  emit selectionChanged(m_L_selectedChannelId);
+  emit sigToUpdateChannelView();
 }
 
 void ChannelDataEngine::createDatas(int t_channelCount)

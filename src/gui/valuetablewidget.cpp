@@ -34,8 +34,9 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_channelDelegate(new ChannelDelegate(this))
 {
   auto dmxEngine = MANAGER->getDmxEngine();
-  auto channelEngine = dmxEngine->getChannelEngine();
-  setChannelDataEngine(dmxEngine->getChannelDataEngine());
+  auto channelDataEngine = dmxEngine->getChannelDataEngine();
+  setChannelDataEngine(channelDataEngine);
+  setRootValue(MANAGER->getRootChannel());
 
   auto totalLayout = new QVBoxLayout();
   totalLayout->addWidget(m_tableView);
@@ -55,8 +56,8 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
   m_tableView->resizeColumnsToContents();
   m_tableView->resizeRowsToContents();
 
-  connect(channelEngine,
-          &ChannelEngine::selectionChanged,
+  connect(channelDataEngine,
+          &ChannelDataEngine::sigToUpdateChannelView,
           this,
           &ValueTableWidget::repaintTableView);
 }
@@ -68,14 +69,13 @@ void ValueTableWidget::setRootValue(RootValue *t_rootValue)
 {
   // we connect to update views
   auto L_dmxChannel = t_rootValue->getL_childValue();
-  m_model->setRootValue(t_rootValue);
+//  m_model->setRootValue(t_rootValue);
   m_channelDelegate->setRootValue(t_rootValue);
 
-  for (const auto &item : std::as_const(L_dmxChannel))
+  for (const auto &item
+       : std::as_const(L_dmxChannel))
   {
-    DmxValue *value = item;
-
-    connect(value,
+    connect(item,
             SIGNAL(levelChanged(id,dmx)),
             this,
             SLOT(repaintTableView()));
@@ -86,14 +86,6 @@ void ValueTableWidget::setChannelDataEngine(ChannelDataEngine *t_cdEngine)
 {
   m_channelDelegate->setChannelDataEngine(t_cdEngine);
 }
-
-//void ValueTableWidget::setL_channelData(QList<ChannelData *> t_L_channelData)
-//{
-//  m_model->setL_channelData(t_L_channelData);
-//  m_channelDelegate->setL_channelData(t_L_channelData);
-//  setRootValue(MANAGER
-//                   ->getRootChannel());
-//}
 
 void ValueTableWidget::repaintTableView()
 {
@@ -220,107 +212,6 @@ void ValueTableView::mouseMoveEvent(QMouseEvent *event)
     return;
   }
   QTableView::mouseMoveEvent(event);
-}
-
-/************************* ValueTableModel ******************************/
-
-ValueTableModel::ValueTableModel(QObject *parent)
-  : QAbstractTableModel(parent)
-{
-  auto channelDataEngine = MANAGER->getDmxEngine()->getChannelDataEngine();
-  connect(channelDataEngine,
-          &ChannelDataEngine::selectionChanged,
-          this,
-          &ValueTableModel::onSelectionChanged);
-}
-
-ValueTableModel::~ValueTableModel()
-{}
-
-//void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
-//                                            const int t_value)
-//{
-//  int valueID = (((t_index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-//                + t_index.column();
-//  overdmx over = 0;
-//  dmx value = 0;
-//  if (t_value > 255) value = 255;
-//  else if (t_value < 0) value = 0;
-//  else value = t_value;
-//  over = t_value - value;
-//  MANAGER->directChannelWidgetsToEngine(valueID,
-//                                        value,
-//                                        over);
-//}
-
-void ValueTableModel::onSelectionChanged(QList<id> L_id)
-{
-  // TODO : améliorer ça !
-  auto topLeft = index(0,0);
-  auto bottomRight = index(DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT - 1,
-                           DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT - 1);
-  emit dataChanged(topLeft,
-                   bottomRight);
-}
-
-int ValueTableModel::rowCount(const QModelIndex &parent) const
-{
-  return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT;
-}
-
-int ValueTableModel::columnCount(const QModelIndex &parent) const
-{
-  return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT;
-}
-
-QVariant ValueTableModel::data(const QModelIndex &index,
-                               int role) const
-{
-  return QVariant();
-}
-
-bool ValueTableModel::setData(const QModelIndex &index,
-                              const QVariant &value,
-                              int role)
-{
-  Q_UNUSED(index)
-  Q_UNUSED(value)
-  Q_UNUSED(role)
-
-  return false;
-}
-
-QVariant ValueTableModel::headerData(int section,
-                                     Qt::Orientation orientation,
-                                     int role) const
-{
-  return QVariant();
-}
-
-bool ValueTableModel::setHeaderData(int section,
-                                    Qt::Orientation orientation,
-                                    const QVariant &value,
-                                    int role)
-{
-  return true;
-}
-
-Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
-{
-  if (!index.isValid())
-    return Qt::NoItemFlags;
-
-  return Qt::ItemIsEnabled;
-
-//  if (!(index.row()%2)) // ligne paire.
-//    return Qt::ItemIsEnabled;
-//  else // ligne impaire
-//    return Qt::ItemIsEnabled
-//        | Qt::ItemIsSelectable
-//        | Qt::ItemIsEditable;
-
-  return QAbstractTableModel::flags(index);
-
 }
 
 /************************* ChannelDelegate ******************************/

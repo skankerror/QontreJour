@@ -228,9 +228,9 @@ private :
 
   void update(id t_id);
 
-signals :
+//signals :
 
-  void selectionChanged(QList<id> t_L_id);
+//  void selectionChanged(QList<id> t_L_id);
 
 public slots :
 

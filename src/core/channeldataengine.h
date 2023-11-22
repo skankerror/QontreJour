@@ -65,7 +65,7 @@ private :
 
 signals :
 
-  void selectionChanged(QList<id> t_L_selectedChannelId);
+  void sigToUpdateChannelView();
 
 private :
 

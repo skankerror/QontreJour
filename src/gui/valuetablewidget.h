@@ -56,7 +56,6 @@ signals :
 
 public slots :
 
-//  void setL_channelData(QList<ChannelData *> t_L_channelData);
   void setChannelDataEngine(ChannelDataEngine *t_cdEngine);
 
 protected slots :
@@ -116,39 +115,40 @@ class ValueTableModel
 
 public :
 
-  explicit ValueTableModel(QObject *parent = nullptr);
+  explicit ValueTableModel(QObject *parent = nullptr)
+      : QAbstractTableModel(parent)
+  {}
 
-  virtual ~ValueTableModel();
-
-//  void recieveValueFromMouse(const QModelIndex &t_index,
-//                             const int t_value);
-
-public slots :
-
-  void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-  void onSelectionChanged(QList<id> L_id);
+  virtual ~ValueTableModel(){}
 
 protected :
 
-  int rowCount(const QModelIndex &parent) const override;
-  int columnCount(const QModelIndex &parent) const override;
+  int rowCount(const QModelIndex &parent) const override
+  { return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT; }
+  int columnCount(const QModelIndex &parent) const override
+  { return parent.isValid() ? 0 : DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT; }
   QVariant data(const QModelIndex &index,
-                int role) const override;
+                int role) const override
+  { return QVariant(); }
   bool setData(const QModelIndex &index,
                const QVariant &value,
-               int role) override;
+               int role) override
+  { Q_UNUSED(index) Q_UNUSED(value) Q_UNUSED(role) return false; }
+
   QVariant headerData(int section,
                       Qt::Orientation orientation,
-                      int role) const override;
+                      int role) const override
+  { return QVariant(); }
+
   bool setHeaderData(int section,
                      Qt::Orientation orientation,
                      const QVariant &value,
-                     int role) override;
-  Qt::ItemFlags flags(const QModelIndex &index) const override;
+                     int role) override
+  { return true; }
 
-protected :
-
-  RootValue *m_rootValue;
+  Qt::ItemFlags flags(const QModelIndex &index) const override
+  { if (!index.isValid()) return Qt::NoItemFlags;
+    return Qt::ItemIsEnabled;}
 };
 
 /************************* ChannelDelegate ******************************/
@@ -165,7 +165,6 @@ public:
 
   RootValue *getRootValue() const{ return m_rootValue; }
 
-  // QAbstractItemDelegate interface
   virtual void paint(QPainter *painter,
                      const QStyleOptionViewItem &option,
                      const QModelIndex &index) const override;
