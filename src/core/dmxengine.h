@@ -23,6 +23,7 @@
 #include <QEasingCurve>
 #include "../qontrejour.h"
 #include "dmxvalue.h"
+#include "channeldataengine.h"
 
 /****************************** ChannelGroupEngine ***********************/
 
@@ -88,20 +89,22 @@ class GoEngine
 public :
 
   explicit GoEngine(RootValue *t_rootValue,
+                    ChannelDataEngine *t_channelDataEngine,
+                    QList<Sequence *> t_L_seq,
                     QObject *parent = nullptr);
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
 
-  void letsGo(QList<Ch_Id_Dmx> &t_fromL_channelid,
-              QEasingCurve &t_outCurve,
-              QList<Ch_Id_Dmx> &t_toL_channelid,
-              QEasingCurve &t_inCurve);
+  void letsGo(id t_fromSceneStep,
+              id t_toSceneStep);
   void letsPause();
   void letsGoBack();
 
 private :
 
   RootValue *m_rootValue;
+  ChannelDataEngine *m_channelDataEngine;
+  QList<Sequence *> m_L_seq;
 
 };
 
@@ -116,6 +119,7 @@ class CueEngine :
 public :
 
   explicit CueEngine(RootValue *t_rootValue,
+                     ChannelDataEngine *t_channelDataEngine,
                      QList<Sequence *> t_L_seq,
                      QObject *parent = nullptr);
 
@@ -181,6 +185,8 @@ private slots :
 
 private :
 
+  ChannelDataEngine *m_channelDataEngine;
+
   GoEngine *m_goEngine;
 
   QList<Sequence *> m_L_seq;
@@ -206,36 +212,20 @@ class ChannelEngine
 public :
 
   explicit ChannelEngine(RootValue *t_rootChannel,
+                         ChannelDataEngine *t_channelDataEngine,
                          QObject *parent = nullptr);
 
   ~ChannelEngine();
 
-  QList<id> selectNonNullChannels();
-  void addChannelDataSelection(QList<id> t_L_id);
-  void removeChannelDataSelection(QList<id> t_L_id);
   RootValue *getRootChannel() const{ return m_rootChannel; }
-  QList<id> getL_selectedChannelId() const{ return m_L_selectedChannelId; }
 
-  QList<ChannelData *> getL_channelData() const
-  { return m_L_channelData; }
-
-  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
-  { m_L_channelData = t_L_channelData; }
   void setRootChannel(RootValue *t_rootChannel)
   { m_rootChannel = t_rootChannel; }
-//  void setL_selectedChannelId(const QList<id> &t_L_selectedChannelId)
-//  { m_L_selectedChannelId = t_L_selectedChannelId; }
-
-  void addToL_selectedChannelId(id t_id);
+  void setChannelDataEngine(ChannelDataEngine *t_channelDataEngine)
+  { m_channelDataEngine = t_channelDataEngine; }
 
 private :
 
-  void createDatas(int t_channelCount);
-  void addToL_directChannelIds(id t_id);
-  void removeFromL_directChannelIds(id t_id);
-  void clearL_directChannelIds();
-  void removeFromL_selectedChannelId(id t_id);
-  void clearL_selectedChannelIds();
   void update(id t_id);
 
 signals :
@@ -264,9 +254,7 @@ private :
 
   RootValue *m_rootChannel;
 
-  QList<ChannelData *> m_L_channelData;
-  QList<id> m_L_directChannelId;
-  QList<id> m_L_selectedChannelId;
+  ChannelDataEngine *m_channelDataEngine;
 };
 
 /****************************** OutputEngine *****************************/
@@ -329,6 +317,9 @@ public :
 
   void setMainSeq(id t_id);
 
+  ChannelDataEngine *getChannelDataEngine() const
+  { return m_channelDataEngine; }
+
 private :
 
   QList<DmxChannel *> getSelectedChannels()const;
@@ -370,6 +361,8 @@ private :
   CueEngine *m_cueEngine;
   ChannelEngine *m_channelEngine;
   OutputEngine *m_outputEngine;
+
+  ChannelDataEngine *m_channelDataEngine;
 
   // members for interpreter
   QList<Uid_Id> m_L_outputUid_IdSelection;

@@ -33,11 +33,9 @@ ValueTableWidget::ValueTableWidget(QWidget *parent)
     m_model(new ValueTableModel(this)),
     m_channelDelegate(new ChannelDelegate(this))
 {
-  auto channelEngine = MANAGER
-                           ->getDmxEngine()
-                           ->getChannelEngine();
-  setL_channelData(channelEngine
-                       ->getL_channelData());
+  auto dmxEngine = MANAGER->getDmxEngine();
+  auto channelEngine = dmxEngine->getChannelEngine();
+  setChannelDataEngine(dmxEngine->getChannelDataEngine());
 
   auto totalLayout = new QVBoxLayout();
   totalLayout->addWidget(m_tableView);
@@ -84,13 +82,18 @@ void ValueTableWidget::setRootValue(RootValue *t_rootValue)
   }
 }
 
-void ValueTableWidget::setL_channelData(QList<ChannelData *> t_L_channelData)
+void ValueTableWidget::setChannelDataEngine(ChannelDataEngine *t_cdEngine)
 {
-  m_model->setL_channelData(t_L_channelData);
-  m_channelDelegate->setL_channelData(t_L_channelData);
-  setRootValue(MANAGER
-                   ->getRootChannel());
+  m_channelDelegate->setChannelDataEngine(t_cdEngine);
 }
+
+//void ValueTableWidget::setL_channelData(QList<ChannelData *> t_L_channelData)
+//{
+//  m_model->setL_channelData(t_L_channelData);
+//  m_channelDelegate->setL_channelData(t_L_channelData);
+//  setRootValue(MANAGER
+//                   ->getRootChannel());
+//}
 
 void ValueTableWidget::repaintTableView()
 {
@@ -141,10 +144,10 @@ void ValueTableView::mousePressEvent(QMouseEvent *event)
     }
     else
     {
-      auto channelengine = MANAGER
-                              ->getDmxEngine()
-                              ->getChannelEngine();
-      channelengine->addToL_selectedChannelId(valueID);
+//      auto channelengine = MANAGER
+//                              ->getDmxEngine()
+//                              ->getChannelEngine();
+//      channelengine->addToL_selectedChannelId(valueID);
     }
     m_isEditing = true;
     m_originEditingPoint = event->pos();
@@ -224,9 +227,9 @@ void ValueTableView::mouseMoveEvent(QMouseEvent *event)
 ValueTableModel::ValueTableModel(QObject *parent)
   : QAbstractTableModel(parent)
 {
-  auto channelEngine = MANAGER->getDmxEngine()->getChannelEngine();
-  connect(channelEngine,
-          &ChannelEngine::selectionChanged,
+  auto channelDataEngine = MANAGER->getDmxEngine()->getChannelDataEngine();
+  connect(channelDataEngine,
+          &ChannelDataEngine::selectionChanged,
           this,
           &ValueTableModel::onSelectionChanged);
 }
@@ -234,24 +237,25 @@ ValueTableModel::ValueTableModel(QObject *parent)
 ValueTableModel::~ValueTableModel()
 {}
 
-void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
-                                            const int t_value)
-{
-  int valueID = (((t_index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
-                + t_index.column();
-  overdmx over = 0;
-  dmx value = 0;
-  if (t_value > 255) value = 255;
-  else if (t_value < 0) value = 0;
-  else value = t_value;
-  over = t_value - value;
-  MANAGER->directChannelWidgetsToEngine(valueID,
-                                        value,
-                                        over);
-}
+//void ValueTableModel::recieveValueFromMouse(const QModelIndex &t_index,
+//                                            const int t_value)
+//{
+//  int valueID = (((t_index.row() - 1)/2) * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
+//                + t_index.column();
+//  overdmx over = 0;
+//  dmx value = 0;
+//  if (t_value > 255) value = 255;
+//  else if (t_value < 0) value = 0;
+//  else value = t_value;
+//  over = t_value - value;
+//  MANAGER->directChannelWidgetsToEngine(valueID,
+//                                        value,
+//                                        over);
+//}
 
 void ValueTableModel::onSelectionChanged(QList<id> L_id)
 {
+  // TODO : améliorer ça !
   auto topLeft = index(0,0);
   auto bottomRight = index(DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT - 1,
                            DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT - 1);
@@ -323,15 +327,7 @@ Qt::ItemFlags ValueTableModel::flags(const QModelIndex &index) const
 
 ChannelDelegate::ChannelDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
-{
-  auto channelEngine = MANAGER
-                           ->getDmxEngine()
-                           ->getChannelEngine();
-  connect(channelEngine,
-          &ChannelEngine::selectionChanged,
-          this,
-          &ChannelDelegate::onSelectionChanged);
-}
+{}
 
 void ChannelDelegate::paint(QPainter *painter,
                             const QStyleOptionViewItem &option,
@@ -339,12 +335,14 @@ void ChannelDelegate::paint(QPainter *painter,
 {
   int valueID = ((index.row() * DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT)
                  + index.column());
-  if (valueID < 0 || valueID >= m_L_channelData.size())
+  if (valueID < 0
+      || valueID >= m_channelDataEngine
+                        ->getChannelDataCount())
   {
     qDebug() << "bluk !";
     return;
   }
-  auto channelData = m_L_channelData.at(valueID);
+  auto channelData = m_channelDataEngine->getChannelData(valueID);
   ChannelDataFlag flag = channelData->getFlag();
   QColor dmxColor;
   switch(flag)
@@ -410,16 +408,5 @@ QSize ChannelDelegate::sizeHint(const QStyleOptionViewItem &option,
 void ChannelDelegate::recieveValueFromMouse(const int t_value)
 {
 
-}
-
-//QModelIndex ChannelDelegate::getIndexFromValueId(const id &t_id) const
-//{
-//  return QModelIndex(t_id / DMX_VALUE_TABLE_MODEL_ROWS_COUNT_DEFAULT,
-//                     t_id % DMX_VALUE_TABLE_MODEL_COLUMNS_COUNT_DEFAULT,);
-//}
-
-void ChannelDelegate::onSelectionChanged(QList<id> L_id)
-{
-  m_L_directChannelId = L_id;
 }
 

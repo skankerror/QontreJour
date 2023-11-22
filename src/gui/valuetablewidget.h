@@ -27,6 +27,7 @@
 #include <QStyledItemDelegate>
 #include <QEvent>
 #include "../core/dmxvalue.h"
+#include "../core/channeldataengine.h"
 
 
 class ValueTableView;
@@ -55,7 +56,8 @@ signals :
 
 public slots :
 
-  void setL_channelData(QList<ChannelData *> t_L_channelData);
+//  void setL_channelData(QList<ChannelData *> t_L_channelData);
+  void setChannelDataEngine(ChannelDataEngine *t_cdEngine);
 
 protected slots :
 
@@ -118,26 +120,13 @@ public :
 
   virtual ~ValueTableModel();
 
-//  DmxValue *getRootValue() const{ return m_rootValue; }
-  QModelIndexList getEditedIndexes() const{ return m_editedIndexes; }
-  QList<ChannelData *> getL_channelData() const
-  { return m_L_channelData; }
-
-  void recieveValueFromMouse(const QModelIndex &t_index,
-                             const int t_value);
-
-  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
-  { m_L_channelData = t_L_channelData; }
+//  void recieveValueFromMouse(const QModelIndex &t_index,
+//                             const int t_value);
 
 public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-
-////  void setEditedIndexes(const QModelIndexList &t_editedIndexes);
-////  void addEditedIndex(QModelIndex &t_editedIndexes);
   void onSelectionChanged(QList<id> L_id);
-//  //public because we need this edit widgets
-//  void editedIndexChanged();
 
 protected :
 
@@ -157,36 +146,9 @@ protected :
                      int role) override;
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-  // to show only non 0 values
-//  QVariant filterData(const QModelIndex &index,
-//                      int role) const;
-//  bool setFilterData(const QModelIndex &index,
-//                     const QVariant &value,
-//                     int role);
-
-
-private :
-
-//  LeveledValue *getValueFromIndex(const QModelIndex &t_index) const;
-//  QList<LeveledValue *> getValuesFromIndexList(const QModelIndexList & t_L_index) const;
-//  QModelIndex getIndexFromValue(const LeveledValue *t_value) const;
-//  QModelIndex getIndexFromValueId(const id &t_id) const;
-//  QVariant oldDdata(const QModelIndex &index,
-//                    int role) const;
-//  QVariant showAllData(const QModelIndex &index,
-//                       int role) const;
-//  QVariant showFilteredData(const QModelIndex &index,
-//                            int role) const;
-
-
 protected :
 
   RootValue *m_rootValue;
-
-  QList<ChannelData *> m_L_channelData;
-  QModelIndexList m_editedIndexes;
-
-
 };
 
 /************************* ChannelDelegate ******************************/
@@ -202,10 +164,6 @@ public:
   explicit ChannelDelegate(QObject *parent = nullptr);
 
   RootValue *getRootValue() const{ return m_rootValue; }
-  QList<ChannelData *> getL_channelData() const{ return m_L_channelData; }
-
-  void setL_channelData(const QList<ChannelData *> &t_L_channelData)
-  { m_L_channelData = t_L_channelData; }
 
   // QAbstractItemDelegate interface
   virtual void paint(QPainter *painter,
@@ -214,29 +172,20 @@ public:
   virtual QSize sizeHint(const QStyleOptionViewItem &option,
                          const QModelIndex &index) const override;
 
-  QList<id> getL_directChannelId() const
-  { return m_L_directChannelId; }
-  void setL_directChannelId(const QList<id> &t_L_directChannelId)
-  { m_L_directChannelId = t_L_directChannelId; }
-
   void recieveValueFromMouse(const int t_value);
 
-private :
-
-//  QModelIndex getIndexFromValueId(const id &t_id) const;
+  void setChannelDataEngine(ChannelDataEngine *t_channelDataEngine)
+  { m_channelDataEngine = t_channelDataEngine; }
 
 public slots :
 
   void setRootValue(RootValue *t_rootValue){ m_rootValue = t_rootValue; }
-  void onSelectionChanged(QList<id> L_id);
 
 private :
 
   RootValue *m_rootValue;
 
-  QList<ChannelData *> m_L_channelData;
-  QList<id> m_L_directChannelId;
-
+  ChannelDataEngine *m_channelDataEngine;
 };
 
 #endif // VALUETABLEWIDGET_H
